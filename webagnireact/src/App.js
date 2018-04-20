@@ -138,14 +138,14 @@ class MiniDrawer extends React.Component {
                         >
                             <MenuIcon />
                         </IconButton>
-                        <Typography variant="title" color="inherit" noWrap>
+                        <Typography variant="title" color="inherit" className={classNames(classes.loginButton)} noWrap>
                             (LOGO)
                         </Typography>
-                        <Button
-                            color="inherit"
-                            className={classNames(classes.loginButton)}
-                        >
-                            Login
+                        <Button color="inherit">
+                            Entrar
+                        </Button>
+                        <Button color="inherit">
+                            Registar
                         </Button>
                     </Toolbar>
                 </AppBar>
