@@ -36,8 +36,9 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { mainMenuListItems, logoutItem } from './sideBarData';
-import LoginPage from './Login';
-import {BrowserRouter, Route, Link } from 'react-router-dom';
+import {BrowserRouter, Route, Switch} from 'react-router-dom';
+import Login from './Login';
+import Home from './Home';
 
 const drawerWidth = 240;
 
@@ -179,7 +180,10 @@ class MiniDrawer extends React.Component {
                 </Drawer>
                 <main className={classes.content}>
                     <div className={classes.toolbar} />
-                    <Typography noWrap>{'TO DO'}</Typography>
+                    <Switch>
+                        <Route exact path='/' component={Home}/>
+                        <Route path='/login' component={Login}/>
+                    </Switch>
                 </main>
             </div>
         );
