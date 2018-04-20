@@ -40,6 +40,10 @@ import {Link, Route, Switch} from 'react-router-dom';
 import Login from './Login';
 import Home from './Home';
 
+import LoginPage from './Login';
+import {Redirect } from 'react-router-dom';
+
+
 const drawerWidth = 240;
 
 const styles = theme => ({
@@ -124,8 +128,9 @@ class MiniDrawer extends React.Component {
     };
 
     handleLogin = () => {
+        //{return <Redirect to='/target'>}
+    };
 
-    }
 
     render() {
         const { classes, theme } = this.props;
