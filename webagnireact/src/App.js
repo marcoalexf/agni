@@ -36,7 +36,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { mainMenuListItems, logoutItem } from './sideBarData';
-import {BrowserRouter, Route, Switch} from 'react-router-dom';
+import {Link, Route, Switch} from 'react-router-dom';
 import Login from './Login';
 import Home from './Home';
 
@@ -148,14 +148,14 @@ class MiniDrawer extends React.Component {
                         <Typography variant="title" color="inherit" className={classNames(classes.loginButton)} noWrap>
                             (LOGO)
                         </Typography>
-                        <BrowserRouter>
-                            <Button
-                                color="inherit"
-                                onClick={this.handleLogin}
-                            >
-                                Entrar
-                            </Button>
-                        </BrowserRouter>
+                        <Button
+                            component={Link}
+                            to="/login"
+                            color="inherit"
+                            onClick={this.handleLogin}
+                        >
+                            Entrar
+                        </Button>
                         <Button color="inherit">
                             Registar
                         </Button>
