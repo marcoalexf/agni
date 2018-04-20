@@ -4,8 +4,11 @@ class Home extends Component {
   render() {
     return (
       <div className="Home">
-        Home
+        <div>
+            <img src={require('./img/agniBlue2.png')} width="82%" justifyContent="center" align-items="center" margin="auto"/>
+        </div>
       </div>
+
     );
   }
 }

@@ -1,6 +1,14 @@
 import React, { Component } from 'react';
 import {Link, Route, Switch} from 'react-router-dom';
-import styles from './login.css'
+import styles from './login.css';
+import Button from 'material-ui/Button';
+import LoginIcon from '@material-ui/icons/Send';
+
+const styles2 = theme => ({
+    rightIcon:{
+        marginLeft: theme.spacing.unit,
+    },
+})
 
 class Login extends Component {
     constructor(props) {
@@ -17,10 +25,11 @@ class Login extends Component {
     render() {
         const { loggingIn } = this.props;
         const { username, password, submitted } = this.state;
+        const { classes } = this.props;
 
         return (
             <div id="login" className="center">
-                <h3>Entrar</h3>
+                <h4>Entrar</h4>
                 <form name="form" onSubmit={this.handleSubmit}>
 
                     <div className="input-group">
@@ -44,7 +53,9 @@ class Login extends Component {
                     </div>
 
                     <div className="form-group">
-                        <button className="submit">Login</button>
+                        <Button variant="raised" color="primary">
+                            Entrar <LoginIcon />
+                        </Button>
                         {loggingIn &&
                         <img src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
                         }
