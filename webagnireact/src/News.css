@@ -1,0 +1,15 @@
+
+#news li {
+    list-style: none;
+    border-bottom: solid lightgray 1px;
+    overflow: auto;
+}
+
+.newspic {
+    float: left;
+}
+
+.newspic img {
+    width: 150px;
+    margin: 10px 10px 5px 0px;
+}

@@ -5,7 +5,7 @@ class Home extends Component {
     return (
       <div className="Home">
         <div>
-            <img src={require('./img/agniBlue2.png')} width="82%" justifyContent="center" align-items="center" margin="auto"/>
+            <img src={require('./img/agniBlue2.png')} width="82%"/>
         </div>
       </div>
 

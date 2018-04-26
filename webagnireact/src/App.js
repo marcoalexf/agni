@@ -39,6 +39,9 @@ import { mainMenuListItems, logoutItem } from './sideBarData';
 import {Link, Route, Switch} from 'react-router-dom';
 import Login from './Login';
 import Home from './Home';
+import News from './News';
+import Profile from './Profile';
+import RegistProblem from './RegistProblem';
 
 import LoginPage from './Login';
 import {Redirect } from 'react-router-dom';
@@ -188,6 +191,9 @@ class MiniDrawer extends React.Component {
                     <Switch>
                         <Route exact path='/' component={Home}/>
                         <Route path='/login' component={Login}/>
+                        <Route path='/noticias' component={News}/>
+                        <Route path='/perfil' component={Profile}/>
+                        <Route path='/registarproblema' component={RegistProblem}/>
                     </Switch>
                 </main>
             </div>
