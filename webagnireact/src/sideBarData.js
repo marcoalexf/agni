@@ -9,8 +9,7 @@ import OperationsIcon from '@material-ui/icons/ViewList';
 import MapIcon from '@material-ui/icons/Place';
 import StatsIcon from '@material-ui/icons/Poll';
 import LogoutIcon from '@material-ui/icons/ExitToApp';
-import {Link, Route, Switch} from 'react-router-dom';
-import Button from 'material-ui/Button';
+import {Link} from 'react-router-dom';
 
 export const mainMenuListItems = (
     <div>

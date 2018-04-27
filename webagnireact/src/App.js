@@ -1,25 +1,3 @@
-/*import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
-
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-      </div>
-    );
-  }
-}
-
-export default App;*/
-
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
@@ -37,15 +15,15 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { mainMenuListItems, logoutItem } from './sideBarData';
 import {Link, Route, Switch} from 'react-router-dom';
+import Register from './Register';
 import Login from './Login';
 import Home from './Home';
 import News from './News';
 import Profile from './Profile';
 import RegistProblem from './RegistProblem';
-
-import LoginPage from './Login';
-import {Redirect } from 'react-router-dom';
-
+import Operations from './Operations';
+import Map from './Map';
+import Statistics from './Statistics';
 
 const drawerWidth = 240;
 
@@ -130,11 +108,6 @@ class MiniDrawer extends React.Component {
         this.setState({ open: false });
     };
 
-    handleLogin = () => {
-        //{return <Redirect to='/target'>}
-    };
-
-
     render() {
         const { classes, theme } = this.props;
 
@@ -156,16 +129,11 @@ class MiniDrawer extends React.Component {
                         <Typography variant="title" color="inherit" className={classNames(classes.loginButton)} noWrap>
                             (SLOGAN)
                         </Typography>
-                        <Button
-                            component={Link}
-                            to="/login"
-                            color="inherit"
-                            onClick={this.handleLogin}
-                        >
+                        <Button component={Link} to="/login" color="inherit">
                             Entrar
                         </Button>
-                        <Button color="inherit">
-                            Registar
+                        <Button component={Link} to="/register" color="inherit">
+                            Criar Conta
                         </Button>
                     </Toolbar>
                 </AppBar>
@@ -191,9 +159,13 @@ class MiniDrawer extends React.Component {
                     <Switch>
                         <Route exact path='/' component={Home}/>
                         <Route path='/login' component={Login}/>
+                        <Route path='/register' component={Register}/>
                         <Route path='/noticias' component={News}/>
                         <Route path='/perfil' component={Profile}/>
                         <Route path='/registarproblema' component={RegistProblem}/>
+                        <Route path='/operacoes' component={Operations}/>
+                        <Route path='/mapa' component={Map}/>
+                        <Route path='/estatisticas' component={Statistics}/>
                     </Switch>
                 </main>
             </div>

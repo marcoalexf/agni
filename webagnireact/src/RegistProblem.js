@@ -1,11 +1,11 @@
-import React, { Component } from 'react';
+import React from 'react';
 import TextField from 'material-ui/TextField';
 import IconButton from 'material-ui/IconButton';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import Typography from 'material-ui/Typography';
 import Select from 'material-ui/Select';
-import Input, { InputLabel } from 'material-ui/Input';
+import { InputLabel } from 'material-ui/Input';
 import { MenuItem } from 'material-ui/Menu';
 import Button from 'material-ui/Button';
 import AddIcon from '@material-ui/icons/Add';

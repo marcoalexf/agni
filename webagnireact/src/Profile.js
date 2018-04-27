@@ -1,8 +1,7 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
-import Card, { CardActions, CardContent, CardMedia } from 'material-ui/Card';
-import Button from 'material-ui/Button';
+import Card, { CardContent, CardMedia } from 'material-ui/Card';
 import Typography from 'material-ui/Typography';
 
 const styles = {
@@ -10,16 +9,19 @@ const styles = {
         maxWidth: 345,
     },
     media: {
-        height: 0,
-        paddingTop: '56.25%', // 16:9
+        paddingTop: '100%',
     },
+    centerCard: {
+        display: 'flex',
+        justifyContent: 'center',
+    }
 };
 
 class Profile extends React.Component {
     render() {
         const { classes } = this.props;
         return (
-            <div className="center">
+            <div className={classes.centerCard}>
                 <div>
                     <Card className={classes.card}>
                         <CardMedia
