@@ -12,6 +12,34 @@ import StatsIcon from '@material-ui/icons/Poll';
 import LogoutIcon from '@material-ui/icons/ExitToApp';
 import {Link} from 'react-router-dom';
 
+/*handleLogout = () => {
+    var token = window.localStorage.getItem('token');
+    var uname = JSON.parse(token).username;
+    var tokenID = JSON.parse(token).tokenID;
+
+    var data = {
+        "user": uname,
+        "token": tokenID
+    }
+
+    if(user!= null && token != null){
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open( "POST", "http://localhost:8080/rest/logout");
+        xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        var myJSON = JSON.stringify(data);
+        xmlHttp.send(myJSON);
+
+        xmlHttp.onreadystatechange = function() {
+            if(xmlHttp.readyState == XMLHttpRequest.DONE && xmlHttp.status == 200) {
+                var response = xmlHttp.responseText;
+                console.log("XML response: " + response);
+                window.localStorage.removeItem('token');
+                //document.location.href = 'initialpage.html';
+            }
+        }
+    }
+}*/
+
 export const mainMenuListItems = (
     <div>
         <ListItem component={Link}
@@ -75,4 +103,5 @@ export const logoutItem = (
             <ListItemText primary="Logout" />
         </ListItem>
     </div>
+
 );

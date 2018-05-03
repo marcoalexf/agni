@@ -29,10 +29,44 @@ const styles =  theme => ({
 });
 
 class Profile extends React.Component {
+
+    loadInformations = () =>{
+        var obj;
+        var token = window.localStorage.getItem('token');
+
+        if(token != null){
+            var uname = JSON.parse(token).username;
+
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.open( "GET", "http://localhost:8080/rest/viewprofile/" + uname, true);
+
+            xmlHttp.onload = function() {
+                var response = xmlHttp.response;
+                console.log("XML response: " + response);
+                obj = JSON.parse(response);
+
+                var username = document.getElementById("showusername");
+                username.innerHTML = uname;
+
+                var email = document.getElementById("showemail");
+                email.innerHTML = obj.user_email;
+
+                var role = document.getElementById("showrole");
+                role.innerHTML = obj.user_role;
+            }
+
+            xmlHttp.send(null);
+        }
+
+        else{
+            document.location.href = '/login';
+        }
+    }
+
     render() {
         const { classes } = this.props;
         return (
-            <div>
+            <div onLoad={this.loadInformations}>
                 <Typography variant="display1" className={classes.title}>Perfil</Typography>
 
                 <Paper className={classes.paper} style={{margin: '0 auto'}} >
@@ -44,14 +78,14 @@ class Profile extends React.Component {
 
                     <Card className={classes.card} style={{margin: '0 auto'}}>
                         <CardContent>
-                            <Typography gutterBottom variant="headline" component="h2">
-                                Nome do utilizador
+                            <Typography id="showusername" gutterBottom variant="headline" component="h2">
+
                             </Typography>
                             <Typography component="p">
                                 Informações do utilizador:
                             </Typography>
-                            <Typography component="p">Tipo</Typography>
-                            <Typography component="p">Email</Typography>
+                            <Typography id="showrole" component="p"></Typography>
+                            <Typography id="showemail" component="p"></Typography>
                         </CardContent>
                     </Card>
                 </Paper>

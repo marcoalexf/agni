@@ -11,7 +11,6 @@ import grey from 'material-ui/colors/grey';
 import FaceIcon from '@material-ui/icons/Face';
 import Paper from 'material-ui/Paper';
 import Typography from 'material-ui/Typography';
-import axios from 'axios';
 
 const styles = theme => ({
     textField: {
@@ -52,6 +51,10 @@ const styles = theme => ({
         width: 600,
         padding: 40,
     }),
+    error:{
+        textAlign: 'center',
+        color: 'red',
+    },
 });
 
 class Register extends Component {
@@ -92,18 +95,57 @@ class Register extends Component {
 
     //handleRoleChange = (event, index, value) => this.setState({value});
 
-    handleCreateAccount(){
-        axios.post('http://localhost/rest/register/v4', {
-            username: this.state.username,
-            email: this.state.email,
-            role: this.state.value,
-            password: this.state.password,
-            confirmPass: this.state.confirmPass,
-        }).then(function(response){
-            document.getElementById("errorMessage").innerHTML = "Registo com sucesso";
-        }).catch(function(error){
-            document.getElementById("errorMessage").innerHTML = "Parametros incorretos ou user ja existe";
-        })
+    handleCreateAccount = () => {
+        // axios.post('http://localhost/rest/register/v4', {
+        //     username: this.state.username,
+        //     email: this.state.email,
+        //     role: this.state.value,
+        //     password: this.state.password,
+        //     confirmPass: this.state.confirmPass,
+        // }).then(function(response){
+        //     document.getElementById("errorMessage").innerHTML = "Registo com sucesso";
+        // }).catch(function(error){
+        //     document.getElementById("errorMessage").innerHTML = "Parametros incorretos ou user ja existe";
+        // })
+
+        console.log("CreateAccount");
+        console.log(this.state.username);
+        console.log(this.state.email);
+        console.log(this.state.value);
+        console.log(this.state.password);
+        console.log(this.state.confirmPass);
+
+        var user = {
+            "username": this.state.username,
+            "email": this.state.email,
+            "role": this.state.value,
+            "password": this.state.password,
+            "confirmation": this.state.confirmPass
+        }
+
+        console.log(user);
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open( "POST", 'http://localhost:8080/rest/register/v4');
+        xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        var myJSON = JSON.stringify(user);
+        xmlHttp.send(myJSON);
+        console.log("XML response:" + xmlHttp.responseText);
+
+        xmlHttp.onreadystatechange = function() {//Call a function when the state changes.
+            if(xmlHttp.readyState == XMLHttpRequest.DONE) {
+
+                if(xmlHttp.status == 200){
+                    console.log("Sucesso");
+                    document.getElementById("errorMessage").innerHTML = "";
+                    document.location.href = '/login';
+                }
+
+                else{
+                    document.getElementById("errorMessage").innerHTML = "Parâmetros incorretos ou utilizador já existe";
+                }
+            }
+
+        }
     }
 
 
@@ -118,7 +160,7 @@ class Register extends Component {
                 <h4>Criar Conta</h4>
 
                 <div className="imgcontainer">
-                    <img src={require('./img/registUser2.png')} alt="Avatar2" width={150} heigth={150} />
+                    <img src={require('./img/registUser2.png')} alt="Avatar2" width={100} heigth={100} />
                     <div><Button> <FaceIcon /> Carregar Foto </Button></div>
                 </div>
 
@@ -187,7 +229,7 @@ class Register extends Component {
                         }
                     </div>
 
-                    <Typography id="errorMessage" component="p"></Typography>
+                    <Typography id="errorMessage" className={classes.error} component="p"></Typography>
                 </form>
                 </Paper>
             </div>

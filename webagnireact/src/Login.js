@@ -72,7 +72,7 @@ class Login extends Component {
     };
 
     handleLogin = () => {
-        console.log("handleLogin");
+        console.log("Login");
         console.log(this.state.username);
         console.log(this.state.password);
         // // var resultElement = document.getElementById("errorMessage");
@@ -94,33 +94,40 @@ class Login extends Component {
          var username = this.state.username;
          var password = this.state.password;
         var resultElement = document.getElementById("errorMessage");
+        var informations = localstorage.getItem('token');
 
          var user = {
              "username": username,
              "password": password
          }
 
-         var xmlHttp = new XMLHttpRequest();
-         xmlHttp.open( "POST", "http://localhost:8080/rest/login/v2");
-         xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-         var myJSON = JSON.stringify(user);
-         xmlHttp.send(myJSON);
-         xmlHttp.onreadystatechange = function() {//Call a function when the state changes.
-             if (xmlHttp.readyState == XMLHttpRequest.DONE) {
-                 if(xmlHttp.status == 200){
-                     var response = xmlHttp.responseText;
-                     console.log("XML response: " + response);
-                     localstorage.setItem('token', response);
-                     console.log(localstorage.getItem('token'));
-                     console.log("Welcome");
-                     document.location.href = '/';
-                 }
-                 else{
-                     console.log("User does not exist or password is not correct");
-                     resultElement.innerHTML = "Nome de utilizador ou password incorretas";
+         if(informations == null){
+             var xmlHttp = new XMLHttpRequest();
+             xmlHttp.open( "POST", "http://localhost:8080/rest/login/v2");
+             xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+             var myJSON = JSON.stringify(user);
+             xmlHttp.send(myJSON);
+             xmlHttp.onreadystatechange = function() {//Call a function when the state changes.
+                 if (xmlHttp.readyState == XMLHttpRequest.DONE) {
+                     if(xmlHttp.status == 200){
+                         var response = xmlHttp.responseText;
+                         console.log("XML response: " + response);
+                         localstorage.setItem('token', response);
+                         console.log(localstorage.getItem('token'));
+                         console.log("Welcome");
+                         document.location.href = '/';
+                     }
+                     else{
+                         console.log("User does not exist or password is not correct");
+                         resultElement.innerHTML = "Nome de utilizador ou password incorretas";
+                     }
                  }
              }
          }
+         else{
+             resultElement.innerHTML = "Primeiro faça logout para iniciar sessão";
+         }
+
     }
 
     render() {

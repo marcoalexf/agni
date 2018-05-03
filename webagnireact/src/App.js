@@ -13,6 +13,7 @@ import IconButton from 'material-ui/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import AccountIcon from '@material-ui/icons/AccountCircle';
 import { mainMenuListItems, logoutItem } from './sideBarData';
 import {Link, Route, Switch} from 'react-router-dom';
 import Register from './Register';
@@ -24,6 +25,7 @@ import RegistProblem from './RegistProblem';
 import Operations from './Operations';
 import Map from './Map';
 import Statistics from './Statistics';
+import Menu, { MenuItem } from 'material-ui/Menu';
 import { createMuiTheme } from 'material-ui/styles';
 
 const drawerWidth = 240;
@@ -116,6 +118,7 @@ const styles = theme => ({
 class MiniDrawer extends React.Component {
     state = {
         open: false,
+        anchorEl: null,
     };
 
     handleDrawerOpen = () => {
@@ -126,8 +129,55 @@ class MiniDrawer extends React.Component {
         this.setState({ open: false });
     };
 
+    handleOpenAccount = event => {
+        this.setState({ anchorEl: event.currentTarget });
+    };
+
+    handleCloseMenuAccount = () => {
+        this.setState({ anchorEl: null });
+    };
+
+    handleProfileOption = () => {
+        document.location.href = '/perfil';
+    }
+
+    handleLogout = () => {
+        var token = window.localStorage.getItem('token');
+        var uname = JSON.parse(token).username;
+        var tokenID = JSON.parse(token).tokenID;
+
+        var data = {
+            "user": uname,
+            "token": tokenID
+        }
+
+        if(uname!= null && token != null){
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.open( "POST", "http://localhost:8080/rest/logout");
+            xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            var myJSON = JSON.stringify(data);
+            xmlHttp.send(myJSON);
+
+            xmlHttp.onreadystatechange = function() {
+                if(xmlHttp.readyState == XMLHttpRequest.DONE && xmlHttp.status == 200) {
+                    var response = xmlHttp.responseText;
+                    console.log("XML response: " + response);
+                    window.localStorage.removeItem('token');
+                    console.log("sucesso");
+                    //document.location.href = 'initialpage.html';
+                }
+            }
+        }
+        else{
+            console.log("tempo expirado");
+        }
+    }
+
+
     render() {
         const { classes, theme } = this.props;
+        const { anchorEl } = this.state;
+        const open = Boolean(anchorEl);
 
         return (
             <div className={classes.root}>
@@ -147,6 +197,31 @@ class MiniDrawer extends React.Component {
                         <Typography variant="title" color="inherit" className={classNames(classes.loginButton)} noWrap>
                             (SLOGAN)
                         </Typography>
+                        <IconButton
+                            aria-owns={open ? 'menu-appbar' : null}
+                            aria-haspopup="true"
+                            color="inherit"
+                            onClick={this.handleOpenAccount}>
+                            <AccountIcon/>
+                        </IconButton>
+                        <Menu
+                            id="menu-appbar"
+                            anchorEl={anchorEl}
+                            anchorOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                            }}
+                            transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                            }}
+                            open={open}
+                            onClose={this.handleCloseMenuAccount}
+                        >
+                            <MenuItem onClick={this.handleProfileOption}>Ver Perfil</MenuItem>
+                            <MenuItem onClick={this.handleLogout}>Logout</MenuItem>
+                        </Menu>
+
                         <Button component={Link} to="/login" color="inherit">
                             Entrar
                         </Button>
