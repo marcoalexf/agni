@@ -9,6 +9,9 @@ import {withStyles} from "material-ui/styles/index";
 import blue from 'material-ui/colors/blue';
 import grey from 'material-ui/colors/grey';
 import FaceIcon from '@material-ui/icons/Face';
+import Paper from 'material-ui/Paper';
+import Typography from 'material-ui/Typography';
+import axios from 'axios';
 
 const styles = theme => ({
     textField: {
@@ -45,6 +48,10 @@ const styles = theme => ({
         marginBottom: theme.spacing.unit,
         width: 600,
     },
+    paper:theme.mixins.gutters({
+        width: 600,
+        padding: 40,
+    }),
 });
 
 class Register extends Component {
@@ -85,6 +92,20 @@ class Register extends Component {
 
     //handleRoleChange = (event, index, value) => this.setState({value});
 
+    handleCreateAccount(){
+        axios.post('http://localhost/rest/register/v4', {
+            username: this.state.username,
+            email: this.state.email,
+            role: this.state.value,
+            password: this.state.password,
+            confirmPass: this.state.confirmPass,
+        }).then(function(response){
+            document.getElementById("errorMessage").innerHTML = "Registo com sucesso";
+        }).catch(function(error){
+            document.getElementById("errorMessage").innerHTML = "Parametros incorretos ou user ja existe";
+        })
+    }
+
 
     render() {
         const { loggingIn } = this.props;
@@ -92,7 +113,8 @@ class Register extends Component {
         const { classes } = this.props;
 
         return (
-            <div id="login" className="center">
+            <div id="login">
+                <Paper className={classes.paper} style={{margin: '0 auto', backgroundColor: '#f2f2f2'}} >
                 <h4>Criar Conta</h4>
 
                 <div className="imgcontainer">
@@ -114,7 +136,7 @@ class Register extends Component {
 
                     <div className="input-group">
                         <div className={'form-group' + (submitted && !email ? ' has-error' : '')}>
-                            <TextField id="email" label="Email" className={classes.textField} value={this.state.email}
+                            <TextField id="email" label="Email" type="email" className={classes.textField} value={this.state.email}
                                        onChange={this.handleEmailChange('email')}/>
                             {submitted && !email &&
                             <div className="help-block">Email is required</div>
@@ -157,14 +179,17 @@ class Register extends Component {
                                 color="primary" className={classes.leftButton}>
                             Entrar
                         </Button>
-                        <Button variant="raised" className={classes.button}>
+                        <Button variant="raised" color={"primary"} className={classes.button} onClick={this.handleCreateAccount}>
                             Criar Conta
                         </Button>
                         {loggingIn &&
                         <img alt={"dono"} src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
                         }
                     </div>
+
+                    <Typography id="errorMessage" component="p"></Typography>
                 </form>
+                </Paper>
             </div>
         );
     }

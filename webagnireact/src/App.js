@@ -24,8 +24,26 @@ import RegistProblem from './RegistProblem';
 import Operations from './Operations';
 import Map from './Map';
 import Statistics from './Statistics';
+import { createMuiTheme } from 'material-ui/styles';
 
 const drawerWidth = 240;
+
+const theme = createMuiTheme({
+    palette: {
+        primary: {
+            light: '#757ce8',
+            main: '#3f50b5',
+            dark: '#002884',
+            contrastText: '#fff',
+        },
+        secondary: {
+            light: '#ff7961',
+            main: '#f44336',
+            dark: '#ba000d',
+            contrastText: '#000',
+        },
+    },
+});
 
 const styles = theme => ({
     root: {
@@ -149,6 +167,7 @@ class MiniDrawer extends React.Component {
                             {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
                         </IconButton>
                     </div>
+
                     <Divider />
                     <List>{mainMenuListItems}</List>
                     <Divider />

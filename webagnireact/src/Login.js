@@ -6,6 +6,9 @@ import TextField from 'material-ui/TextField';
 import {withStyles} from "material-ui/styles/index";
 import blue from 'material-ui/colors/blue';
 import grey from 'material-ui/colors/grey';
+import Paper from 'material-ui/Paper';
+import Typography from 'material-ui/Typography';
+import axios from "axios/index";
 
 const styles = theme => ({
     textField: {
@@ -33,13 +36,23 @@ const styles = theme => ({
         //overflow: 'hidden',
         //position: 'relative',
         display: 'flex',
-    }
+    },
+    paper:theme.mixins.gutters({
+        rounded: true,
+        //margin: auto,
+        width: 600,
+        //border-radius: 5,
+        padding: 40,
+    }),
+    error:{
+        textAlign: 'center',
+        color: 'red',
+    },
 });
 
 class Login extends Component {
     constructor(props) {
         super(props)
-
 
         this.state = {
             username: '',
@@ -58,14 +71,67 @@ class Login extends Component {
         this.setState({ [prop]: event.target.value });
     };
 
+    handleLogin = () => {
+        console.log("handleLogin");
+        console.log(this.state.username);
+        console.log(this.state.password);
+        // // var resultElement = document.getElementById("errorMessage");
+        // // var config = {
+        // //     headers: {"Content-Type": "application/json;charset=UTF-8"}
+        // // }
+        // //
+        // // axios.post('http://localhost/rest/login/v2', {
+        // //     username: this.state.username,
+        // //     password: this.state.password,
+        // // }, config).then(function(response){
+        // //     //resultElement.innerHTML = "Bem vindo a app";
+        // //     console.log("deu");
+        // // }).catch(function(error){
+        // //     //resultElement.innerHTML = "User nao existe ou Password Incorreta";
+        // //     console.log("nao deu");
+        // // })
+         var localstorage = window.localStorage;
+         var username = this.state.username;
+         var password = this.state.password;
+        var resultElement = document.getElementById("errorMessage");
+
+         var user = {
+             "username": username,
+             "password": password
+         }
+
+         var xmlHttp = new XMLHttpRequest();
+         xmlHttp.open( "POST", "http://localhost:8080/rest/login/v2");
+         xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+         var myJSON = JSON.stringify(user);
+         xmlHttp.send(myJSON);
+         xmlHttp.onreadystatechange = function() {//Call a function when the state changes.
+             if (xmlHttp.readyState == XMLHttpRequest.DONE) {
+                 if(xmlHttp.status == 200){
+                     var response = xmlHttp.responseText;
+                     console.log("XML response: " + response);
+                     localstorage.setItem('token', response);
+                     console.log(localstorage.getItem('token'));
+                     console.log("Welcome");
+                     document.location.href = '/';
+                 }
+                 else{
+                     console.log("User does not exist or password is not correct");
+                     resultElement.innerHTML = "Nome de utilizador ou password incorretas";
+                 }
+             }
+         }
+    }
 
     render() {
+        const {theme} = this.props;
         const { loggingIn } = this.props;
         const { username, password, submitted } = this.state;
         const { classes } = this.props;
 
         return (
-            <div id="login" className="center">
+            <div id="login">
+                <Paper className={classes.paper} style={{margin: '0 auto', backgroundColor: '#f2f2f2'}} >
                 <h4>Entrar</h4>
 
                 <div className="imgcontainer">
@@ -96,18 +162,20 @@ class Login extends Component {
 
                     <div className={classes.buttons}>
                         <Button component={Link}
-                                to="/login"
+                                to="/register"
                                 color="primary" className={classes.leftButton}>
                             Criar conta
                         </Button>
-                        {<Button variant="raised" className={classes.button}>
+                        <Button variant="raised" color={"primary"} className={classes.button} onClick={this.handleLogin}>
                             Entrar
-                        </Button>}
+                        </Button>
                         {loggingIn &&
                         <img alt={"dono"} src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
                         }
                     </div>
+                    <div id="errorMessage" className={classes.error}></div>
                 </form>
+                </Paper>
             </div>
         );
     }

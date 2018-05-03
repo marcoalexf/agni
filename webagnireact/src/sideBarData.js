@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
+import HomeIcon from '@material-ui/icons/Home';
 import NewsIcon from '@material-ui/icons/Public';
 import ProfileIcon from '@material-ui/icons/PermIdentity';
 import RegistPIcon from '@material-ui/icons/NoteAdd';
@@ -13,6 +14,13 @@ import {Link} from 'react-router-dom';
 
 export const mainMenuListItems = (
     <div>
+        <ListItem component={Link}
+                  to="/">
+            <ListItemIcon>
+                <HomeIcon />
+            </ListItemIcon>
+            <ListItemText primary="Página Inicial" />
+        </ListItem>
         <ListItem component={Link}
                   to="/noticias">
             <ListItemIcon>

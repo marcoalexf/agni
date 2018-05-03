@@ -1,16 +1,103 @@
 import React, { Component } from 'react';
+import Paper from 'material-ui/Paper';
+import Typography from 'material-ui/Typography';
+import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table';
+import GridList, { GridListTile, GridListTileBar } from 'material-ui/GridList';
+import Subheader from 'material-ui/List/ListSubheader';
+import IconButton from 'material-ui/IconButton';
+import StarBorderIcon from '@material-ui/icons/StarBorder';
+import InfoIcon from '@material-ui/icons/Info';
+import appProgressData from './appProgressData';
+import {Link} from 'react-router-dom';
+import {withStyles} from "material-ui/styles/index";
+import newsData from './newsData';
+
+const styles = theme => ({
+    paper:theme.mixins.gutters({
+        width: 600,
+        padding: 40,
+        margin: 20,
+        display: 'inline-block',
+    }),
+    table: {
+
+    },
+});
 
 class Home extends Component {
-  render() {
-    return (
-      <div className="Home">
-        <div>
-            <img src={require('./img/agniBlue2.png')} alt="agni" width="82%"/>
-        </div>
-      </div>
+    constructor(props) {
+        super(props)
+    }
+    render() {
+        const { classes } = this.props;
 
-    );
-  }
+        return (
+          <div className="Home">
+
+              <Paper className={classes.paper} style={{backgroundColor: '#f2f2f2'}} >
+                  <Typography variant="display1">Progressao da App</Typography>
+                  <Table className={classes.table}>
+                      <TableHead>
+                          <TableRow>
+                              <TableCell>Titulo</TableCell>
+                              <TableCell>Data</TableCell>
+                          </TableRow>
+                      </TableHead>
+                      <TableBody>
+                          {appProgressData.map(n => {
+                              return (
+                                  <TableRow key={n.name}>
+                                      <TableCell>{n.name}</TableCell>
+                                      <TableCell>{n.date}</TableCell>
+                                  </TableRow>
+                              );
+                          })}
+                      </TableBody>
+                  </Table>
+              </Paper>
+
+              <Paper className={classes.paper} style={{backgroundColor: '#f2f2f2'}} >
+                  <Typography variant="display1">Estatisticas de ocorrências</Typography>
+              </Paper>
+
+              <Paper className={classes.paper} style={{backgroundColor: '#f2f2f2'}} >
+                  <Typography variant="display1" component={Link} to="/noticias">Noticias</Typography>
+                  <GridList cellHeight={180} className={classes.gridList}>
+                      <GridListTile key="Subheader" cols={2} style={{ height: 'auto' }}>
+                          <Subheader component="div">Abril</Subheader>
+                      </GridListTile>
+                      {newsData.map(news => (
+                          <GridListTile key={news.img}>
+                              <img src={news.img} alt={news.title} />
+                              <GridListTileBar
+                                  title=''
+                                  titlePosition="top"
+                                  actionIcon={
+                                      <IconButton className={classes.iconStar}>
+                                          <StarBorderIcon />
+                                      </IconButton>
+                                  }
+                                  actionPosition="left"
+                                  className={classes.titleBar}
+                              />
+                              <GridListTileBar
+                                  title={news.title}
+                                  subtitle={<span>by: {news.author}</span>}
+                                  actionIcon={
+                                      <IconButton className={classes.icon}>
+                                          <InfoIcon />
+                                      </IconButton>
+                                  }
+                              />
+                          </GridListTile>
+                      ))}
+                  </GridList>
+              </Paper>
+
+          </div>
+
+        );
+    }
 }
 
-export default Home;
+export default withStyles(styles)(Home);

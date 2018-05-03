@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Typography from 'material-ui/Typography';
 import { withStyles } from 'material-ui/styles';
 import GridList, { GridListTile, GridListTileBar } from 'material-ui/GridList';
 import Subheader from 'material-ui/List/ListSubheader';
@@ -9,6 +10,9 @@ import InfoIcon from '@material-ui/icons/Info';
 import newsData from './newsData';
 
 const styles = theme => ({
+    title:{
+      margin:20,
+    },
     root: {
         display: 'flex',
         flexWrap: 'wrap',
@@ -39,6 +43,9 @@ class News extends React.Component {
         const { classes } = this.props;
 
         return(
+            <div>
+                <Typography variant="display1" className={classes.title}>Noticias</Typography>
+
             <div className={classes.root}>
                 <GridList cellHeight={180} className={classes.gridList}>
                     <GridListTile key="Subheader" cols={2} style={{ height: 'auto' }}>
@@ -70,6 +77,7 @@ class News extends React.Component {
                         </GridListTile>
                     ))}
                 </GridList>
+            </div>
             </div>
         );
     }

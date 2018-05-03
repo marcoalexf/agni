@@ -1,0 +1,55 @@
+POST http://localhost:8080/rest/login/v2
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{     "username":"margarida",     "password":"pass9" }
+
+<> 2018-05-03T013624.200.json
+
+###
+
+POST http://localhost:8080/rest/login/v2
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{     "username":"margarida"     "password":"pass9" }
+
+<> 2018-05-03T013612.400.txt
+
+###
+
+POST http://localhost:8080/rest/login/v2
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{     "username":"margarida"     "password":"pass9" }
+
+<> 2018-05-03T013540.400.txt
+
+###
+
+POST http://localhost:8080/rest/login/v2
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{     "username":"margarida"     "password":"pass9" }
+
+<> 2018-05-03T013539-1.400.txt
+
+###
+
+POST http://localhost:8080/rest/login/v2
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{     "username":"margarida"     "password":"pass9" }
+
+<> 2018-05-03T013539.400.txt
+
+###
+

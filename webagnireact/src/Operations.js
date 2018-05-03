@@ -1,12 +1,16 @@
 import React, { Component } from 'react';
 import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table';
 import operationsData from './operationsData';
+import Typography from 'material-ui/Typography';
 import InfoIcon from '@material-ui/icons/Info';
 import IconButton from 'material-ui/IconButton';
 import PropTypes from 'prop-types';
 import {withStyles} from "material-ui/styles/index";
 
 const styles = theme => ({
+    title:{
+        margin:20,
+    },
     root: {
         width: '100%',
         marginTop: theme.spacing.unit * 3,
@@ -22,6 +26,9 @@ class Operations extends React.Component {
         const { classes } = this.props;
 
         return (
+            <div>
+            <Typography variant="display1" className={classes.title}>Operacoes</Typography>
+
             <Table className={classes.table}>
                 <TableHead>
                     <TableRow>
@@ -50,6 +57,7 @@ class Operations extends React.Component {
                     })}
                 </TableBody>
             </Table>
+            </div>
         );
     }
 }

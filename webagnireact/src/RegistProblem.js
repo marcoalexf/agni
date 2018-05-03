@@ -10,6 +10,12 @@ import { MenuItem } from 'material-ui/Menu';
 import Button from 'material-ui/Button';
 import AddIcon from '@material-ui/icons/Add';
 
+const styles =  theme => ({
+    title:{
+        margin:20,
+    },
+});
+
 class RegistProblem extends React.Component {
 
     state = {
@@ -39,8 +45,11 @@ class RegistProblem extends React.Component {
     };
 
     render(){
+        const { classes } = this.props;
         return(
             <div>
+                <Typography variant="display1">Registar Problema</Typography>
+
                 <div id="registername">
                     <TextField
                         id="name"
