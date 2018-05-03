@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import Drawer from 'material-ui/Drawer';
 import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
+import { Manager, Target, Popper } from 'react-popper';
 import Button from 'material-ui/Button';
 import List from 'material-ui/List';
 import Typography from 'material-ui/Typography';
@@ -14,6 +15,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import AccountIcon from '@material-ui/icons/AccountCircle';
+import LogoutIcon from '@material-ui/icons/ExitToApp';
 import { mainMenuListItems, logoutItem } from './sideBarData';
 import {Link, Route, Switch} from 'react-router-dom';
 import Register from './Register';
@@ -25,7 +27,10 @@ import RegistProblem from './RegistProblem';
 import Operations from './Operations';
 import Map from './Map';
 import Statistics from './Statistics';
-import Menu, { MenuItem } from 'material-ui/Menu';
+import ClickAwayListener from 'material-ui/utils/ClickAwayListener';
+import Grow from 'material-ui/transitions/Grow';
+import Paper from 'material-ui/Paper';
+import { MenuItem, MenuList } from 'material-ui/Menu';
 import { createMuiTheme } from 'material-ui/styles';
 
 const drawerWidth = 240;
@@ -113,12 +118,18 @@ const styles = theme => ({
         backgroundColor: theme.palette.background.default,
         padding: theme.spacing.unit * 3,
     },
+    account: {
+        width: 400,
+    },
+    popperClose: {
+        pointerEvents: 'none',
+    },
 });
 
 class MiniDrawer extends React.Component {
     state = {
         open: false,
-        anchorEl: null,
+        accountOpen: false,
     };
 
     handleDrawerOpen = () => {
@@ -133,41 +144,53 @@ class MiniDrawer extends React.Component {
         this.setState({ anchorEl: event.currentTarget });
     };
 
-    handleCloseMenuAccount = () => {
-        this.setState({ anchorEl: null });
-    };
-
     handleProfileOption = () => {
         document.location.href = '/perfil';
     }
 
-    handleLogout = () => {
-        var token = window.localStorage.getItem('token');
-        var uname = JSON.parse(token).username;
-        var tokenID = JSON.parse(token).tokenID;
+    handleToggle = () => {
+        this.setState({ accountOpen: !this.state.accountOpen });
+    };
 
-        var data = {
-            "user": uname,
-            "token": tokenID
+    handleClose = event => {
+        if (this.target1.contains(event.target)) {
+            return;
         }
 
-        if(uname!= null && token != null){
-            var xmlHttp = new XMLHttpRequest();
-            xmlHttp.open( "POST", "http://localhost:8080/rest/logout");
-            xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            var myJSON = JSON.stringify(data);
-            xmlHttp.send(myJSON);
+        this.setState({ accountOpen: false });
+    };
 
-            xmlHttp.onreadystatechange = function() {
-                if(xmlHttp.readyState == XMLHttpRequest.DONE && xmlHttp.status == 200) {
-                    var response = xmlHttp.responseText;
-                    console.log("XML response: " + response);
-                    window.localStorage.removeItem('token');
-                    console.log("sucesso");
-                    //document.location.href = 'initialpage.html';
+    handleLogout = () => {
+        var token = window.localStorage.getItem('token');
+
+        if(token != null){
+            var uname = JSON.parse(token).username;
+            var tokenID = JSON.parse(token).tokenID;
+
+            var data = {
+                "user": uname,
+                "token": tokenID
+            }
+
+            if(uname!= null){
+                var xmlHttp = new XMLHttpRequest();
+                xmlHttp.open( "POST", "http://localhost:8080/rest/logout");
+                xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+                var myJSON = JSON.stringify(data);
+                xmlHttp.send(myJSON);
+
+                xmlHttp.onreadystatechange = function() {
+                    if(xmlHttp.readyState == XMLHttpRequest.DONE && xmlHttp.status == 200) {
+                        var response = xmlHttp.responseText;
+                        console.log("XML response: " + response);
+                        window.localStorage.removeItem('token');
+                        console.log("sucesso");
+                        //document.location.href = 'initialpage.html';
+                    }
                 }
             }
         }
+
         else{
             console.log("tempo expirado");
         }
@@ -176,8 +199,7 @@ class MiniDrawer extends React.Component {
 
     render() {
         const { classes, theme } = this.props;
-        const { anchorEl } = this.state;
-        const open = Boolean(anchorEl);
+        const { accountOpen } = this.state;
 
         return (
             <div className={classes.root}>
@@ -197,30 +219,40 @@ class MiniDrawer extends React.Component {
                         <Typography variant="title" color="inherit" className={classNames(classes.loginButton)} noWrap>
                             (SLOGAN)
                         </Typography>
-                        <IconButton
-                            aria-owns={open ? 'menu-appbar' : null}
-                            aria-haspopup="true"
-                            color="inherit"
-                            onClick={this.handleOpenAccount}>
-                            <AccountIcon/>
-                        </IconButton>
-                        <Menu
-                            id="menu-appbar"
-                            anchorEl={anchorEl}
-                            anchorOrigin={{
-                                vertical: 'top',
-                                horizontal: 'right',
-                            }}
-                            transformOrigin={{
-                                vertical: 'top',
-                                horizontal: 'right',
-                            }}
-                            open={open}
-                            onClose={this.handleCloseMenuAccount}
-                        >
-                            <MenuItem onClick={this.handleProfileOption}>Ver Perfil</MenuItem>
-                            <MenuItem onClick={this.handleLogout}>Logout</MenuItem>
-                        </Menu>
+
+                        <Manager>
+                            <Target>
+                                <div
+                                    ref={node => {
+                                        this.target1 = node;
+                                    }}
+                                >
+                                    <IconButton
+                                        aria-owns={accountOpen ? 'menu-list-grow' : null}
+                                        aria-haspopup="true"
+                                        color="inherit"
+                                        onClick={this.handleToggle}>
+                                        <AccountIcon/>
+                                    </IconButton>
+                                </div>
+                            </Target>
+                            <Popper
+                                placement="bottom-start"
+                                eventsEnabled={accountOpen}
+                                className={classNames({ [classes.popperClose]: !accountOpen })}
+                            >
+                                <ClickAwayListener onClickAway={this.handleClose}>
+                                    <Grow in={accountOpen} id="menu-list-grow" style={{ transformOrigin: '0 0 0' }}>
+                                        <Paper>
+                                            <MenuList role="menu">
+                                                <MenuItem onClick={this.handleProfileOption}>Perfil</MenuItem>
+                                                <MenuItem onClick={this.handleLogout}><LogoutIcon/>Sair</MenuItem>
+                                            </MenuList>
+                                        </Paper>
+                                    </Grow>
+                                </ClickAwayListener>
+                            </Popper>
+                        </Manager>
 
                         <Button component={Link} to="/login" color="inherit">
                             Entrar
@@ -273,4 +305,3 @@ MiniDrawer.propTypes = {
 };
 
 export default withStyles(styles, { withTheme: true })(MiniDrawer);
-

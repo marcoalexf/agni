@@ -23,9 +23,13 @@ const styles =  theme => ({
         justifyContent: 'center',
     },
     paper:theme.mixins.gutters({
-        width: 600,
+        width: 800,
         padding: 40,
     }),
+    editProfile:{
+        marginRigth: 200,
+        justifyContent: 'rigth',
+    }
 });
 
 class Profile extends React.Component {
@@ -71,10 +75,11 @@ class Profile extends React.Component {
 
                 <Paper className={classes.paper} style={{margin: '0 auto'}} >
 
-                    <div><Button style={{margin: 'left'}}> <ProfileIcon /> Editar Perfil </Button></div>
-                    <div className="imgcontainer">
-                        <img src={require('./img/user.png')} alt="Avatar" style={{margin: '0 auto'}}/>
-                    </div>
+                    <Button className={classes.editProfile}
+                        //style={{margin: 'left'}}
+                    > <ProfileIcon /> Editar Perfil </Button>
+
+                    <img src={require('./img/user.png')} alt="Avatar" style={{margin: '0 auto'}}/>
 
                     <Card className={classes.card} style={{margin: '0 auto'}}>
                         <CardContent>
