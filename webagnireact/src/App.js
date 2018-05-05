@@ -185,7 +185,7 @@ class MiniDrawer extends React.Component {
                         console.log("XML response: " + response);
                         window.localStorage.removeItem('token');
                         console.log("sucesso");
-                        //document.location.href = 'initialpage.html';
+                        document.location.href = '/login';
                     }
                 }
             }
@@ -217,7 +217,7 @@ class MiniDrawer extends React.Component {
                             <MenuIcon />
                         </IconButton>
                         <Typography variant="title" color="inherit" className={classNames(classes.loginButton)} noWrap>
-                            (SLOGAN)
+                            (Slogan)
                         </Typography>
 
                         <Manager>
@@ -246,7 +246,7 @@ class MiniDrawer extends React.Component {
                                         <Paper>
                                             <MenuList role="menu">
                                                 <MenuItem onClick={this.handleProfileOption}>Perfil</MenuItem>
-                                                <MenuItem onClick={this.handleLogout}><LogoutIcon/>Sair</MenuItem>
+                                                <MenuItem onClick={this.handleLogout}><LogoutIcon/>Terminar Sessao</MenuItem>
                                             </MenuList>
                                         </Paper>
                                     </Grow>
