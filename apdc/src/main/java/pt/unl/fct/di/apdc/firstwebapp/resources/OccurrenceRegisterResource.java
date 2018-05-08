@@ -49,6 +49,8 @@ public class OccurrenceRegisterResource {
 			occurrenceEntity.setProperty("user_occurrence_type", data.type);
 			occurrenceEntity.setProperty("user_occurrence_level", data.level);
 			occurrenceEntity.setProperty("user_occurrence_visibility", data.visibility);
+			occurrenceEntity.setProperty("user_occurrence_lat", data.lat);
+			occurrenceEntity.setProperty("user_occurrence_lon", data.lon);
 			// TODO occurrenceEntity.setProperty("user_occurrence_media", ????);
 			datastore.put(occurrenceEntity);
 			
