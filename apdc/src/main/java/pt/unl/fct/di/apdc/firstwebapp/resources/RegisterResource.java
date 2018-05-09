@@ -55,14 +55,9 @@ public class RegisterResource {
 			user.setProperty("user_email", data.email);
 			user.setUnindexedProperty("user_creation_time", new Date());
 			user.setProperty("user_role", data.role);
-			user.setProperty("user_cellphone", data.cellphone);
-			user.setProperty("user_telephone", data.telephone);
-			user.setProperty("user_address", data.address);
-			user.setProperty("user_address_extra", data.addressExtra);
-			user.setProperty("user_address_city", data.addressCity);
-			user.setProperty("user_address_postal_code", data.addressPostalCode);
-			user.setUnindexedProperty("user_nif", data.nif);
-			user.setUnindexedProperty("user_cc", data.cc);
+			user.setProperty("user_district", data.district);
+			user.setProperty("user_county", data.county);
+			user.setProperty("user_locality", data.locality);
 			datastore.put(txn,user);
 			LOG.info("User registered " + data.username);
 			txn.commit();
