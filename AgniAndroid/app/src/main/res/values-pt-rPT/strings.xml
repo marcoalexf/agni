@@ -17,6 +17,7 @@
     <string name="action_register">Registar</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_user_type">Tipo de utilizador</string>
+    <string name="prompt_name">Nome</string>
     <string-array name="user_types">
         <item>Civil</item>
         <item>Funcionário</item>

@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.Serializable;
 
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements Serializable{
     TextView tokenID;
     @BindView(R.id.login_button)
     Button login_button;
+    @BindView(R.id.register_button) Button register_button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +45,13 @@ public class MainActivity extends AppCompatActivity implements Serializable{
         this.login_button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 loginUser(username_input.getText().toString(), password_input.getText().toString());
+            }
+        });
+
+        this.register_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                registerUser();
             }
         });
     }
@@ -63,8 +72,12 @@ public class MainActivity extends AppCompatActivity implements Serializable{
         call.enqueue(new Callback<LoginResponse>() {
             @Override
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
-                if(response.code() == 200)
+                if (response.code() == 200)
                     launchActivity(response.body());
+                else {
+                    Toast toast = Toast.makeText(getApplicationContext(), "Login Failed", Toast.LENGTH_SHORT);
+                    toast.show();
+                }
             }
 
             @Override
@@ -78,6 +91,11 @@ public class MainActivity extends AppCompatActivity implements Serializable{
     public void launchActivity(LoginResponse response){
         Intent intent = new Intent(this, HomePage.class);
         intent.putExtra(RESPONSE, response);
+        startActivity(intent);
+    }
+
+    public void registerUser(){
+        Intent intent = new Intent(this, RegisterActivity.class);
         startActivity(intent);
     }
 }

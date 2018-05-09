@@ -23,6 +23,8 @@ import butterknife.ButterKnife;
 public class HomePage extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, Serializable {
 
+    String username, name, email, type;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +58,7 @@ public class HomePage extends AppCompatActivity
         TextView header_username = header.findViewById(R.id.header_username);
         header_username.setText(response.getUsername());
 
+        this.username = response.getUsername();
     }
 
     @Override
@@ -100,6 +103,13 @@ public class HomePage extends AppCompatActivity
             setTitle("Profile");
             ProfileFragment profile = new ProfileFragment();
             FragmentManager fman = getSupportFragmentManager();
+
+            Bundle args = new Bundle();
+            args.putString("username", username);
+            //args.putString("name", name);
+            //args.putString("type", type);
+            //args.putString("email", email);
+            profile.setArguments(args);
 
             fman.beginTransaction().replace(R.id.fragment, profile).commit();
         } else if (id == R.id.nav_occurencies) {

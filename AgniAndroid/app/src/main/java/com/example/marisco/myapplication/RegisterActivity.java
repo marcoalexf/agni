@@ -19,6 +19,7 @@ import android.widget.Spinner;
 import java.io.Serializable;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -29,45 +30,41 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
 
 
     public static final String RESPONSE = "com.example.marisco.myapplication.RESPONSE";
+    private static final String REGISTER_ENDPOINT = "";
     private View mProgressView;
     private View mRegisterFormView;
     Retrofit retrofit;
 
-    @BindView(R.id.username_input)
-    EditText username_input;
-    @BindView(R.id.email)
-    EditText email_input;
-    @BindView(R.id.password_input)
-    EditText password_input;
-    @BindView(R.id.passwordConf)
-    EditText password_confirmation;
-    @BindView(R.id.register_button)
-    Button register_button;
-    @BindView(R.id.spinner_user_type)
-    Spinner spinner_user_type;
+    @BindView(R.id.name) EditText name_input;
+    @BindView(R.id.username) EditText username_input;
+    @BindView(R.id.email) EditText email_input;
+    @BindView(R.id.password) EditText password_input;
+    @BindView(R.id.passwordConf) EditText password_confirmation;
+    @BindView(R.id.register_button) Button register_button;
+    @BindView(R.id.spinner_user_type) Spinner spinner_user_type;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+        ButterKnife.bind(this);
         // Set up the register form.
        // populateAutoComplete();
-
         register_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 attemptRegister();
             }
         });
-
+/*
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.user_types, android.R.layout.simple_spinner_item);
         // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
-        spinner_user_type.setAdapter(adapter);
+        spinner_user_type.setAdapter(adapter);*/
     }
 
     /*private void populateAutoComplete() {
@@ -79,6 +76,7 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
      */
     private void attemptRegister() {
         AutoCompleteTextView mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+        EditText mNameView = (EditText) findViewById(R.id.name);
         EditText mUsernameView = (EditText) findViewById(R.id.username);
         EditText mPasswordView = (EditText) findViewById(R.id.password);
         EditText mPasswordConfView = (EditText) findViewById(R.id.passwordConf);
@@ -88,8 +86,10 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
         mPasswordView.setError(null);
         mPasswordConfView.setError(null);
         mUsernameView.setError(null);
+        mNameView.setError(null);
 
-        // Store values at the time of the login attempt.
+        String name = name_input.getText().toString();
+        String username = username_input.getText().toString();
         String email = email_input.getText().toString();
         String password = password_input.getText().toString();
         String passwordConf = password_confirmation.getText().toString();
@@ -97,24 +97,36 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
         boolean cancel = false;
         View focusView = null;
 
+        if(TextUtils.isEmpty(name) && !cancel){
+            mNameView.setError(getString(R.string.error_field_required));
+            focusView = mNameView;
+            cancel = true;
+        }
+
+        if(TextUtils.isEmpty(username) && !cancel){
+            mUsernameView.setError(getString(R.string.error_field_required));
+            focusView = mUsernameView;
+            cancel = true;
+        }
+
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)){
+        if (!TextUtils.isEmpty(password) && !isPasswordValid(password) && !cancel){
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
         }
-        if(!password.equals(passwordConf)){
+        if(!password.equals(passwordConf) && !cancel){
             mPasswordView.setError(getString(R.string.error_password_does_not_match));
             focusView = mPasswordView;
             cancel = true;
         }
 
         // Check for a valid email address.
-        if (TextUtils.isEmpty(email)) {
+        if (TextUtils.isEmpty(email) && !cancel) {
             mEmailView.setError(getString(R.string.error_field_required));
             focusView = mEmailView;
             cancel = true;
-        } else if (!isEmailValid(email)) {
+        } else if (!isEmailValid(email) && !cancel) {
             mEmailView.setError(getString(R.string.error_invalid_email));
             focusView = mEmailView;
             cancel = true;
@@ -127,7 +139,7 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            showProgress(true);
+            //showProgress(true);
             registerUser();
         }
     }
@@ -179,26 +191,28 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
     }
 
     private void registerUser(){
+        String name = name_input.getText().toString();
         String username = username_input.getText().toString();
         String email = email_input.getText().toString();
         String password = password_input.getText().toString();
-        String user_type = spinner_user_type.getSelectedItem().toString();
+        String role = spinner_user_type.getSelectedItem().toString();
+
         if (retrofit == null) {
             retrofit = new Retrofit.Builder()
-                    .baseUrl("https://blissful-land-196114.appspot.com/rest/")
+                    .baseUrl(REGISTER_ENDPOINT)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }
 
         AgniAPI agniAPI = retrofit.create(AgniAPI.class);
 
-        Call<LoginResponse> call = agniAPI.registerUser(new UserRegister(username, password, email, user_type));
+        Call<LoginResponse> call = agniAPI.registerUser(new UserRegister(name, username, password, email, role));
 
         call.enqueue(new Callback<LoginResponse>() {
             @Override
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                 if(response.code() == 200)
-                    launchActivity(response.body());
+                    finish();
             }
 
             @Override
@@ -207,11 +221,4 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
             }
         });
     }
-
-    public void launchActivity(LoginResponse response){
-        Intent intent = new Intent(this, HomePage.class);
-        intent.putExtra(RESPONSE, response);
-        startActivity(intent);
-    }
-
 }

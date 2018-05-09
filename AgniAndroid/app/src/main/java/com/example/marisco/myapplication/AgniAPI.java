@@ -14,5 +14,4 @@ public interface AgniAPI {
     @POST("register")
     Call<LoginResponse> registerUser(@Body UserRegister user);
 
-
 }

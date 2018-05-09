@@ -18,6 +18,9 @@
         completions."
     </string>
 
+    <string name="prompt_name">Name</string>
+    <string name="prompt_username">Username</string>
+
     <string name="title_activity_home_page">HomePage</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
