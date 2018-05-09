@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<datastore-indexes autoGenerate="true">
-	<datastore-index kind="UserLog" ancestor="true" source="manual">
-		<property name="user_login_time" direction="desc" />
-		<property name="user_login_ip" direction="asc" />
-	</datastore-index>
-</datastore-indexes>

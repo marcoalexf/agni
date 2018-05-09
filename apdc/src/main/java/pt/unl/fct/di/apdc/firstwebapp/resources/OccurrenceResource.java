@@ -105,7 +105,7 @@ public class OccurrenceResource {
 		}
 	}**/
 	
-	@POST
+	/**@POST
 	@Path("/list")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response listOccurrences(ListOccurrenceData data) {
@@ -138,6 +138,6 @@ public class OccurrenceResource {
 				txn.rollback();
 			}
 		}
-	}
+	}**/
 
 }
