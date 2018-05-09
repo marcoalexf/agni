@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Agni</string>
+    <string name="prompt_username">Nome de utilizador</string>
+    <string name="prompt_password">Palavra-passe</string>
+    <string name="prompt_password_conf">Confirmação da password</string>
+    <string name="error_invalid_email">Email inválido</string>
+    <string name="error_invalid_password">Palavra-passe demasiado curta</string>
+    <string name="error_incorrect_password">Palavra-passe incorreta</string>
+    <string name="error_password_does_not_match">A password não é igual à confirmação da
+    password</string>
+    <string name="error_field_required">Campo obrigatório</string>
+    <string name="permission_rationale">É necessário acesso aos contactos para completar sugestões
+        de e-mail</string>
+    <string name="action_sign_in">Entrar</string>
+    <string name="action_sign_in_short">Entrar</string>
+    <string name="action_register">Registar</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_user_type">Tipo de utilizador</string>
+    <string-array name="user_types">
+        <item>Civil</item>
+        <item>Funcionário</item>
+        <item>Bombeiro</item>
+    </string-array>
+</resources>
