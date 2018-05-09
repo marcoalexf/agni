@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements Serializable{
 
         if (retrofit == null) {
             retrofit = new Retrofit.Builder()
-                    .baseUrl("https://blissful-land-196114.appspot.com/rest/")
+                    .baseUrl("https://liquid-layout-196103.appspot.com/rest/")
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }

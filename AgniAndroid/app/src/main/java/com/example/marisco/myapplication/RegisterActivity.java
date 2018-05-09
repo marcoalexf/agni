@@ -20,6 +20,7 @@ import java.io.Serializable;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -30,7 +31,7 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
 
 
     public static final String RESPONSE = "com.example.marisco.myapplication.RESPONSE";
-    private static final String REGISTER_ENDPOINT = "";
+    private static final String REGISTER_ENDPOINT = "https://liquid-layout-196103.appspot.com/rest/";
     private View mProgressView;
     private View mRegisterFormView;
     Retrofit retrofit;
@@ -42,6 +43,9 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
     @BindView(R.id.passwordConf) EditText password_confirmation;
     @BindView(R.id.register_button) Button register_button;
     @BindView(R.id.spinner_user_type) Spinner spinner_user_type;
+    @BindView(R.id.county) EditText county_input;
+    @BindView(R.id.district) EditText district_input;
+    @BindView(R.id.locality) EditText locality_input;
 
 
     @Override
@@ -93,6 +97,9 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
         String email = email_input.getText().toString();
         String password = password_input.getText().toString();
         String passwordConf = password_confirmation.getText().toString();
+        String county = county_input.getText().toString();
+        String district = district_input.getText().toString();
+        String locality = locality_input.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -195,7 +202,9 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
         String username = username_input.getText().toString();
         String email = email_input.getText().toString();
         String password = password_input.getText().toString();
-        String role = spinner_user_type.getSelectedItem().toString();
+        String locality = locality_input.getText().toString();
+        String district = district_input.getText().toString();
+        String county = county_input.getText().toString();
 
         if (retrofit == null) {
             retrofit = new Retrofit.Builder()
@@ -206,17 +215,18 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
 
         AgniAPI agniAPI = retrofit.create(AgniAPI.class);
 
-        Call<LoginResponse> call = agniAPI.registerUser(new UserRegister(name, username, password, email, role));
+        UserRegister ur = new UserRegister(name, username, password, email, "basic", locality, county, district);
+        Call<ResponseBody> call = agniAPI.registerUser(ur);
 
-        call.enqueue(new Callback<LoginResponse>() {
+        call.enqueue(new Callback<ResponseBody>() {
             @Override
-            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if(response.code() == 200)
                     finish();
             }
 
             @Override
-            public void onFailure(Call<LoginResponse> call, Throwable t) {
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
                 Log.e("ERROR", t.toString());
             }
         });

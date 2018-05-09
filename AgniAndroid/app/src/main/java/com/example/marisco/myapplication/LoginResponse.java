@@ -12,10 +12,10 @@ public class LoginResponse implements Serializable {
     @SerializedName("tokenID")
     String tokenID;
 
-    @SerializedName("expirationDate")
+    @SerializedName("expirationData")
     long expirationDate;
 
-    @SerializedName("creationDate")
+    @SerializedName("creationData")
     long creationDate;
 
     public String getUsername() {
