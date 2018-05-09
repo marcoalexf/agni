@@ -12,6 +12,7 @@ webagnireact/\.idea/workspace\.xml
 bin/
 gen/
 out/
+.idea/
 
 # Gradle files
 .gradle/
