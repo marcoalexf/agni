@@ -1,20 +1,34 @@
-import React from 'react';
-import { withGoogleMap, GoogleMap } from "react-google-maps";
+import React, { Component } from 'react';
+import GoogleMapReact from 'google-map-react';
 
-// For documentation about the googlemaps component see:
-//
-// https://github.com/tomchentw/react-google-maps
-// and
-// https://github.com/tomchentw/react-google-maps/pull/168
+const AnyReactComponent = ({ text }) => <div>{text}</div>;
 
+class Map extends Component {
+    static defaultProps = {
+        center: {
+            lat: 59.95,
+            lng: 30.33
+        },
+        zoom: 11
+    };
 
-class Map extends React.Component{
-     render(){
-          return(
-            <div>
-                <h2>Estou me a passar com o mapa</h2>
+    render() {
+        return (
+            // Important! Always set the container height explicitly
+            <div style={{ height: '100vh', width: '100%' }}>
+                <GoogleMapReact
+                    bootstrapURLKeys={{ key: 'AIzaSyAtTD5VCFlMDX0HcnPbnZWWArACgGR5Ywk' }}
+                    defaultCenter={this.props.center}
+                    defaultZoom={this.props.zoom}
+                >
+                    <AnyReactComponent
+                        lat={59.955413}
+                        lng={30.337844}
+                        text={'Kreyser Avrora'}
+                    />
+                </GoogleMapReact>
             </div>
-         );
+        );
     }
 }
 

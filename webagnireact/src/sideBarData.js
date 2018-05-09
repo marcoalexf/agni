@@ -100,7 +100,7 @@ export const logoutItem = (
             <ListItemIcon>
                 <LogoutIcon />
             </ListItemIcon>
-            <ListItemText primary="Logout" />
+            <ListItemText primary="Sobre nos" />
         </ListItem>
     </div>
 

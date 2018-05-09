@@ -2,10 +2,11 @@ import React, { Component } from 'react';
 import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table';
 import operationsData from './operationsData';
 import Typography from 'material-ui/Typography';
-import InfoIcon from '@material-ui/icons/Info';
+import InfoIcon from '@material-ui/icons/EventNote';
 import IconButton from 'material-ui/IconButton';
 import PropTypes from 'prop-types';
 import {withStyles} from "material-ui/styles/index";
+import {Link} from "react-router-dom";
 
 const styles = theme => ({
     title:{
@@ -45,7 +46,8 @@ class Operations extends React.Component {
                     {operationsData.map(n => {
                         return (
                             <TableRow key={n.name}>
-                                <TableCell> <IconButton> <InfoIcon/> </IconButton></TableCell>
+                                <TableCell> <IconButton component={Link}
+                                                        to="/operacao"> <InfoIcon/> </IconButton></TableCell>
                                 <TableCell>{n.name}</TableCell>
                                 <TableCell>{n.type}</TableCell>
                                 <TableCell>{n.date}</TableCell>

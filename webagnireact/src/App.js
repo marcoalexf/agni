@@ -27,6 +27,7 @@ import RegistProblem from './RegistProblem';
 import Operations from './Operations';
 import Map from './Map';
 import Statistics from './Statistics';
+import Operation from './Operation';
 import ClickAwayListener from 'material-ui/utils/ClickAwayListener';
 import Grow from 'material-ui/transitions/Grow';
 import Paper from 'material-ui/Paper';
@@ -217,7 +218,7 @@ class MiniDrawer extends React.Component {
                             <MenuIcon />
                         </IconButton>
                         <Typography variant="title" color="inherit" className={classNames(classes.loginButton)} noWrap>
-                            (Slogan)
+                            Menos florestas negras, mais caminhos verdes e céus mais azuis
                         </Typography>
 
                         <Manager>
@@ -292,6 +293,7 @@ class MiniDrawer extends React.Component {
                         <Route path='/operacoes' component={Operations}/>
                         <Route path='/mapa' component={Map}/>
                         <Route path='/estatisticas' component={Statistics}/>
+                        <Route path='/operacao' component={Operation}/>
                     </Switch>
                 </main>
             </div>

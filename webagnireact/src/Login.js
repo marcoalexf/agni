@@ -19,23 +19,11 @@ const styles = theme => ({
     rightIcon:{
         marginLeft: theme.spacing.unit,
     },
-    leftButton:{
-        flex: 1,
-        margin: theme.spacing.unit,
-        justifyContent: 'flex-start'
-    },
     button: {
-        margin: theme.spacing.unit,
+        //margin: theme.spacing.unit,
+        marginLeft: 380,
         backgroundColor: blue[500],
         color: grey[50],
-    },
-    buttons:{
-        flexGrow: 1,
-        //height: 430,
-        //zIndex: 1,
-        //overflow: 'hidden',
-        //position: 'relative',
-        display: 'flex',
     },
     paper:theme.mixins.gutters({
         rounded: true,
@@ -90,9 +78,9 @@ class Login extends Component {
         // //     //resultElement.innerHTML = "User nao existe ou Password Incorreta";
         // //     console.log("nao deu");
         // // })
-         var localstorage = window.localStorage;
-         var username = this.state.username;
-         var password = this.state.password;
+        var localstorage = window.localStorage;
+        var username = this.state.username;
+        var password = this.state.password;
         var resultElement = document.getElementById("errorMessage");
         var informations = localstorage.getItem('token');
 
@@ -167,10 +155,10 @@ class Login extends Component {
                         </div>
                     </div><br/>
 
-                    <div className={classes.buttons}>
+                    <div >
                         <Button component={Link}
                                 to="/register"
-                                color="primary" className={classes.leftButton}>
+                                color="primary">
                             Criar conta
                         </Button>
                         <Button variant="raised" color={"primary"} className={classes.button} onClick={this.handleLogin}>
