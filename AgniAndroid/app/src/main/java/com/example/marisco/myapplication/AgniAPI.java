@@ -15,4 +15,7 @@ public interface AgniAPI {
     @POST("register")
     Call<ResponseBody> registerUser(@Body UserRegister user);
 
+    @POST("profile")
+    Call<ProfileResponse> getProfile(@Body LoginResponse token);
+
 }

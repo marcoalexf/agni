@@ -29,6 +29,7 @@ public class UserRegister{
         this.county = county;
         this.district = district;
         this.locality = locality;
+        this.name = name;
     }
 
     public String getUser_type() {
