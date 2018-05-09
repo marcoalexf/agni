@@ -24,10 +24,12 @@ import Home from './Home';
 import News from './News';
 import Profile from './Profile';
 import RegistProblem from './RegistProblem';
+import ThankYou from './ThankYou';
 import Operations from './Operations';
 import Map from './Map';
 import Statistics from './Statistics';
 import Operation from './Operation';
+import AboutUs from './AboutUs';
 import ClickAwayListener from 'material-ui/utils/ClickAwayListener';
 import Grow from 'material-ui/transitions/Grow';
 import Paper from 'material-ui/Paper';
@@ -83,6 +85,8 @@ const styles = theme => ({
     },
     loginButton:{
         flex:1,
+        fontFamily: 'Roboto Mono',
+        fontSize: 12,
     },
     hide: {
         display: 'none',
@@ -166,11 +170,13 @@ class MiniDrawer extends React.Component {
 
         if(token != null){
             var uname = JSON.parse(token).username;
-            var tokenID = JSON.parse(token).tokenID;
+            var tokenID = JSON.parse(token);
 
             var data = {
-                "user": uname,
-                "token": tokenID
+                "username": uname,
+                "tokenID": tokenID.tokenID,
+                "creationData": tokenID.creationData,
+                "expirationData": tokenID.expirationData
             }
 
             if(uname!= null){
@@ -217,9 +223,9 @@ class MiniDrawer extends React.Component {
                         >
                             <MenuIcon />
                         </IconButton>
-                        <Typography variant="title" color="inherit" className={classNames(classes.loginButton)} noWrap>
+                        <q className={classNames(classes.loginButton)}>
                             Menos florestas negras, mais caminhos verdes e céus mais azuis
-                        </Typography>
+                        </q>
 
                         <Manager>
                             <Target>
@@ -294,6 +300,8 @@ class MiniDrawer extends React.Component {
                         <Route path='/mapa' component={Map}/>
                         <Route path='/estatisticas' component={Statistics}/>
                         <Route path='/operacao' component={Operation}/>
+                        <Route path='/obrigada' component={ThankYou}/>
+                        <Route path='/sobrenos' component={AboutUs}/>
                     </Switch>
                 </main>
             </div>

@@ -86,29 +86,40 @@ class Profile extends React.Component {
 
         if(token != null){
             var uname = JSON.parse(token).username;
+            var tokenID = JSON.parse(token);
 
-            var xmlHttp = new XMLHttpRequest();
-            xmlHttp.open( "GET", "http://localhost:8080/rest/viewprofile/" + uname, true);
-            xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-
-            xmlHttp.onload = function() {
-                var response = xmlHttp.response;
-                console.log("XML response: " + response);
-                obj = JSON.parse(response);
-
-                var username = document.getElementById("showusername");
-                username.innerHTML = uname;
-
-                var email = document.getElementById("showemail");
-                email.innerHTML = obj.user_email;
-
-                var role = document.getElementById("showrole");
-                role.innerHTML = obj.user_role;
+            var user = {
+                "username": uname,
+                "token": tokenID
             }
 
-            xmlHttp.send(null);
-        }
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.open( "POST", "http://localhost:8080/rest/profile/", true);
+            xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            var myJSON = JSON.stringify(user);
+            xmlHttp.send(myJSON);
 
+            xmlHttp.onreadystatechange = function() {
+                if (xmlHttp.readyState == XMLHttpRequest.DONE && xmlHttp.status == 200){
+                    var response = xmlHttp.response;
+                    console.log("XML response: " + response);
+                    obj = JSON.parse(response);
+
+                    var username = document.getElementById("showusername");
+                    username.innerHTML = uname;
+
+                    var name = document.getElementById("showname");
+                    name.innerHTML = obj.user_name;
+
+                    var email = document.getElementById("showemail");
+                    email.innerHTML = obj.user_email;
+
+                    var role = document.getElementById("showrole");
+                    role.innerHTML = obj.user_role;
+                }
+
+            }
+        }
         else{
             document.location.href = '/login';
         }
@@ -193,6 +204,7 @@ class Profile extends React.Component {
                             <b id="supports">0</b> <text>Comentarios</text>
                         </div>
 
+                        <Typography id="showname" component="p"></Typography>
                         <p id="showrole" className={classes.role}></p>
 
                     </div>

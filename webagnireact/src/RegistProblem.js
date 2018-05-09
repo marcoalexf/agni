@@ -17,6 +17,12 @@ import NotificationsOff from '@material-ui/icons/NotificationsOff';
 import NotificationsActive from '@material-ui/icons/NotificationsActive';
 import { FormControl, FormHelperText } from 'material-ui/Form';
 import { FormGroup, FormControlLabel } from 'material-ui/Form';
+import Dialog, {
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+} from 'material-ui/Dialog';
 import {withStyles} from "material-ui/styles/index";
 import GoogleMapReact from 'google-map-react';
 
@@ -64,6 +70,7 @@ class RegistProblem extends React.Component {
         problem: "limpeza",
         urgency: "3",
         location: '',
+        open: false,
     };
 
     handleChange = name => event => {
@@ -93,6 +100,55 @@ class RegistProblem extends React.Component {
     handleTypeChange = event => {
         this.setState({ [event.target.name]: event.target.value });
     };
+
+    handleClickOpen = () => {
+        this.setState({ open: true });
+    };
+
+    handleClose = () => {
+        this.setState({ open: false });
+    };
+
+    handleRegistProblem = () => {
+        //TODO xml http request
+        var token = window.localStorage.getItem('token');
+        var tokenjson = JSON.parse(token);
+
+        var data = {
+            "title": this.state.name,
+            "type": this.state.problem,
+            "level": this.state.urgency,
+            "visibility": this.state.private,
+            "token": tokenjson,
+            "lat": 59.95,
+            "lon": 30.33
+        }
+
+        console.log(data);
+
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open( "POST", 'http://localhost:8080/rest/occurrence/register');
+        xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        var myJSON = JSON.stringify(data);
+        xmlHttp.send(myJSON);
+
+        xmlHttp.onreadystatechange = function() {//Call a function when the state changes.
+            if(xmlHttp.readyState == XMLHttpRequest.DONE) {
+
+                if(xmlHttp.status == 200){
+                    console.log("Sucesso");
+                    document.location.href = '/obrigada';
+                }
+
+                else{
+                    console.log("Ocorreu um erro - Nao foi possivel registar o problema");
+                    //document.getElementById("errorMessage").innerHTML = "Parâmetros incorretos ou utilizador já existe";
+                }
+            }
+
+        }
+    }
+
 
     static defaultProps = {
         center: {
@@ -228,10 +284,32 @@ class RegistProblem extends React.Component {
                     </div>
 
                     <div id="submeter" className={classes.regButton}>
-                        <Button variant="raised" size="small" color="primary"  style={{margin:'0 auto'}}>
+                        <Button variant="raised" size="small" color="primary" style={{margin:'0 auto'}} onClick={this.handleClickOpen}>
                             <AddIcon />
                             Registar Problema
                         </Button>
+
+                        <Dialog
+                            open={this.state.open}
+                            onClose={this.handleClose}
+                            aria-labelledby="alert-dialog-title"
+                            aria-describedby="alert-dialog-description"
+                        >
+                            <DialogTitle id="alert-dialog-title">{"Tem a certeza que pretende registar o problema?"}</DialogTitle>
+                            <DialogContent>
+                                <DialogContentText id="alert-dialog-description">
+                                    Podera posteriormente mudar a visibilidade na seccao operacoes
+                                </DialogContentText>
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={this.handleClose} color="primary">
+                                    Cancelar
+                                </Button>
+                                <Button onClick={this.handleRegistProblem} color="primary" autoFocus>
+                                    Sim
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
                     </div>
                 </Paper>
             </div>
