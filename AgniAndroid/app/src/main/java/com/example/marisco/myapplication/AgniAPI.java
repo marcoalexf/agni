@@ -1,5 +1,6 @@
 package com.example.marisco.myapplication;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
@@ -12,6 +13,6 @@ public interface AgniAPI {
     Call<LoginResponse> loginUser(@Body User user);
 
     @POST("register")
-    Call<LoginResponse> registerUser(@Body UserRegister user);
+    Call<ResponseBody> registerUser(@Body UserRegister user);
 
 }

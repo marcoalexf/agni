@@ -118,6 +118,57 @@
 
             </android.support.design.widget.TextInputLayout>
 
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/locality"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Localidade"
+                android:imeActionId="6"
+                android:imeActionLabel="@string/action_sign_in_short"
+                android:imeOptions="actionUnspecified"
+                android:inputType="text"
+                android:maxLines="1"
+                android:singleLine="true" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/county"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Concelho"
+                android:imeActionId="6"
+                android:imeActionLabel="@string/action_sign_in_short"
+                android:imeOptions="actionUnspecified"
+                android:inputType="text"
+                android:maxLines="1"
+                android:singleLine="true" />
+
+            </android.support.design.widget.TextInputLayout>
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/district"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Distrito"
+                android:imeActionId="6"
+                android:imeActionLabel="@string/action_sign_in_short"
+                android:imeOptions="actionUnspecified"
+                android:inputType="text"
+                android:maxLines="1"
+                android:singleLine="true" />
+
+            </android.support.design.widget.TextInputLayout>
             <Spinner
                 android:id="@+id/spinner_user_type"
                 android:layout_width="fill_parent"
