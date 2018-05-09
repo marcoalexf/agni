@@ -23,22 +23,13 @@ const styles = theme => ({
         marginLeft: theme.spacing.unit,
     },
     leftButton:{
-        flex: 1,
-        margin: theme.spacing.unit,
-        justifyContent: 'flex-start'
+        marginTop: 10,
     },
     button: {
-        margin: theme.spacing.unit,
+        marginTop: 10,
+        marginLeft: 380,
         backgroundColor: blue[500],
         color: grey[50],
-    },
-    buttons:{
-        flexGrow: 1,
-        //height: 430,
-        //zIndex: 1,
-        //overflow: 'hidden',
-        //position: 'relative',
-        display: 'flex',
     },
     selectRole:{
         marginLeft: theme.spacing.unit,
@@ -215,7 +206,7 @@ class Register extends Component {
                         </div>
                     </div>
 
-                    <div className={classes.buttons}>
+                    <div>
                         <Button component={Link}
                                 to="/login"
                                 color="primary" className={classes.leftButton}>

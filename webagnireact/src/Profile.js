@@ -212,9 +212,9 @@ class Profile extends React.Component {
                         <Tab icon={<PersonPinIcon />} label="AMIGOS" />
                     </Tabs>
 
-                    {value === 0 && <TabContainer>Item One</TabContainer>}
-                    {value === 1 && <TabContainer>Item Two</TabContainer>}
-                    {value === 2 && <TabContainer>Item Three</TabContainer>}
+                    {value === 0 && <TabContainer>Sem reportes de momento</TabContainer>}
+                    {value === 1 && <TabContainer>Sem apoios de momento</TabContainer>}
+                    {value === 2 && <TabContainer>Sem amigos de momento</TabContainer>}
                 </Paper>
             </div>
 

@@ -25,10 +25,6 @@
 			<param-name>jersey.config.server.tracing.type</param-name>
 			<param-value>ALL</param-value> <!-- This is a debug utility that should be disabled when code goes to production -->
 		</init-param>
-		<init-param>
-    		<param-name>jersey.config.server.provider.classnames</param-name>
-    		<param-value>org.glassfish.jersey.media.multipart.MultiPartFeature</param-value>
-		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet-mapping>
