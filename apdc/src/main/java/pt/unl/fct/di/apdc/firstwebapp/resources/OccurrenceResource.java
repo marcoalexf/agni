@@ -121,6 +121,9 @@ public class OccurrenceResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response listOccurrences(ListOccurrenceData data) {
 		LOG.fine("Attempt to send list of occurrences");
+		if(data == null) {
+			return Response.status(Status.FORBIDDEN).build();
+		}
 		if(data.token != null && !data.token.isTokenValid()) {
 			LOG.warning("Failed to send list of occurrences, token for user: " + data.token.username + "is invalid");
 			return Response.status(Status.FORBIDDEN).build();
