@@ -31,7 +31,7 @@ const styles =  theme => ({
     },
 });
 
-class Operation extends React.Component {
+class InfoOperation extends React.Component {
     state = {
         accountOpen: false,
         value: 0,
@@ -81,8 +81,8 @@ class Operation extends React.Component {
 
 }
 
-Operation.propTypes = {
+InfoOperation.propTypes = {
     classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(Operation);
+export default withStyles(styles)(InfoOperation);

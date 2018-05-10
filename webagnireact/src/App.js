@@ -8,7 +8,6 @@ import Toolbar from 'material-ui/Toolbar';
 import { Manager, Target, Popper } from 'react-popper';
 import Button from 'material-ui/Button';
 import List from 'material-ui/List';
-import Typography from 'material-ui/Typography';
 import Divider from 'material-ui/Divider';
 import IconButton from 'material-ui/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
@@ -28,7 +27,7 @@ import ThankYou from './ThankYou';
 import Operations from './Operations';
 import Map from './Map';
 import Statistics from './Statistics';
-import Operation from './Operation';
+import Operation from './InfoOperation';
 import AboutUs from './AboutUs';
 import ClickAwayListener from 'material-ui/utils/ClickAwayListener';
 import Grow from 'material-ui/transitions/Grow';
@@ -190,16 +189,21 @@ class MiniDrawer extends React.Component {
                     if(xmlHttp.readyState == XMLHttpRequest.DONE && xmlHttp.status == 200) {
                         var response = xmlHttp.responseText;
                         console.log("XML response: " + response);
-                        window.localStorage.removeItem('token');
+                        //window.localStorage.removeItem('token');
                         console.log("sucesso");
                         document.location.href = '/login';
                     }
+                    else{
+                        //TO DO- ver se o tempo ja expirou antes de "chatear" o server
+                        console.log("tempo expirado");
+                    }
+                    window.localStorage.removeItem('token');
                 }
             }
         }
 
         else{
-            console.log("tempo expirado");
+            console.log("nao existe nenhuma conta com login de momento");
         }
     }
 

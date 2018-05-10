@@ -88,6 +88,10 @@ class Profile extends React.Component {
             var uname = JSON.parse(token).username;
             var tokenID = JSON.parse(token);
 
+            // if(tokenObj.expirationData){
+            //  tratar para o caso do token ter expirado
+            // }
+
             var user = {
                 "username": uname,
                 "token": tokenID
@@ -100,24 +104,31 @@ class Profile extends React.Component {
             xmlHttp.send(myJSON);
 
             xmlHttp.onreadystatechange = function() {
-                if (xmlHttp.readyState == XMLHttpRequest.DONE && xmlHttp.status == 200){
-                    var response = xmlHttp.response;
-                    console.log("XML response: " + response);
-                    obj = JSON.parse(response);
+                if (xmlHttp.readyState == XMLHttpRequest.DONE){
+                    if(xmlHttp.status == 200){
+                        var response = xmlHttp.response;
+                        console.log("XML response: " + response);
+                        obj = JSON.parse(response);
 
-                    var username = document.getElementById("showusername");
-                    username.innerHTML = uname;
+                        var username = document.getElementById("showusername");
+                        username.innerHTML = uname;
 
-                    var name = document.getElementById("showname");
-                    name.innerHTML = obj.user_name;
+                        var name = document.getElementById("showname");
+                        name.innerHTML = obj.user_name;
 
-                    var email = document.getElementById("showemail");
-                    email.innerHTML = obj.user_email;
+                        var email = document.getElementById("showemail");
+                        email.innerHTML = obj.user_email;
 
-                    var role = document.getElementById("showrole");
-                    role.innerHTML = obj.user_role;
+                        var role = document.getElementById("showrole");
+                        role.innerHTML = obj.user_role;
+                    }
+
+                    else{
+                        //TO DO- ver se o tempo ja expirou antes de "chatear" o server
+                        console.log("tempo expirado");
+                        window.localStorage.removeItem('token');
+                    }
                 }
-
             }
         }
         else{
@@ -198,7 +209,7 @@ class Profile extends React.Component {
                             <b id="reports">0</b> <text>Reportes de Problemas</text>
                         </div>
                         <div className={classes.basicInfo}>
-                            <b id="supports">0</b> <text>Gostos</text>
+                            <b id="supports">0</b> <text>A apoiar</text>
                         </div>
                         <div className={classes.basicInfo}>
                             <b id="supports">0</b> <text>Comentarios</text>
@@ -220,7 +231,7 @@ class Profile extends React.Component {
                         textColor="primary"
                     >
                         <Tab icon={<ReportsIcon />} label="REPORTES" />
-                        <Tab icon={<FavoriteIcon />} label="GOSTOS" />
+                        <Tab icon={<FavoriteIcon />} label="A APOIAR" />
                         <Tab icon={<PersonPinIcon />} label="AMIGOS" />
                     </Tabs>
 
