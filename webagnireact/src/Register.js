@@ -46,6 +46,9 @@ const styles = theme => ({
         textAlign: 'center',
         color: 'red',
     },
+    input: {
+        display: 'none',
+    },
 });
 
 class Register extends Component {
@@ -55,6 +58,7 @@ class Register extends Component {
 
         this.state = {
             username: '',
+            name: '',
             email: '',
             role: '',
             password: '',
@@ -101,6 +105,7 @@ class Register extends Component {
 
         console.log("CreateAccount");
         console.log(this.state.username);
+        console.log(this.state.name);
         console.log(this.state.email);
         console.log(this.state.value);
         console.log(this.state.password);
@@ -108,15 +113,15 @@ class Register extends Component {
 
         var user = {
             "username": this.state.username,
+            "name": this.state.name,
             "email": this.state.email,
             "role": this.state.value,
-            "password": this.state.password,
-            "confirmation": this.state.confirmPass
+            "password": this.state.password
         }
 
         console.log(user);
         var xmlHttp = new XMLHttpRequest();
-        xmlHttp.open( "POST", 'http://localhost:8080/rest/register/v4');
+        xmlHttp.open( "POST", 'http://localhost:8080/rest/register');
         xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         var myJSON = JSON.stringify(user);
         xmlHttp.send(myJSON);
@@ -152,7 +157,16 @@ class Register extends Component {
 
                 <div className="imgcontainer">
                     <img src={require('./img/registUser2.png')} alt="Avatar2" width={100} heigth={100} />
-                    <div><Button> <FaceIcon /> Carregar Foto </Button></div>
+                    <div>
+                        <input
+                            accept="image/*"
+                            className={classes.input}
+                            id="raised-button-file"
+                            multiple
+                            type="file"
+                        />
+                        <label htmlFor="raised-button-file"><Button component={"span"}> <FaceIcon /> Carregar Foto </Button></label>
+                    </div>
                 </div>
 
                 <form name="form" onSubmit={this.handleSubmit}>
@@ -163,6 +177,16 @@ class Register extends Component {
                                        onChange={this.handleUsernameChange('username')}/>
                             {submitted && !username &&
                             <div className="help-block">Username is required</div>
+                            }
+                        </div>
+                    </div>
+
+                    <div className="input-group">
+                        <div className={'form-group' + (submitted && !username ? ' has-error' : '')}>
+                            <TextField id="name" label="Name" className={classes.textField} value={this.state.name}
+                                       onChange={this.handleUsernameChange('name')}/>
+                            {submitted && !username &&
+                            <div className="help-block">Name is required</div>
                             }
                         </div>
                     </div>
@@ -198,7 +222,7 @@ class Register extends Component {
 
                     <div className="input-group">
                         <div className={'form-group' + (submitted && !confirmPass ? ' has-error' : '')}>
-                            <TextField id="confirmpassword" label="Reentroduza a Password" type="password" className={classes.textField} value={this.state.confirmPass}
+                            <TextField id="confirmpassword" label="Confirmar Password" type="password" className={classes.textField} value={this.state.confirmPass}
                                        onChange={this.handleConfirmPassChange('confirmPass')}/>
                             {submitted && !confirmPass &&
                             <div className="help-block">Confirmation of password is required</div>

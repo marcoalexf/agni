@@ -91,7 +91,7 @@ class Login extends Component {
 
          if(informations == null){
              var xmlHttp = new XMLHttpRequest();
-             xmlHttp.open( "POST", "http://localhost:8080/rest/login/v2");
+             xmlHttp.open( "POST", "http://localhost:8080/rest/login");
              xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
              var myJSON = JSON.stringify(user);
              xmlHttp.send(myJSON);

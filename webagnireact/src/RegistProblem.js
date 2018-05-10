@@ -4,6 +4,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import Icon from 'material-ui/Icon';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
+import ErrorIcon from '@material-ui/icons/Cancel';
 import Typography from 'material-ui/Typography';
 import Select from 'material-ui/Select';
 import { InputLabel } from 'material-ui/Input';
@@ -15,8 +16,10 @@ import Paper from 'material-ui/Paper';
 import Checkbox from 'material-ui/Checkbox';
 import NotificationsOff from '@material-ui/icons/NotificationsOff';
 import NotificationsActive from '@material-ui/icons/NotificationsActive';
+import Radio, { RadioGroup } from 'material-ui/Radio';
 import { FormControl, FormHelperText } from 'material-ui/Form';
-import { FormGroup, FormControlLabel } from 'material-ui/Form';
+import { FormLabel, FormControlLabel } from 'material-ui/Form';
+import Dialog, {DialogActions, DialogContent, DialogContentText, DialogTitle,} from 'material-ui/Dialog';
 import {withStyles} from "material-ui/styles/index";
 import GoogleMapReact from 'google-map-react';
 
@@ -28,10 +31,11 @@ const styles =  theme => ({
     },
     paper:theme.mixins.gutters({
         padding: 40,
+        width: 800,
     }),
     textField: {
         margin: theme.spacing.unit,
-        width: 400,
+        width: 430,
     },
     formControl: {
         margin: theme.spacing.unit,
@@ -41,7 +45,7 @@ const styles =  theme => ({
         marginTop: theme.spacing.unit * 2,
     },
     uploadButton: {
-        marginLeft: 500,
+        margin: 20,
     },
     map:{
         display: 'inline-block',
@@ -52,6 +56,10 @@ const styles =  theme => ({
     regButton:{
         marginLeft: 1000,
     },
+    searchButton:{
+        marginLeft: theme.spacing.unit,
+        marginBottom: theme.spacing.unit,
+    },
 });
 
 class RegistProblem extends React.Component {
@@ -61,15 +69,19 @@ class RegistProblem extends React.Component {
         description: '',
         private: false,
         visibility: "public",
+        spaceType: "public",
         problem: "limpeza",
         urgency: "3",
         location: '',
+        open: false,
+        privateSpace: false,
     };
 
     handleChange = name => event => {
         this.setState({
             [name]: event.target.value,
         });
+        console.log("spaceType: " + this.state.spaceType + " privateSpace: " + this.state.privateSpace);
     };
 
     handleMouseDownVisibility = event => {
@@ -80,7 +92,6 @@ class RegistProblem extends React.Component {
         if(event.target.value == 'private'){
             this.setState(
                 {private: true}
-                //{private: !this.state.private}
             );
         }
         else{
@@ -90,9 +101,77 @@ class RegistProblem extends React.Component {
         this.setState({ [event.target.name]: event.target.value });
     }
 
+    handleTypeOfSpace = event => {
+        if(event.target.value == 'private'){
+            this.setState(
+                {privateSpace: true}
+            );
+        }
+        else{
+            this.setState({privateSpace: false});
+        }
+
+        this.setState({ [event.target.name]: event.target.value });
+        console.log("spaceType: " + this.state.spaceType + " privateSpace: " + this.state.privateSpace);
+    }
+
+    handleSpaceChange = event => {
+        this.setState({ spaceType: event.target.value });
+    };
+
     handleTypeChange = event => {
         this.setState({ [event.target.name]: event.target.value });
     };
+
+    handleClickOpen = () => {
+        this.setState({ open: true });
+    };
+
+    handleClose = () => {
+        this.setState({ open: false });
+    };
+
+    handleRegistProblem = () => {
+        var token = window.localStorage.getItem('token');
+        var tokenjson = JSON.parse(token);
+
+        var data = {
+            "token": tokenjson,
+            "title": this.state.name,
+            "description": this.state.description,
+            "type": this.state.problem,
+            "level": this.state.urgency,
+            "visibility": this.state.private,
+            "lat": 59.95,
+            "lon": 30.33,
+            "notificationOnResolve": this.state.open,
+        }
+
+        console.log(data);
+
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open( "POST", 'http://localhost:8080/rest/occurrence/register');
+        xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        var myJSON = JSON.stringify(data);
+        xmlHttp.send(myJSON);
+
+        xmlHttp.onreadystatechange = function() {//Call a function when the state changes.
+            if(xmlHttp.readyState == XMLHttpRequest.DONE) {
+
+                if(xmlHttp.status == 200){
+                    console.log("Sucesso");
+                    document.location.href = '/obrigada';
+                }
+
+                else{
+                    console.log("Ocorreu um erro - Nao foi possivel registar o problema");
+                    console.log("O token pode ter expirado");
+                }
+            }
+
+        }
+    }
+
 
     static defaultProps = {
         center: {
@@ -108,23 +187,22 @@ class RegistProblem extends React.Component {
             <div>
                 <Typography variant="display1" className={classes.title}>Registar Problema</Typography>
 
-                <Paper className={classes.paper}>
+                <Paper className={classes.paper} style={{margin: '0 auto'}}>
 
                     <TextField
                         id="name"
                         label="Nome do registo"
                         onChange={this.handleChange('name')}
                         className={classes.textField}
-                    />
+                    /><br/>
 
                     <Button variant="raised" component="span" className={classes.uploadButton}>
                         Upload de imagem <WallpaperIcon size="large"/>
-                    </Button>
-
+                    </Button><br/>
 
                     <TextField
                         id="description"
-                        label="Descricao"
+                        label="Descricao - descreva o estado generico do problema"
                         multiline
                         rows="4"
                         onChange={this.handleChange('description')}
@@ -138,10 +216,10 @@ class RegistProblem extends React.Component {
                             onChange={this.handleChange('location')}
                             className={classes.textField}
                         />
-                        <Button variant="raised" size="small" color="primary"> <SearchIcon/> </Button>
+                        <Button variant="fab" mini className={classes.searchButton}> <SearchIcon/> </Button>
                     </div>
 
-                    <div style={{ height: '40vh', width: '40%' }}>
+                    <div style={{ height: '40vh', width: '100%' }}>
                         <GoogleMapReact
                             bootstrapURLKeys={{ key: 'AIzaSyAtTD5VCFlMDX0HcnPbnZWWArACgGR5Ywk' }}
                             defaultCenter={this.props.center}
@@ -153,6 +231,43 @@ class RegistProblem extends React.Component {
                                 text={'Kreyser Avrora'}
                             />
                         </GoogleMapReact>
+                    </div>
+
+                    <div>
+                        <FormControl
+                            component="fieldset"
+                            required
+                        >
+                            <FormLabel component="legend">Tipo de espaco</FormLabel>
+                            <RadioGroup
+                                aria-label="typeSpace"
+                                name="typeSpace"
+                                value={this.state.spaceType}
+                                onChange={this.handleSpaceChange}
+                            >
+                                <FormControlLabel
+                                    value="public"
+                                    control={<Radio color="primary" />}
+                                    label="Publico"
+                                />
+                                <FormControlLabel value="private" control={<Radio color="primary" />} label="Privado" />
+                            </RadioGroup>
+                        </FormControl>
+                    </div>
+
+                    <div id="typeofspace">
+                        <FormControl className={classes.formControl}>
+                            <Select
+                                value={this.state.spaceType}
+                                onChange = {this.handleTypeOfSpace}
+                                displayEmpty
+                                name='spaceType'
+                                className={classes.selectEmpty}
+                            >
+                                <MenuItem value="public">Espaco publico</MenuItem>
+                                <MenuItem value="private">Espaco privado</MenuItem>
+                            </Select>
+                        </FormControl>
                     </div>
 
                     <div className={classes.properties}>
@@ -200,15 +315,14 @@ class RegistProblem extends React.Component {
                                         name='visibility'
                                         className={classes.selectEmpty}
                                     >
-                                        <MenuItem value="public">Publico</MenuItem>
-                                        <MenuItem value="private">Privado</MenuItem>
+                                        <MenuItem value="public">Toda a gente pode ver este problema</MenuItem>
+                                        <MenuItem value="private">Apenas eu posso ver este problema</MenuItem>
                                     </Select>
                                     <FormHelperText>Visibilidade</FormHelperText>
                                 </FormControl>
                                 <FormControl>
                                     <Icon
                                         aria-label="regist visibility"
-                                        color="default"
                                     >
                                         {this.state.private ? <VisibilityOff /> : <Visibility />}
                                     </Icon>
@@ -227,11 +341,33 @@ class RegistProblem extends React.Component {
                         />
                     </div>
 
-                    <div id="submeter" className={classes.regButton}>
-                        <Button variant="raised" size="small" color="primary"  style={{margin:'0 auto'}}>
+                    <div id="submeter" className={"imgcontainer"}>
+                        <Button variant="raised" size="small" color="primary" style={{margin:'0 auto'}} onClick={this.handleClickOpen}>
                             <AddIcon />
                             Registar Problema
                         </Button>
+
+                        <Dialog
+                            open={this.state.open}
+                            onClose={this.handleClose}
+                            aria-labelledby="alert-dialog-title"
+                            aria-describedby="alert-dialog-description"
+                        >
+                            <DialogTitle id="alert-dialog-title">{"Tem a certeza que pretende registar o problema?"}</DialogTitle>
+                            <DialogContent>
+                                <DialogContentText id="alert-dialog-description">
+                                    Podera posteriormente mudar a visibilidade na seccao operacoes
+                                </DialogContentText>
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={this.handleClose} color="primary">
+                                    Cancelar
+                                </Button>
+                                <Button onClick={this.handleRegistProblem} color="primary" autoFocus>
+                                    Sim
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
                     </div>
                 </Paper>
             </div>
