@@ -25,6 +25,10 @@ const styles = theme => ({
 
 class Operations extends React.Component {
 
+    state = {
+        occurrences: null,
+    };
+
     loadOperations = () => {
         console.log("aqui");
         var obj;
@@ -52,36 +56,45 @@ class Operations extends React.Component {
             xmlHttp.send(myJSON);
 
             xmlHttp.onreadystatechange = function () {
-                if (xmlHttp.readyState == XMLHttpRequest.DONE && xmlHttp.status == 200) {
-                    var response = xmlHttp.response;
-                    console.log("XML response: " + response);
-                    obj = JSON.parse(response);
+                if (xmlHttp.readyState == XMLHttpRequest.DONE) {
+                    if(xmlHttp.status == 200){
+                        var response = xmlHttp.response;
+                        console.log("XML response: " + response);
+                        obj = JSON.parse(response);
 
-                    console.log(obj);
+                        console.log(obj);
 
-                    for(var occurrence in obj){
-                        var map = obj[occurrence];
+                        for(var occurrence in obj){
+                            var map = obj[occurrence];
 
-                        console.log(map);
+                            console.log(map);
 
-                        var data = map.user_occurrence_data;
-                        var level = map.user_occurrence_level;
-                        var lat = map.user_occurrence_lat;
-                        var long = map.user_occurrence_lon;
-                        var title = map.user_occurrence_title;
-                        var type  = map.user_occurrence_type;
-                        var visibility = map.user_occurrence_visibility;
+                            var data = map.user_occurrence_data;
+                            var level = map.user_occurrence_level;
+                            var lat = map.user_occurrence_lat;
+                            var long = map.user_occurrence_lon;
+                            var title = map.user_occurrence_title;
+                            var type  = map.user_occurrence_type;
+                            var visibility = map.user_occurrence_visibility;
+                        }
+                            Operations.changeObj(obj);
+                    }
+                    else {
+                        //TO DO- ver se o tempo ja expirou antes de "chatear" o server
+                        console.log("tempo expirado");
+                        //window.localStorage.removeItem('token');
                     }
                 }
-
-                else {
-                    //TO DO- ver se o tempo ja expirou antes de "chatear" o server
-                    console.log("tempo expirado");
-                    //window.localStorage.removeItem('token');
-                }
-
             }
+
         }
+        this.setState({ occurrences: obj });
+        console.log(this.state.occurrences);
+    }
+
+    changeObj = obj => {
+        this.setState({ occurrences: obj });
+        console.log(this.state.occurrences);
     }
 
     render() {

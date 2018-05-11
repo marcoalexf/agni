@@ -39,7 +39,7 @@ const styles =  theme => ({
     },
     formControl: {
         margin: theme.spacing.unit,
-        width: 220,
+        width: 250,
     },
     selectEmpty: {
         marginTop: theme.spacing.unit * 2,
@@ -48,7 +48,7 @@ const styles =  theme => ({
         margin: 20,
     },
     map:{
-        display: 'inline-block',
+        marginBottom: 20,
     },
     properties:{
         display: 'inline-block',
@@ -59,6 +59,9 @@ const styles =  theme => ({
     searchButton:{
         marginLeft: theme.spacing.unit,
         marginBottom: theme.spacing.unit,
+    },
+    input: {
+        display: 'none',
     },
 });
 
@@ -194,11 +197,22 @@ class RegistProblem extends React.Component {
                         label="Nome do registo"
                         onChange={this.handleChange('name')}
                         className={classes.textField}
-                    /><br/>
+                    />
 
-                    <Button variant="raised" component="span" className={classes.uploadButton}>
-                        Upload de imagem <WallpaperIcon size="large"/>
-                    </Button><br/>
+                    <div>
+                        <input
+                            accept="image/*"
+                            className={classes.input}
+                            id="raised-button-file"
+                            multiple
+                            type="file"
+                        />
+                        <label htmlFor="raised-button-file">
+                            <Button component="span" variant="raised" className={classes.uploadButton}>
+                                Upload de imagem <WallpaperIcon size="large"/>
+                            </Button>
+                        </label>
+                    </div>
 
                     <TextField
                         id="description"
@@ -219,7 +233,7 @@ class RegistProblem extends React.Component {
                         <Button variant="fab" mini className={classes.searchButton}> <SearchIcon/> </Button>
                     </div>
 
-                    <div style={{ height: '40vh', width: '100%' }}>
+                    <div className={classes.map} style={{ height: '40vh', width: '100%' }}>
                         <GoogleMapReact
                             bootstrapURLKeys={{ key: 'AIzaSyAtTD5VCFlMDX0HcnPbnZWWArACgGR5Ywk' }}
                             defaultCenter={this.props.center}
@@ -233,7 +247,7 @@ class RegistProblem extends React.Component {
                         </GoogleMapReact>
                     </div>
 
-                    <div>
+                    <div id="typeOfSpace">
                         <FormControl
                             component="fieldset"
                             required
@@ -252,21 +266,6 @@ class RegistProblem extends React.Component {
                                 />
                                 <FormControlLabel value="private" control={<Radio color="primary" />} label="Privado" />
                             </RadioGroup>
-                        </FormControl>
-                    </div>
-
-                    <div id="typeofspace">
-                        <FormControl className={classes.formControl}>
-                            <Select
-                                value={this.state.spaceType}
-                                onChange = {this.handleTypeOfSpace}
-                                displayEmpty
-                                name='spaceType'
-                                className={classes.selectEmpty}
-                            >
-                                <MenuItem value="public">Espaco publico</MenuItem>
-                                <MenuItem value="private">Espaco privado</MenuItem>
-                            </Select>
                         </FormControl>
                     </div>
 
