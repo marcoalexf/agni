@@ -24,8 +24,60 @@ const styles = theme => ({
 });
 
 function OperationsTable(props){
-    var occ = this.state.occurrences;
-    
+    var map = {user_occurrence_title: 'ana'};
+    var token = window.localStorage.getItem('token');
+    var uname = JSON.parse(token).username;
+    var tokenObj = JSON.parse(token);
+
+    var user = {
+        "username": uname,
+        "token": tokenObj,
+        "showPrivate": true //MUDAR ISTO DEPOIS
+    }
+
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open("POST", "http://localhost:8080/rest/occurrence/list", true);
+    xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    var myJSON = JSON.stringify(user);
+    xmlHttp.send(myJSON);
+
+    xmlHttp.onload = function (e) {
+        if (xmlHttp.readyState === 4) {
+            if(xmlHttp.status === 200){
+                var response = xmlHttp.response;
+                var obj = JSON.parse(response);
+                map = obj[0];
+                this.setState({ occurrences: map });
+                console.log("state.occurrences:")
+                console.log(this.state.occurrences);
+                console.log(obj);
+            }
+            else {
+                //TO DO- ver se o tempo ja expirou antes de "chatear" o server
+                console.log("tempo expirado");
+                //window.localStorage.removeItem('token');
+            }
+        }
+    }.bind(this);
+
+    const table = map.map((occ) =>
+        <TableBody>
+            <TableRow key={occ.user_occurrence_title}>
+                <TableCell> <IconButton component={Link}
+                                        to="/operacao"> <InfoIcon/> </IconButton></TableCell>
+                <TableCell>{occ.user_occurrence_title}</TableCell>
+                <TableCell>{occ.user_occurrence_type}</TableCell>
+                <TableCell>{occ.user_occurrence_data}</TableCell>
+                <TableCell>{'nao tratado'}</TableCell>
+                <TableCell numeric> {occ.user_occurrence_level}</TableCell>
+                <TableCell>{occ.user_occurrence_visibility}</TableCell>
+            </TableRow>
+        </TableBody>
+    );
+
+    return(
+        {table}
+    );
 }
 
 class Operations extends React.Component {
@@ -73,23 +125,25 @@ class Operations extends React.Component {
                         obj = JSON.parse(response);
                         var map = obj[0];
                         this.setState({ occurrences: map });
+                        console.log("state.occurrences:")
                         console.log(this.state.occurrences);
-
                         console.log(obj);
 
-                        // for(var occurrence in obj){
-                        //     var map = obj[occurrence];
-                        //
-                        //     console.log(map);
-                        //
-                        //     var data = map.user_occurrence_data;
-                        //     var level = map.user_occurrence_level;
-                        //     var lat = map.user_occurrence_lat;
-                        //     var long = map.user_occurrence_lon;
-                        //     var title = map.user_occurrence_title;
-                        //     var type  = map.user_occurrence_type;
-                        //     var visibility = map.user_occurrence_visibility;
-                        // }
+                        return(map.map((occ) =>
+                            <TableBody>
+                                <TableRow key={occ.user_occurrence_title}>
+                                    <TableCell> <IconButton component={Link}
+                                                            to="/operacao"> <InfoIcon/> </IconButton></TableCell>
+                                    <TableCell>{occ.user_occurrence_title}</TableCell>
+                                    <TableCell>{occ.user_occurrence_type}</TableCell>
+                                    <TableCell>{occ.user_occurrence_data}</TableCell>
+                                    <TableCell>{'nao tratado'}</TableCell>
+                                    <TableCell numeric> {occ.user_occurrence_level}</TableCell>
+                                    <TableCell>{occ.user_occurrence_visibility}</TableCell>
+                                </TableRow>
+                            </TableBody>
+                            )
+                        );
                     }
                     else {
                         //TO DO- ver se o tempo ja expirou antes de "chatear" o server
@@ -109,8 +163,6 @@ class Operations extends React.Component {
 
         return (
             <div>
-                {this.loadOperations}
-
                 <Typography variant="display1" className={classes.title}>Operacoes</Typography>
 
                 <Table className={classes.table}>
@@ -125,37 +177,9 @@ class Operations extends React.Component {
                             <TableCell>Visibilidade</TableCell>
                         </TableRow>
                     </TableHead>
+
                     <TableBody>
-                        {/*{for(var occurrence in this.state.occurrences){*/}
-                            {/*var map = occurences[occurrence];*/}
-                            {/*console.log(map);*/}
-                            {/*return (*/}
-                            {/*<TableRow key={map.user_occurrence_title}>*/}
-                                {/*<TableCell> <IconButton component={Link}*/}
-                                                        {/*to="/operacao"> <InfoIcon/> </IconButton></TableCell>*/}
-                                {/*<TableCell>{map.user_occurrence_title}</TableCell>*/}
-                                {/*<TableCell>{map.user_occurrence_type}</TableCell>*/}
-                                {/*<TableCell>{map.user_occurrence_data}</TableCell>*/}
-                                {/*<TableCell>{'nao tratado'}</TableCell>*/}
-                                {/*<TableCell numeric> {map.user_occurrence_level}</TableCell>*/}
-                                {/*<TableCell>{map.user_occurrence_visibility}</TableCell>*/}
-                            {/*</TableRow>*/}
-                            {/*);*/}
-                        {/*}}*/}
-                        {this.state.occurrences.map(function(occ){
-                            return(
-                                occ.map(function(data, lat, level, lon, title, type, visibility){
-
-                                    }
-
-                                )
-                            );
-                            }
-
-                            )
-
-                        }
-                        {operationsData.map(n => {
+                        {operationsData.map(n =>
                             return (
                                 <TableRow key={n.name}>
                                     <TableCell> <IconButton component={Link}
@@ -168,7 +192,7 @@ class Operations extends React.Component {
                                     <TableCell>{n.visibility}</TableCell>
                                 </TableRow>
                             );
-                        })}
+                        )}
                     </TableBody>
                 </Table>
 
