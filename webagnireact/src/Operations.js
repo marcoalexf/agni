@@ -23,18 +23,28 @@ const styles = theme => ({
     },
 });
 
-class Operations extends React.Component {
+function OperationsTable(props){
+    var occ = this.state.occurrences;
+    
+}
 
-    state = {
-        occurrences: null,
-    };
+class Operations extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            occurrences: 'null',
+        };
+
+        this.loadOperations = this.loadOperations.bind(this);
+    }
 
     loadOperations = () => {
         console.log("aqui");
         var obj;
         var token = window.localStorage.getItem('token');
 
-        if(token != null) {
+        //if(token != null) {
             var uname = JSON.parse(token).username;
             var tokenObj = JSON.parse(token);
 
@@ -55,29 +65,31 @@ class Operations extends React.Component {
             var myJSON = JSON.stringify(user);
             xmlHttp.send(myJSON);
 
-            xmlHttp.onreadystatechange = function () {
-                if (xmlHttp.readyState == XMLHttpRequest.DONE) {
-                    if(xmlHttp.status == 200){
+            xmlHttp.onload = function (e) {
+                if (xmlHttp.readyState === 4) {
+                    if(xmlHttp.status === 200){
                         var response = xmlHttp.response;
-                        console.log("XML response: " + response);
+                        //console.log("XML response: " + response);
                         obj = JSON.parse(response);
+                        var map = obj[0];
+                        this.setState({ occurrences: map });
+                        console.log(this.state.occurrences);
 
                         console.log(obj);
 
-                        for(var occurrence in obj){
-                            var map = obj[occurrence];
-
-                            console.log(map);
-
-                            var data = map.user_occurrence_data;
-                            var level = map.user_occurrence_level;
-                            var lat = map.user_occurrence_lat;
-                            var long = map.user_occurrence_lon;
-                            var title = map.user_occurrence_title;
-                            var type  = map.user_occurrence_type;
-                            var visibility = map.user_occurrence_visibility;
-                        }
-                            Operations.changeObj(obj);
+                        // for(var occurrence in obj){
+                        //     var map = obj[occurrence];
+                        //
+                        //     console.log(map);
+                        //
+                        //     var data = map.user_occurrence_data;
+                        //     var level = map.user_occurrence_level;
+                        //     var lat = map.user_occurrence_lat;
+                        //     var long = map.user_occurrence_lon;
+                        //     var title = map.user_occurrence_title;
+                        //     var type  = map.user_occurrence_type;
+                        //     var visibility = map.user_occurrence_visibility;
+                        // }
                     }
                     else {
                         //TO DO- ver se o tempo ja expirou antes de "chatear" o server
@@ -85,23 +97,20 @@ class Operations extends React.Component {
                         //window.localStorage.removeItem('token');
                     }
                 }
-            }
+            //}
 
-        }
-        this.setState({ occurrences: obj });
-        console.log(this.state.occurrences);
+        }.bind(this);
     }
 
-    changeObj = obj => {
-        this.setState({ occurrences: obj });
-        console.log(this.state.occurrences);
-    }
+
 
     render() {
         const { classes } = this.props;
 
         return (
-            <div onLoad={this.loadOperations}>
+            <div>
+                {this.loadOperations}
+
                 <Typography variant="display1" className={classes.title}>Operacoes</Typography>
 
                 <Table className={classes.table}>
@@ -117,6 +126,35 @@ class Operations extends React.Component {
                         </TableRow>
                     </TableHead>
                     <TableBody>
+                        {/*{for(var occurrence in this.state.occurrences){*/}
+                            {/*var map = occurences[occurrence];*/}
+                            {/*console.log(map);*/}
+                            {/*return (*/}
+                            {/*<TableRow key={map.user_occurrence_title}>*/}
+                                {/*<TableCell> <IconButton component={Link}*/}
+                                                        {/*to="/operacao"> <InfoIcon/> </IconButton></TableCell>*/}
+                                {/*<TableCell>{map.user_occurrence_title}</TableCell>*/}
+                                {/*<TableCell>{map.user_occurrence_type}</TableCell>*/}
+                                {/*<TableCell>{map.user_occurrence_data}</TableCell>*/}
+                                {/*<TableCell>{'nao tratado'}</TableCell>*/}
+                                {/*<TableCell numeric> {map.user_occurrence_level}</TableCell>*/}
+                                {/*<TableCell>{map.user_occurrence_visibility}</TableCell>*/}
+                            {/*</TableRow>*/}
+                            {/*);*/}
+                        {/*}}*/}
+                        {this.state.occurrences.map(function(occ){
+                            return(
+                                occ.map(function(data, lat, level, lon, title, type, visibility){
+
+                                    }
+
+                                )
+                            );
+                            }
+
+                            )
+
+                        }
                         {operationsData.map(n => {
                             return (
                                 <TableRow key={n.name}>

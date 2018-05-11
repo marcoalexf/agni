@@ -159,9 +159,9 @@ class RegistProblem extends React.Component {
         xmlHttp.send(myJSON);
 
         xmlHttp.onreadystatechange = function() {//Call a function when the state changes.
-            if(xmlHttp.readyState == XMLHttpRequest.DONE) {
+            if(xmlHttp.readyState === XMLHttpRequest.DONE) {
 
-                if(xmlHttp.status == 200){
+                if(xmlHttp.status === 200){
                     console.log("Sucesso");
                     document.location.href = '/obrigada';
                 }

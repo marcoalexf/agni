@@ -86,7 +86,7 @@ class Profile extends React.Component {
 
         if(token != null){
             var uname = JSON.parse(token).username;
-            var tokenID = JSON.parse(token);
+            var tokenObj = JSON.parse(token);
 
             // if(tokenObj.expirationData){
             //  tratar para o caso do token ter expirado
@@ -94,7 +94,7 @@ class Profile extends React.Component {
 
             var user = {
                 "username": uname,
-                "token": tokenID
+                "token": tokenObj
             }
 
             var xmlHttp = new XMLHttpRequest();
@@ -206,13 +206,13 @@ class Profile extends React.Component {
                         <div id="showusername" className={classes.username}></div>
                         <Typography id="showemail" component="p"></Typography>
                         <div className={classes.basicInfo}>
-                            <b id="reports">0</b> <text>Reportes de Problemas</text>
+                            <b id="reports">0</b> <q>Reportes de Problemas</q>
                         </div>
                         <div className={classes.basicInfo}>
-                            <b id="supports">0</b> <text>A apoiar</text>
+                            <b id="supports">0</b> <q>A apoiar</q>
                         </div>
                         <div className={classes.basicInfo}>
-                            <b id="supports">0</b> <text>Comentarios</text>
+                            <b id="supports">0</b> <q>Comentarios</q>
                         </div>
 
                         <Typography id="showname" component="p"></Typography>
