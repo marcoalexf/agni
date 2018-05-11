@@ -7,9 +7,9 @@ import NewsIcon from '@material-ui/icons/Public';
 import ProfileIcon from '@material-ui/icons/PermIdentity';
 import RegistPIcon from '@material-ui/icons/NoteAdd';
 import OperationsIcon from '@material-ui/icons/ViewList';
+import AccessibilityIcon from '@material-ui/icons/Accessibility';
 import MapIcon from '@material-ui/icons/Place';
 import StatsIcon from '@material-ui/icons/Poll';
-import LogoutIcon from '@material-ui/icons/ExitToApp';
 import {Link} from 'react-router-dom';
 
 /*handleLogout = () => {
@@ -96,9 +96,10 @@ export const mainMenuListItems = (
 
 export const logoutItem = (
     <div>
-        <ListItem button>
+        <ListItem component={Link}
+                           to="/sobrenos">
             <ListItemIcon>
-                <LogoutIcon />
+                <AccessibilityIcon />
             </ListItemIcon>
             <ListItemText primary="Sobre nos" />
         </ListItem>

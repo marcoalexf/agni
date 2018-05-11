@@ -33,7 +33,6 @@ public class RegisterData {
 	}
 	public boolean validRegistration() {
 		return nonEmptyField(username) && nonEmptyField(password) && nonEmptyField(email) 
-				&& nonEmptyField(name) && email.contains("@") && nonEmptyField(role) 
-				&& nonEmptyField(district) && nonEmptyField(county) && nonEmptyField(locality);
+				&& nonEmptyField(name) && email.contains("@") && nonEmptyField(role);
 	}
 }

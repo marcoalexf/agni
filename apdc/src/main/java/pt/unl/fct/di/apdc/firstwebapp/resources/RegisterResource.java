@@ -36,7 +36,7 @@ public class RegisterResource {
 	public Response registerUser(RegisterData data) {
 		LOG.fine("Attempt to register user: " + data.username);
 		
-		if( ! data.validRegistration() ) {
+		if(!data.validRegistration()) {
 			return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
 		}
 		
@@ -47,7 +47,7 @@ public class RegisterResource {
 			@SuppressWarnings("unused")
 			Entity user = datastore.get(userKey);
 			txn.rollback();
-			return Response.status(Status.BAD_REQUEST).entity("User already exists.").build(); 
+			return Response.status(Status.BAD_REQUEST).entity("User already exists.").build();
 		} catch (EntityNotFoundException e) {
 			Entity user = new Entity("User", data.username);
 			user.setProperty("user_name", data.name);

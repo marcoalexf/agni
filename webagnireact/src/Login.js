@@ -63,21 +63,7 @@ class Login extends Component {
         console.log("Login");
         console.log(this.state.username);
         console.log(this.state.password);
-        // // var resultElement = document.getElementById("errorMessage");
-        // // var config = {
-        // //     headers: {"Content-Type": "application/json;charset=UTF-8"}
-        // // }
-        // //
-        // // axios.post('http://localhost/rest/login/v2', {
-        // //     username: this.state.username,
-        // //     password: this.state.password,
-        // // }, config).then(function(response){
-        // //     //resultElement.innerHTML = "Bem vindo a app";
-        // //     console.log("deu");
-        // // }).catch(function(error){
-        // //     //resultElement.innerHTML = "User nao existe ou Password Incorreta";
-        // //     console.log("nao deu");
-        // // })
+
         var localstorage = window.localStorage;
         var username = this.state.username;
         var password = this.state.password;
@@ -91,7 +77,7 @@ class Login extends Component {
 
          if(informations == null){
              var xmlHttp = new XMLHttpRequest();
-             xmlHttp.open( "POST", "http://localhost:8080/rest/login/v2");
+             xmlHttp.open( "POST", "http://localhost:8080/rest/login");
              xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
              var myJSON = JSON.stringify(user);
              xmlHttp.send(myJSON);

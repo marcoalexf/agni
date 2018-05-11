@@ -1,7 +1,10 @@
 package com.example.marisco.myapplication;
 
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +25,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
 
     //TODO: Isto ta a dar loop infinito nao sei porque..
 
-    GoogleMap map;
+    private GoogleMap map;
     @BindView(R.id.mapView) MapView mapView;
 
 
@@ -52,12 +55,29 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
         });*/
         // Inflate the layout for this fragment
 
+        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+
         return v;
     }
 
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) throws SecurityException{
+        switch (requestCode) {
+            case 1: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    map.setMyLocationEnabled(true);
+
+                } else {
+                    //meter mapa em local standard
+                }
+                return;
+            }
+        }
+    }
+
     @Override
-    public void onMapReady(GoogleMap map) throws SecurityException{
+    public void onMapReady(GoogleMap map) {
         this.map = map;
-        map.setMyLocationEnabled(true);
     }
 }

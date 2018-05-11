@@ -85,7 +85,6 @@ public class MainActivity extends AppCompatActivity implements Serializable{
                 Log.e("ERROR", t.toString());
             }
         });
-
     }
 
     public void launchActivity(LoginResponse response){

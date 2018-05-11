@@ -8,7 +8,6 @@ import Toolbar from 'material-ui/Toolbar';
 import { Manager, Target, Popper } from 'react-popper';
 import Button from 'material-ui/Button';
 import List from 'material-ui/List';
-import Typography from 'material-ui/Typography';
 import Divider from 'material-ui/Divider';
 import IconButton from 'material-ui/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
@@ -24,10 +23,12 @@ import Home from './Home';
 import News from './News';
 import Profile from './Profile';
 import RegistProblem from './RegistProblem';
+import ThankYou from './ThankYou';
 import Operations from './Operations';
 import Map from './Map';
 import Statistics from './Statistics';
-import Operation from './Operation';
+import Operation from './InfoOperation';
+import AboutUs from './AboutUs';
 import ClickAwayListener from 'material-ui/utils/ClickAwayListener';
 import Grow from 'material-ui/transitions/Grow';
 import Paper from 'material-ui/Paper';
@@ -83,6 +84,8 @@ const styles = theme => ({
     },
     loginButton:{
         flex:1,
+        fontFamily: 'Roboto Mono',
+        fontSize: 12,
     },
     hide: {
         display: 'none',
@@ -166,11 +169,13 @@ class MiniDrawer extends React.Component {
 
         if(token != null){
             var uname = JSON.parse(token).username;
-            var tokenID = JSON.parse(token).tokenID;
+            var tokenID = JSON.parse(token);
 
             var data = {
-                "user": uname,
-                "token": tokenID
+                "username": uname,
+                "tokenID": tokenID.tokenID,
+                "creationData": tokenID.creationData,
+                "expirationData": tokenID.expirationData
             }
 
             if(uname!= null){
@@ -184,16 +189,21 @@ class MiniDrawer extends React.Component {
                     if(xmlHttp.readyState == XMLHttpRequest.DONE && xmlHttp.status == 200) {
                         var response = xmlHttp.responseText;
                         console.log("XML response: " + response);
-                        window.localStorage.removeItem('token');
+                        //window.localStorage.removeItem('token');
                         console.log("sucesso");
                         document.location.href = '/login';
                     }
+                    else{
+                        //TO DO- ver se o tempo ja expirou antes de "chatear" o server
+                        console.log("tempo expirado");
+                    }
+                    window.localStorage.removeItem('token');
                 }
             }
         }
 
         else{
-            console.log("tempo expirado");
+            console.log("nao existe nenhuma conta com login de momento");
         }
     }
 
@@ -217,9 +227,9 @@ class MiniDrawer extends React.Component {
                         >
                             <MenuIcon />
                         </IconButton>
-                        <Typography variant="title" color="inherit" className={classNames(classes.loginButton)} noWrap>
+                        <q className={classNames(classes.loginButton)}>
                             Menos florestas negras, mais caminhos verdes e céus mais azuis
-                        </Typography>
+                        </q>
 
                         <Manager>
                             <Target>
@@ -294,6 +304,8 @@ class MiniDrawer extends React.Component {
                         <Route path='/mapa' component={Map}/>
                         <Route path='/estatisticas' component={Statistics}/>
                         <Route path='/operacao' component={Operation}/>
+                        <Route path='/obrigada' component={ThankYou}/>
+                        <Route path='/sobrenos' component={AboutUs}/>
                     </Switch>
                 </main>
             </div>

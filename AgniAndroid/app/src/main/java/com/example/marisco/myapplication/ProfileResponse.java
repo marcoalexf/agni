@@ -4,19 +4,17 @@ import com.google.gson.annotations.SerializedName;
 
 public class ProfileResponse {
 
-    @SerializedName("name") private String name;
+    @SerializedName("user_name") private String name;
 
-    @SerializedName("role") private String role;
+    @SerializedName("user_role") private String role;
 
-    @SerializedName("email") private String email;
+    @SerializedName("user_email") private String email;
 
-    @SerializedName("username") private String username;
+    @SerializedName("user_district") private String district;
 
-    @SerializedName("district") private String district;
+    @SerializedName("user_county") private String county;
 
-    @SerializedName("county") private String county;
-
-    @SerializedName("locality") private String locality;
+    @SerializedName("user_locality") private String locality;
 
     public String getName() {
         return name;
@@ -40,14 +38,6 @@ public class ProfileResponse {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public String getDistrict() {
