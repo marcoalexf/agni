@@ -28,8 +28,8 @@
             android:theme="@style/AppTheme.NoActionBar" />
 
         <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAtTD5VCFlMDX0HcnPbnZWWArACgGR5Ywk" />
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyBp0bNOT2mZzgY3afDIYZ7FZpbRtWvm4u4" />
 
         <activity android:name=".RegisterActivity"/>
 

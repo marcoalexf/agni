@@ -41,6 +41,14 @@
     <string name="profile_registers">Registers: </string>
     <string name="profile_comments">Comments: </string>
 
+
+
+    <!--Occurrence info-->
+    <string name="occurrence_title">Title:</string>
+    <string name="occurrence_description">Occurrence description:</string>
+    <string name="occurrence_area">Area:</string>
+    <string name="occurrence_public">Public</string>
+    <string name="occurrence_private">Private</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

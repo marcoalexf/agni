@@ -51,10 +51,10 @@ public class ProfileFragment extends Fragment {
         ButterKnife.bind(this, v);
         Bundle b = this.getArguments();
         if(b != null){
-            this.token = (LoginResponse) getActivity().getIntent().getSerializableExtra(TOKEN);
+            this.token = (LoginResponse) b.getSerializable(TOKEN);
         }
 
-        //this.username = args.getString("username");
+        this.username = token.getUsername();
        //profile_username.setText(this.username);
         getProfile();
         return v;
@@ -70,20 +70,16 @@ public class ProfileFragment extends Fragment {
 
         AgniAPI agniAPI = retrofit.create(AgniAPI.class);
 
-        if(token == null){
-            Toast toast2 = Toast.makeText(getActivity(), "token é nulo", Toast.LENGTH_SHORT);
-            toast2.show();
-        }
+        ProfileRequest request = new ProfileRequest(token.username, token);
+        Call<ProfileResponse> call = agniAPI.getProfile(request);
 
-
-        Call<ProfileResponse> call = agniAPI.getProfile(token);
         call.enqueue(new Callback<ProfileResponse>() {
             @Override
             public void onResponse(Call<ProfileResponse> call, Response<ProfileResponse> response) {
                 if (response.code() == 200)
                     fillInfo(response.body());
                 else {
-                    Toast toast = Toast.makeText(getActivity(), "Failed to get profile", Toast.LENGTH_SHORT);
+                    Toast toast = Toast.makeText(getActivity(), "Failed to get profile" + response.code(), Toast.LENGTH_SHORT);
                     toast.show();
                 }
             }
@@ -101,15 +97,13 @@ public class ProfileFragment extends Fragment {
         startActivity(intent);
     }*/
     private void fillInfo(ProfileResponse response){
-        Toast toast2 = Toast.makeText(getActivity(), "tou no fillInfo", Toast.LENGTH_SHORT);
-        toast2.show();
-        profile_username.setText(response.getUsername());
         profile_type.setText(response.getRole());
+        profile_username.setText(username);
 
-        profile_name.append(response.getName());
-        profile_email.append(response.getEmail());
-        profile_locality.append(response.getLocality());
-        profile_county.append(response.getCounty());
-        profile_district.append(response.getDistrict());
+        profile_name.append(" " + response.getName());
+        profile_email.append(" " + response.getEmail());
+        profile_locality.append(" " + response.getLocality());
+        profile_county.append(" " + response.getCounty());
+        profile_district.append(" " + response.getDistrict());
     }
 }
