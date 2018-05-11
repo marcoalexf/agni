@@ -18,9 +18,22 @@
     <string name="prompt_email">Email</string>
     <string name="prompt_user_type">Tipo de utilizador</string>
     <string name="prompt_name">Nome</string>
+    <string name="prompt_locality">Localidade</string>
+    <string name="prompt_county">Concelho</string>
+    <string name="prompt_district">Distrito</string>
     <string-array name="user_types">
         <item>Civil</item>
         <item>Funcionário</item>
         <item>Bombeiro</item>
     </string-array>
+
+    <!--Profile info-->
+    <string name="profile_name">Nome: </string>
+    <string name="profile_email">Email: </string>
+    <string name="profile_locality">Localidade: </string>
+    <string name="profile_county">Concelho: </string>
+    <string name="profile_district">Distrito: </string>
+    <string name="profile_likes">Gostos: </string>
+    <string name="profile_registers">Registos: </string>
+    <string name="profile_comments">Comentários: </string>
 </resources>

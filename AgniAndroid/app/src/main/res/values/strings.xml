@@ -5,7 +5,7 @@
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
-    <string name="prompt_password">Password (optional)</string>
+    <string name="prompt_password">Password</string>
     <string name="action_sign_in">Sign in or register</string>
     <string name="action_sign_in_short">Sign in</string>
     <string name="error_invalid_email">This email address is invalid</string>
@@ -20,6 +20,9 @@
 
     <string name="prompt_name">Name</string>
     <string name="prompt_username">Username</string>
+    <string name="prompt_locality">Locality</string>
+    <string name="prompt_county">County</string>
+    <string name="prompt_district">District</string>
 
     <string name="title_activity_home_page">HomePage</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -27,6 +30,16 @@
     <string name="nav_header_title">Android Studio</string>
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
+
+    <!--Profile info-->
+    <string name="profile_name">Name: </string>
+    <string name="profile_email">Email: </string>
+    <string name="profile_locality">Locality: </string>
+    <string name="profile_county">County: </string>
+    <string name="profile_district">District: </string>
+    <string name="profile_likes">Likes: </string>
+    <string name="profile_registers">Registers: </string>
+    <string name="profile_comments">Comments: </string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

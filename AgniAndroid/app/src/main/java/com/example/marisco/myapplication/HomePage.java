@@ -15,7 +15,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-
 import java.io.Serializable;
 
 import butterknife.ButterKnife;
@@ -24,6 +23,8 @@ public class HomePage extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, Serializable {
 
     String username, name, email, type;
+    private LoginResponse token;
+    private static final String TOKEN = "token";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +60,8 @@ public class HomePage extends AppCompatActivity
         header_username.setText(response.getUsername());
 
         this.username = response.getUsername();
+
+        this.token = response;
     }
 
     @Override
@@ -105,7 +108,8 @@ public class HomePage extends AppCompatActivity
             FragmentManager fman = getSupportFragmentManager();
 
             Bundle args = new Bundle();
-            args.putString("username", username);
+            args.putSerializable(TOKEN, token);
+            //args.putString("username", username);
             //args.putString("name", name);
             //args.putString("type", type);
             //args.putString("email", email);
