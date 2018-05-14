@@ -24,97 +24,122 @@ const styles = theme => ({
 });
 
 function makeAJAXCall(){
-    console.log("comeco da funcao");
-    var map;
-    var token = window.localStorage.getItem('token');
-    var uname = JSON.parse(token).username;
-    var tokenObj = JSON.parse(token);
+    return new Promise(function(resolve, reject) {
+        console.log("comeco da funcao");
+        var map;
+        var token = window.localStorage.getItem('token');
+        var uname = JSON.parse(token).username;
+        var tokenObj = JSON.parse(token);
 
-    var user = {
-        "username": uname,
-        "token": tokenObj,
-        "showPrivate": true //MUDAR ISTO DEPOIS
-    }
+        var user = {
+            "username": uname,
+            "token": tokenObj,
+            "showPrivate": true //MUDAR ISTO DEPOIS
+        }
 
-    console.log("pedido");
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open("POST", "http://localhost:8080/rest/occurrence/list", true);
-    xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    var myJSON = JSON.stringify(user);
-    xmlHttp.send(myJSON);
+        console.log("pedido");
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open("POST", "http://localhost:8080/rest/occurrence/list", true);
+        xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        var myJSON = JSON.stringify(user);
+        xmlHttp.send(myJSON);
 
-    console.log("esperar pelo estado");
-    xmlHttp.onreadystatechange = function () {
-        console.log("1");
-        if (xmlHttp.readyState === 4) {
-            console.log("2");
-            if(xmlHttp.status === 200){
-                console.log("3");
-                var response = xmlHttp.response;
-                var obj = JSON.parse(response);
-                map = obj[0];
-                console.log(map);
+        console.log("esperar pelo estado");
+        xmlHttp.onreadystatechange = function () {
+            console.log("1");
+            if (xmlHttp.readyState === 4) {
+                console.log("2");
+                if (xmlHttp.status === 200) {
+                    console.log("3");
+                    var response = xmlHttp.response;
+                    var obj = JSON.parse(response);
+                    map = obj[0];
+                    console.log(map);
 
-                var title = document.getElementById("showtitle");
-                title.innerHTML = map.user_occurrence_title;
+                    this.setState({ occurrences: [map] });
 
-                var type = document.getElementById("showtype");
-                type.innerHTML = map.user_occurrence_type;
+                    var title = document.getElementById("showtitle");
+                    title.innerHTML = map.user_occurrence_title;
 
-                //callback(FillTable(map));
+                    var type = document.getElementById("showtype");
+                    type.innerHTML = map.user_occurrence_type;
+
+                    resolve(map);
+
+                    //callback(FillTable(map));
+                }
+                else {
+                    console.log("tempo expirado");
+                    reject(Error('Tempo expirado'));
+                }
             }
             else {
-                console.log("tempo expirado");
+                console.log("4");
             }
-        }
-        else{
-            console.log("4");
-        }
-    }.bind(this);
+      //  }.bind(this);
+        }.bind(this);
+    }.bind(this)
+    );
+
 }
 
-function FillTable(data){
-    const myPromise = new Promise(makeAJAXCall);
-    myPromise.then( function () {
-            const object = [data];
-            const table =
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Informações</TableCell>
-                            <TableCell>Nome</TableCell>
-                            <TableCell>Tipo</TableCell>
-                            <TableCell>Data</TableCell>
-                            <TableCell>Estado</TableCell>
-                            <TableCell numeric>Grau de urgência</TableCell>
-                            <TableCell>Visibilidade</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {object.map(occ => {
-                            return (
-                                <TableRow key={occ.user_occurrence_title}>
-                                    <TableCell> <IconButton component={Link}
-                                                            to="/operacao"> <InfoIcon/> </IconButton></TableCell>
-                                    <TableCell>{occ.user_occurrence_title}</TableCell>
-                                    <TableCell>{occ.user_occurrence_type}</TableCell>
-                                    <TableCell>{occ.user_occurrence_data}</TableCell>
-                                    <TableCell>{'nao tratado'}</TableCell>
-                                    <TableCell numeric> {occ.user_occurrence_level}</TableCell>
-                                    <TableCell>{occ.user_occurrence_visibility}</TableCell>
-                                </TableRow>
-                            );
-                        })}
-                    </TableBody>
-                </Table>;
-
-            //$('.table').append(table);
-
-            return(
-                {table}
-            )
+function fillTable(){
+    console.log("fillTable");
+    //var div = document.querySelector('div');
+    makeAJAXCall.then( function (response) {
+            console.log("fillTable response")
+            console.log(response);
+            return response;
         }
     );
+}
+
+function ShowTable(props){
+    const object = [props.data];
+    const table =
+        <Table>
+            <TableHead>
+                <TableRow>
+                    <TableCell>Informações</TableCell>
+                    <TableCell>Nome</TableCell>
+                    <TableCell>Tipo</TableCell>
+                    <TableCell>Data</TableCell>
+                    <TableCell>Estado</TableCell>
+                    <TableCell numeric>Grau de urgência</TableCell>
+                    <TableCell>Visibilidade</TableCell>
+                </TableRow>
+            </TableHead>
+            <TableBody>
+                {object.map(occ => {
+                    return (
+                        <TableRow key={occ.user_occurrence_title}>
+                            <TableCell> <IconButton component={Link}
+                                                    to="/operacao"> <InfoIcon/> </IconButton></TableCell>
+                            <TableCell>{occ.user_occurrence_title}</TableCell>
+                            <TableCell>{occ.user_occurrence_type}</TableCell>
+                            <TableCell>{occ.user_occurrence_data}</TableCell>
+                            <TableCell>{'nao tratado'}</TableCell>
+                            <TableCell numeric> {occ.user_occurrence_level}</TableCell>
+                            <TableCell>{occ.user_occurrence_visibility}</TableCell>
+                        </TableRow>
+                    );
+                })}
+            </TableBody>
+        </Table>;
+
+    //$('.table').append(table);
+
+    //div.appendChild(table);
+
+    return(
+        {table}
+    )
+}
+
+function ShowButton(){
+    return(
+        <Button/>
+    )
 }
 
 class Operations extends React.Component {
@@ -122,9 +147,86 @@ class Operations extends React.Component {
         super(props);
 
         this.state = {
-            occurrences: 'null',
+
         };
+
+        makeAJAXCall.then((value) => {
+            this.setState({occurrences: [value]})
+        })
+
+        // this.makeAJAXCall = this.makeAJAXCall.bind(this);
     }
+
+    // fillTable = () => {
+    //     console.log("fillTable");
+    //     //var div = document.querySelector('div');
+    //     this.makeAJAXCall.then( function (response) {
+    //             console.log("fillTable response")
+    //             console.log(response);
+    //             return response;
+    //         }
+    //     );
+    // }
+    //
+    // makeAJAXCall = () => {
+    //     return new Promise(function(resolve, reject) {
+    //             console.log("comeco da funcao");
+    //             var map;
+    //             var token = window.localStorage.getItem('token');
+    //             var uname = JSON.parse(token).username;
+    //             var tokenObj = JSON.parse(token);
+    //
+    //             var user = {
+    //                 "username": uname,
+    //                 "token": tokenObj,
+    //                 "showPrivate": true //MUDAR ISTO DEPOIS
+    //             }
+    //
+    //             console.log("pedido");
+    //             var xmlHttp = new XMLHttpRequest();
+    //             xmlHttp.open("POST", "http://localhost:8080/rest/occurrence/list", true);
+    //             xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    //             var myJSON = JSON.stringify(user);
+    //             xmlHttp.send(myJSON);
+    //
+    //             console.log("esperar pelo estado");
+    //             xmlHttp.onreadystatechange = function () {
+    //                 console.log("1");
+    //                 if (xmlHttp.readyState === 4) {
+    //                     console.log("2");
+    //                     if (xmlHttp.status === 200) {
+    //                         console.log("3");
+    //                         var response = xmlHttp.response;
+    //                         var obj = JSON.parse(response);
+    //                         map = obj[0];
+    //                         console.log(map);
+    //
+    //                         this.setState({ occurrences: [map] });
+    //
+    //                         var title = document.getElementById("showtitle");
+    //                         title.innerHTML = map.user_occurrence_title;
+    //
+    //                         var type = document.getElementById("showtype");
+    //                         type.innerHTML = map.user_occurrence_type;
+    //
+    //                         resolve(map);
+    //
+    //                         //callback(FillTable(map));
+    //                     }
+    //                     else {
+    //                         console.log("tempo expirado");
+    //                         reject(Error('Tempo expirado'));
+    //                     }
+    //                 }
+    //                 else {
+    //                     console.log("4");
+    //                 }
+    //                 //  }.bind(this);
+    //             }.bind(this);
+    //         }.bind(this)
+    //     );
+    //
+    // }
 
     render() {
         const { classes } = this.props;
@@ -135,12 +237,44 @@ class Operations extends React.Component {
                 <Typography variant="display1" className={classes.title}>Operacoes</Typography>
 
                 <div className="table">
-                    <FillTable/>
+
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Informações</TableCell>
+                                <TableCell>Nome</TableCell>
+                                <TableCell>Tipo</TableCell>
+                                <TableCell>Data</TableCell>
+                                <TableCell>Estado</TableCell>
+                                <TableCell numeric>Grau de urgência</TableCell>
+                                <TableCell>Visibilidade</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {this.state.occurrences.map(occ => {
+                                return (
+                                    <TableRow key={occ.user_occurrence_title}>
+                                        <TableCell> <IconButton component={Link}
+                                                                to="/operacao"> <InfoIcon/> </IconButton></TableCell>
+                                        <TableCell>{occ.user_occurrence_title}</TableCell>
+                                        <TableCell>{occ.user_occurrence_type}</TableCell>
+                                        <TableCell>{occ.user_occurrence_data}</TableCell>
+                                        <TableCell>{'nao tratado'}</TableCell>
+                                        <TableCell numeric> {occ.user_occurrence_level}</TableCell>
+                                        <TableCell>{occ.user_occurrence_visibility}</TableCell>
+                                    </TableRow>
+                                );
+                            })}
+                        </TableBody>
+                    </Table>
+
+                    {/*<ShowTable data={fillTable}/>*/}
+                    {/*<FillTable/>*/}
                     {/*{makeAJAXCall(FillTable)}*/}
                 </div>
 
-                <div id="showtitle" className={classes.username}></div>
-                <div id="showtype"></div>
+                <p id="showtitle" className={classes.username}></p>
+                <p id="showtype"></p>
 
                 {/*<FillTable/>*/}
 
@@ -176,8 +310,9 @@ class Operations extends React.Component {
 
             {/* </Table> */}
 
-                <Button onClick={this.loadOperations}>Pedido Rest</Button>
+                <Button onClick={fillTable}>Pedido Rest</Button>
             </div>
+
         );
     }
 }

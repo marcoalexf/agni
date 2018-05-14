@@ -128,9 +128,8 @@ class Register extends Component {
         console.log("XML response:" + xmlHttp.responseText);
 
         xmlHttp.onreadystatechange = function() {//Call a function when the state changes.
-            if(xmlHttp.readyState == XMLHttpRequest.DONE) {
-
-                if(xmlHttp.status == 200){
+            if(xmlHttp.readyState === XMLHttpRequest.DONE) {
+                if(xmlHttp.status === 200){
                     console.log("Sucesso");
                     document.getElementById("errorMessage").innerHTML = "";
                     document.location.href = '/login';
@@ -147,7 +146,7 @@ class Register extends Component {
 
     render() {
         const { loggingIn } = this.props;
-        const { username, email, value, password, confirmPass, submitted } = this.state;
+        const { username, email, password, confirmPass, submitted } = this.state;
         const { classes } = this.props;
 
         return (
