@@ -31,8 +31,10 @@ public class RegisterData {
 	private boolean nonEmptyField(String field) {
 		return field != null && !field.isEmpty();
 	}
+	
 	public boolean validRegistration() {
 		return nonEmptyField(username) && nonEmptyField(password) && nonEmptyField(email) 
 				&& nonEmptyField(name) && email.contains("@") && nonEmptyField(role);
 	}
+	
 }

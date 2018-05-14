@@ -29,4 +29,13 @@ public class OccurrenceData {
 		this.lon = lon;
 		this.notificationOnResolve = notificationOnResolve;
 	}
+	
+	private boolean nonEmptyField(String field) {
+		return field != null && !field.isEmpty();
+	}
+	
+	public boolean validRegistration() {
+		return nonEmptyField(title) && nonEmptyField(description) && nonEmptyField(type);
+	}
+	
 }

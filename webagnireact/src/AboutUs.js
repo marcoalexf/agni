@@ -46,6 +46,10 @@ const styles =  theme => ({
         margin: 10,
         textAlign: 'center',
     },
+    inlineImg:{
+        display: 'inline-block',
+        marginRight: 20,
+    },
 });
 
 class AboutUs extends React.Component {
@@ -183,6 +187,26 @@ class AboutUs extends React.Component {
                         </CardActions>
                     </Card>
                 </div>
+
+                <div className={classes.title}>
+                    Apresenta
+                </div>
+
+                <div className="imgcontainer">
+                    <img src={require('./img/agniWithBackground.png')} alt="Avatar" />
+                </div>
+
+                <div className={classes.title}>
+                    Com o apoio de
+                </div>
+
+                <div className="imgcontainer">
+                    <img src={require('./img/material-ui.svg')} alt="Avatar" width={'100'} className={classes.inlineImg} />
+                    <img src={require('./img/jshtmlcss.png')} alt="Avatar" width={'100'} className={classes.inlineImg} />
+                    <img src={require('./img/java.jpg')} alt="Avatar" width={'100'} className={classes.inlineImg} />
+                    <img src={require('./img/Android-Logo.jpg')} alt="Avatar" width={'100'} className={classes.inlineImg} />
+                </div>
+
 
             </div>
 

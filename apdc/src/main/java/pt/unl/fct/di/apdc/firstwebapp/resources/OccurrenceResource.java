@@ -30,6 +30,7 @@ import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.firstwebapp.util.ListOccurrenceData;
 import pt.unl.fct.di.apdc.firstwebapp.util.OccurrenceData;
+import pt.unl.fct.di.apdc.firstwebapp.util.SecurityManager;
 
 @Path("/occurrence")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -138,7 +139,7 @@ public class OccurrenceResource {
 			Filter propertyFilter = new FilterPredicate("user_occurrence_visibility", FilterOperator.EQUAL, true);
 			ctrQuery.setFilter(propertyFilter);
 		}
-		else if(!data.token.username.equals(data.username) /** && !hasAdminAccess **/) {
+		else if(!data.token.username.equals(data.username) && !SecurityManager.userHasAccess("see_private_occurrences", data.token.username)) {
 			return Response.status(Status.FORBIDDEN).build();
 		}
 		List<Entity> results = datastore.prepare(ctrQuery).asList(FetchOptions.Builder.withDefaults());

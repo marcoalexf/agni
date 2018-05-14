@@ -23,119 +23,296 @@ const styles = theme => ({
     },
 });
 
-class Operations extends React.Component {
-
-    state = {
-        occurrences: null,
-    };
-
-    loadOperations = () => {
-        console.log("aqui");
-        var obj;
+function makeAJAXCall(){
+    return new Promise(function(resolve, reject) {
+        console.log("comeco da funcao");
+        var map;
         var token = window.localStorage.getItem('token');
+        var uname = JSON.parse(token).username;
+        var tokenObj = JSON.parse(token);
 
-        if(token != null) {
-            var uname = JSON.parse(token).username;
-            var tokenObj = JSON.parse(token);
+        var user = {
+            "username": uname,
+            "token": tokenObj,
+            "showPrivate": true //MUDAR ISTO DEPOIS
+        }
 
-            // if(tokenObj.expirationData){
-            //  tratar para o caso do token ter expirado
-            // }
+        console.log("pedido");
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open("POST", "http://localhost:8080/rest/occurrence/list", true);
+        xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        var myJSON = JSON.stringify(user);
+        xmlHttp.send(myJSON);
 
-            //MUDAR SHOW PRIVATE DEPOIS
-            var user = {
-                "username": uname,
-                "token": tokenObj,
-                "showPrivate": true //MUDAR ISTO DEPOIS
-            }
+        console.log("esperar pelo estado");
+        xmlHttp.onreadystatechange = function () {
+            console.log("1");
+            if (xmlHttp.readyState === 4) {
+                console.log("2");
+                if (xmlHttp.status === 200) {
+                    console.log("3");
+                    var response = xmlHttp.response;
+                    var obj = JSON.parse(response);
+                    map = obj[0];
+                    console.log(map);
 
-            var xmlHttp = new XMLHttpRequest();
-            xmlHttp.open("POST", "http://localhost:8080/rest/occurrence/list", true);
-            xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            var myJSON = JSON.stringify(user);
-            xmlHttp.send(myJSON);
+                    this.setState({ occurrences: [map] });
 
-            xmlHttp.onreadystatechange = function () {
-                if (xmlHttp.readyState == XMLHttpRequest.DONE) {
-                    if(xmlHttp.status == 200){
-                        var response = xmlHttp.response;
-                        console.log("XML response: " + response);
-                        obj = JSON.parse(response);
+                    var title = document.getElementById("showtitle");
+                    title.innerHTML = map.user_occurrence_title;
 
-                        console.log(obj);
+                    var type = document.getElementById("showtype");
+                    type.innerHTML = map.user_occurrence_type;
 
-                        for(var occurrence in obj){
-                            var map = obj[occurrence];
+                    resolve(map);
 
-                            console.log(map);
-
-                            var data = map.user_occurrence_data;
-                            var level = map.user_occurrence_level;
-                            var lat = map.user_occurrence_lat;
-                            var long = map.user_occurrence_lon;
-                            var title = map.user_occurrence_title;
-                            var type  = map.user_occurrence_type;
-                            var visibility = map.user_occurrence_visibility;
-                        }
-                            Operations.changeObj(obj);
-                    }
-                    else {
-                        //TO DO- ver se o tempo ja expirou antes de "chatear" o server
-                        console.log("tempo expirado");
-                        //window.localStorage.removeItem('token');
-                    }
+                    //callback(FillTable(map));
+                }
+                else {
+                    console.log("tempo expirado");
+                    reject(Error('Tempo expirado'));
                 }
             }
+            else {
+                console.log("4");
+            }
+      //  }.bind(this);
+        }.bind(this);
+    }.bind(this)
+    );
 
+}
+
+function fillTable(){
+    console.log("fillTable");
+    //var div = document.querySelector('div');
+    makeAJAXCall.then( function (response) {
+            console.log("fillTable response")
+            console.log(response);
+            return response;
         }
-        this.setState({ occurrences: obj });
-        console.log(this.state.occurrences);
+    );
+}
+
+function ShowTable(props){
+    const object = [props.data];
+    const table =
+        <Table>
+            <TableHead>
+                <TableRow>
+                    <TableCell>Informações</TableCell>
+                    <TableCell>Nome</TableCell>
+                    <TableCell>Tipo</TableCell>
+                    <TableCell>Data</TableCell>
+                    <TableCell>Estado</TableCell>
+                    <TableCell numeric>Grau de urgência</TableCell>
+                    <TableCell>Visibilidade</TableCell>
+                </TableRow>
+            </TableHead>
+            <TableBody>
+                {object.map(occ => {
+                    return (
+                        <TableRow key={occ.user_occurrence_title}>
+                            <TableCell> <IconButton component={Link}
+                                                    to="/operacao"> <InfoIcon/> </IconButton></TableCell>
+                            <TableCell>{occ.user_occurrence_title}</TableCell>
+                            <TableCell>{occ.user_occurrence_type}</TableCell>
+                            <TableCell>{occ.user_occurrence_data}</TableCell>
+                            <TableCell>{'nao tratado'}</TableCell>
+                            <TableCell numeric> {occ.user_occurrence_level}</TableCell>
+                            <TableCell>{occ.user_occurrence_visibility}</TableCell>
+                        </TableRow>
+                    );
+                })}
+            </TableBody>
+        </Table>;
+
+    //$('.table').append(table);
+
+    //div.appendChild(table);
+
+    return(
+        {table}
+    )
+}
+
+function ShowButton(){
+    return(
+        <Button/>
+    )
+}
+
+class Operations extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+
+        };
+
+        makeAJAXCall.then((value) => {
+            this.setState({occurrences: [value]})
+        })
+
+        // this.makeAJAXCall = this.makeAJAXCall.bind(this);
     }
 
-    changeObj = obj => {
-        this.setState({ occurrences: obj });
-        console.log(this.state.occurrences);
-    }
+    // fillTable = () => {
+    //     console.log("fillTable");
+    //     //var div = document.querySelector('div');
+    //     this.makeAJAXCall.then( function (response) {
+    //             console.log("fillTable response")
+    //             console.log(response);
+    //             return response;
+    //         }
+    //     );
+    // }
+    //
+    // makeAJAXCall = () => {
+    //     return new Promise(function(resolve, reject) {
+    //             console.log("comeco da funcao");
+    //             var map;
+    //             var token = window.localStorage.getItem('token');
+    //             var uname = JSON.parse(token).username;
+    //             var tokenObj = JSON.parse(token);
+    //
+    //             var user = {
+    //                 "username": uname,
+    //                 "token": tokenObj,
+    //                 "showPrivate": true //MUDAR ISTO DEPOIS
+    //             }
+    //
+    //             console.log("pedido");
+    //             var xmlHttp = new XMLHttpRequest();
+    //             xmlHttp.open("POST", "http://localhost:8080/rest/occurrence/list", true);
+    //             xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    //             var myJSON = JSON.stringify(user);
+    //             xmlHttp.send(myJSON);
+    //
+    //             console.log("esperar pelo estado");
+    //             xmlHttp.onreadystatechange = function () {
+    //                 console.log("1");
+    //                 if (xmlHttp.readyState === 4) {
+    //                     console.log("2");
+    //                     if (xmlHttp.status === 200) {
+    //                         console.log("3");
+    //                         var response = xmlHttp.response;
+    //                         var obj = JSON.parse(response);
+    //                         map = obj[0];
+    //                         console.log(map);
+    //
+    //                         this.setState({ occurrences: [map] });
+    //
+    //                         var title = document.getElementById("showtitle");
+    //                         title.innerHTML = map.user_occurrence_title;
+    //
+    //                         var type = document.getElementById("showtype");
+    //                         type.innerHTML = map.user_occurrence_type;
+    //
+    //                         resolve(map);
+    //
+    //                         //callback(FillTable(map));
+    //                     }
+    //                     else {
+    //                         console.log("tempo expirado");
+    //                         reject(Error('Tempo expirado'));
+    //                     }
+    //                 }
+    //                 else {
+    //                     console.log("4");
+    //                 }
+    //                 //  }.bind(this);
+    //             }.bind(this);
+    //         }.bind(this)
+    //     );
+    //
+    // }
 
     render() {
         const { classes } = this.props;
 
+
         return (
-            <div onLoad={this.loadOperations}>
+            <div>
                 <Typography variant="display1" className={classes.title}>Operacoes</Typography>
 
-                <Table className={classes.table}>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Informações</TableCell>
-                            <TableCell>Nome</TableCell>
-                            <TableCell>Tipo</TableCell>
-                            <TableCell>Data</TableCell>
-                            <TableCell>Estado</TableCell>
-                            <TableCell numeric>Grau de urgência</TableCell>
-                            <TableCell>Visibilidade</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {operationsData.map(n => {
-                            return (
-                                <TableRow key={n.name}>
-                                    <TableCell> <IconButton component={Link}
-                                                            to="/operacao"> <InfoIcon/> </IconButton></TableCell>
-                                    <TableCell>{n.name}</TableCell>
-                                    <TableCell>{n.type}</TableCell>
-                                    <TableCell>{n.date}</TableCell>
-                                    <TableCell>{n.state}</TableCell>
-                                    <TableCell numeric> {n.level}</TableCell>
-                                    <TableCell>{n.visibility}</TableCell>
-                                </TableRow>
-                            );
-                        })}
-                    </TableBody>
-                </Table>
+                <div className="table">
 
-                <Button onClick={this.loadOperations}>Pedido Rest</Button>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Informações</TableCell>
+                                <TableCell>Nome</TableCell>
+                                <TableCell>Tipo</TableCell>
+                                <TableCell>Data</TableCell>
+                                <TableCell>Estado</TableCell>
+                                <TableCell numeric>Grau de urgência</TableCell>
+                                <TableCell>Visibilidade</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {this.state.occurrences.map(occ => {
+                                return (
+                                    <TableRow key={occ.user_occurrence_title}>
+                                        <TableCell> <IconButton component={Link}
+                                                                to="/operacao"> <InfoIcon/> </IconButton></TableCell>
+                                        <TableCell>{occ.user_occurrence_title}</TableCell>
+                                        <TableCell>{occ.user_occurrence_type}</TableCell>
+                                        <TableCell>{occ.user_occurrence_data}</TableCell>
+                                        <TableCell>{'nao tratado'}</TableCell>
+                                        <TableCell numeric> {occ.user_occurrence_level}</TableCell>
+                                        <TableCell>{occ.user_occurrence_visibility}</TableCell>
+                                    </TableRow>
+                                );
+                            })}
+                        </TableBody>
+                    </Table>
+
+                    {/*<ShowTable data={fillTable}/>*/}
+                    {/*<FillTable/>*/}
+                    {/*{makeAJAXCall(FillTable)}*/}
+                </div>
+
+                <p id="showtitle" className={classes.username}></p>
+                <p id="showtype"></p>
+
+                {/*<FillTable/>*/}
+
+                {/*<Table className={classes.table}>*/}
+                    {/*<TableHead>*/}
+                        {/*<TableRow>*/}
+                            {/*<TableCell>Informações</TableCell>*/}
+                            {/*<TableCell>Nome</TableCell>*/}
+                            {/*<TableCell>Tipo</TableCell>*/}
+                            {/*<TableCell>Data</TableCell>*/}
+                            {/*<TableCell>Estado</TableCell>*/}
+                            {/*<TableCell numeric>Grau de urgência</TableCell>*/}
+                            {/*<TableCell>Visibilidade</TableCell>*/}
+                        {/*</TableRow>*/}
+                    {/*</TableHead>*/}
+
+                    {/*<TableBody>*/}
+                        {/*{operationsData.map(n => {*/}
+                            {/*return (*/}
+                                {/*<TableRow key={n.name}>*/}
+                                    {/*<TableCell> <IconButton component={Link}*/}
+                                                            {/*to="/operacao"> <InfoIcon/> </IconButton></TableCell>*/}
+                                    {/*<TableCell>{n.name}</TableCell>*/}
+                                    {/*<TableCell>{n.type}</TableCell>*/}
+                                    {/*<TableCell>{n.date}</TableCell>*/}
+                                    {/*<TableCell>{n.state}</TableCell>*/}
+                                    {/*<TableCell numeric> {n.level}</TableCell>*/}
+                                    {/*<TableCell>{n.visibility}</TableCell>*/}
+                                {/*</TableRow>*/}
+                            {/*);*/}
+                        {/*})}*/}
+                    {/*</TableBody>*/}
+
+            {/* </Table> */}
+
+                <Button onClick={fillTable}>Pedido Rest</Button>
             </div>
+
         );
     }
 }

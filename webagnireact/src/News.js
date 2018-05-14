@@ -121,7 +121,7 @@ class News extends React.Component {
                             focusRipple
                             key={news.title}
                             className={classes.image}
-                            focusVisibleClassName={classes.focusVisible}
+                            focusvisibleclassname={classes.focusVisible}
                         >
                           <span
                               className={classes.imageSrc}

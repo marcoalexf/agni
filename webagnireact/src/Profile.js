@@ -86,7 +86,7 @@ class Profile extends React.Component {
 
         if(token != null){
             var uname = JSON.parse(token).username;
-            var tokenID = JSON.parse(token);
+            var tokenObj = JSON.parse(token);
 
             // if(tokenObj.expirationData){
             //  tratar para o caso do token ter expirado
@@ -94,7 +94,7 @@ class Profile extends React.Component {
 
             var user = {
                 "username": uname,
-                "token": tokenID
+                "token": tokenObj
             }
 
             var xmlHttp = new XMLHttpRequest();
@@ -104,8 +104,8 @@ class Profile extends React.Component {
             xmlHttp.send(myJSON);
 
             xmlHttp.onreadystatechange = function() {
-                if (xmlHttp.readyState == XMLHttpRequest.DONE){
-                    if(xmlHttp.status == 200){
+                if (xmlHttp.readyState === XMLHttpRequest.DONE){
+                    if(xmlHttp.status === 200){
                         var response = xmlHttp.response;
                         console.log("XML response: " + response);
                         obj = JSON.parse(response);
@@ -127,6 +127,7 @@ class Profile extends React.Component {
                         //TO DO- ver se o tempo ja expirou antes de "chatear" o server
                         console.log("tempo expirado");
                         window.localStorage.removeItem('token');
+                        document.location.href = '/login';
                     }
                 }
             }
@@ -206,13 +207,13 @@ class Profile extends React.Component {
                         <div id="showusername" className={classes.username}></div>
                         <Typography id="showemail" component="p"></Typography>
                         <div className={classes.basicInfo}>
-                            <b id="reports">0</b> <text>Reportes de Problemas</text>
+                            <b id="reports">0</b> Reportes de Problemas
                         </div>
                         <div className={classes.basicInfo}>
-                            <b id="supports">0</b> <text>A apoiar</text>
+                            <b id="supports">0</b> A apoiar
                         </div>
                         <div className={classes.basicInfo}>
-                            <b id="supports">0</b> <text>Comentarios</text>
+                            <b id="supports">0</b> Comentarios
                         </div>
 
                         <Typography id="showname" component="p"></Typography>
