@@ -17,7 +17,7 @@ const styles = theme => ({
         marginLeft: theme.spacing.unit,
         marginRight: theme.spacing.unit,
         marginBottom: theme.spacing.unit,
-        width: 600,
+        width: 550,
     },
     rightIcon:{
         marginLeft: theme.spacing.unit,
@@ -36,7 +36,7 @@ const styles = theme => ({
         marginRight: theme.spacing.unit,
         marginTop: theme.spacing.unit,
         marginBottom: theme.spacing.unit,
-        width: 600,
+        width: 550,
     },
     paper:theme.mixins.gutters({
         width: 600,
@@ -54,7 +54,6 @@ const styles = theme => ({
 class Register extends Component {
     constructor(props) {
         super(props)
-
 
         this.state = {
             username: '',
@@ -172,7 +171,7 @@ class Register extends Component {
 
                     <div className="input-group">
                         <div className={'form-group' + (submitted && !username ? ' has-error' : '')}>
-                            <TextField id="username" label="Username" className={classes.textField} value={this.state.username}
+                            <TextField required id="username" label="Username" className={classes.textField} value={this.state.username}
                                        onChange={this.handleUsernameChange('username')}/>
                             {submitted && !username &&
                             <div className="help-block">Username is required</div>
@@ -182,7 +181,7 @@ class Register extends Component {
 
                     <div className="input-group">
                         <div className={'form-group' + (submitted && !username ? ' has-error' : '')}>
-                            <TextField id="name" label="Name" className={classes.textField} value={this.state.name}
+                            <TextField required id="name" label="Name" className={classes.textField} value={this.state.name}
                                        onChange={this.handleUsernameChange('name')}/>
                             {submitted && !username &&
                             <div className="help-block">Name is required</div>
@@ -192,7 +191,7 @@ class Register extends Component {
 
                     <div className="input-group">
                         <div className={'form-group' + (submitted && !email ? ' has-error' : '')}>
-                            <TextField id="email" label="Email" type="email" className={classes.textField} value={this.state.email}
+                            <TextField required id="email" label="Email" type="email" className={classes.textField} value={this.state.email}
                                        onChange={this.handleEmailChange('email')}/>
                             {submitted && !email &&
                             <div className="help-block">Email is required</div>
@@ -211,7 +210,7 @@ class Register extends Component {
 
                     <div className="input-group">
                         <div className={'form-group' + (submitted && !password ? ' has-error' : '')}>
-                            <TextField id="password" label="Password" type="password" className={classes.textField} value={this.state.password}
+                            <TextField required id="password" label="Password" type="password" className={classes.textField} value={this.state.password}
                                        onChange={this.handlePasswordChange('password')}/>
                             {submitted && !password &&
                             <div className="help-block">Password is required</div>
@@ -221,7 +220,7 @@ class Register extends Component {
 
                     <div className="input-group">
                         <div className={'form-group' + (submitted && !confirmPass ? ' has-error' : '')}>
-                            <TextField id="confirmpassword" label="Confirmar Password" type="password" className={classes.textField} value={this.state.confirmPass}
+                            <TextField required id="confirmpassword" label="Confirmar Password" type="password" className={classes.textField} value={this.state.confirmPass}
                                        onChange={this.handleConfirmPassChange('confirmPass')}/>
                             {submitted && !confirmPass &&
                             <div className="help-block">Confirmation of password is required</div>

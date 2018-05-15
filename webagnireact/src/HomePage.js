@@ -15,12 +15,13 @@ const styles = theme => ({
       marginBottom: 60,
     },
     icons: {
-        fontSize: 100,
+        fontSize: 90,
         color: 'grey',
     },
     iconSection: {
         display: 'inline-block',
-        marginLeft: 80,
+        marginLeft: 40,
+        marginRight: 40,
     },
     margin: {
         margin: theme.spacing.unit * 2,
