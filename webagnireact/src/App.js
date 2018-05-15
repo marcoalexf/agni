@@ -20,11 +20,13 @@ import {Link, Route, Switch} from 'react-router-dom';
 import Register from './Register';
 import Login from './Login';
 import Home from './Home';
+import HomePage from './HomePage';
 import News from './News';
 import Profile from './Profile';
 import RegistProblem from './RegistProblem';
 import ThankYou from './ThankYou';
 import Operations from './Operations';
+import TestOperations from './TestOperations';
 import Map from './Map';
 import Statistics from './Statistics';
 import Operation from './InfoOperation';
@@ -294,7 +296,7 @@ class MiniDrawer extends React.Component {
                 <main className={classes.content}>
                     <div className={classes.toolbar} />
                     <Switch>
-                        <Route exact path='/' component={Home}/>
+                        <Route exact path='/' component={HomePage}/>
                         <Route path='/login' component={Login}/>
                         <Route path='/register' component={Register}/>
                         <Route path='/noticias' component={News}/>
@@ -306,6 +308,7 @@ class MiniDrawer extends React.Component {
                         <Route path='/operacao' component={Operation}/>
                         <Route path='/obrigada' component={ThankYou}/>
                         <Route path='/sobrenos' component={AboutUs}/>
+                        <Route path='/testarope' component={TestOperations}/>
                     </Switch>
                 </main>
             </div>

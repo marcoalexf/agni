@@ -71,7 +71,7 @@ export const mainMenuListItems = (
             <ListItemText primary="Registar Problema" />
         </ListItem>
         <ListItem component={Link}
-                  to="/operacoes">
+                  to="/testarope">
             <ListItemIcon>
                 <OperationsIcon />
             </ListItemIcon>
