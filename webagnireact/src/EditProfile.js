@@ -184,18 +184,15 @@ let xmlRequest = new Promise(function(resolve, reject) {
                     //TO DO- ver se o tempo ja expirou antes de "chatear" o server
                     console.log("tempo expirado");
                     window.localStorage.removeItem('token');
-                    document.location.href = '/login';
+                    //document.location.href = '/login';
                 }
             }
         }
     }
     else {
-        document.location.href = '/login';
+        //document.location.href = '/login';
     }
 })
-
-
-
 
 class EditProfile extends React.Component {
     constructor(){
@@ -211,9 +208,6 @@ class EditProfile extends React.Component {
             console.log(value);
             this.setState({username: value});
             console.log(this.state.username);
-            // this.setState({email: value.user_email});
-            // this.setState({name: value.user_name});
-            // this.setState({role: value.user_role});
         })
     }
 
@@ -268,13 +262,13 @@ class EditProfile extends React.Component {
                         //TO DO- ver se o tempo ja expirou antes de "chatear" o server
                         console.log("tempo expirado");
                         window.localStorage.removeItem('token');
-                        document.location.href = '/login';
+                        // document.location.href = '/login';
                     }
                 }
             }
         }
         else{
-            document.location.href = '/login';
+            // document.location.href = '/login';
         }
     }
 

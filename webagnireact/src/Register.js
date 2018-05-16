@@ -131,7 +131,7 @@ class Register extends Component {
                 if(xmlHttp.status === 200){
                     console.log("Sucesso");
                     document.getElementById("errorMessage").innerHTML = "";
-                    document.location.href = '/login';
+                    // document.location.href = '/login';
                 }
 
                 else{
