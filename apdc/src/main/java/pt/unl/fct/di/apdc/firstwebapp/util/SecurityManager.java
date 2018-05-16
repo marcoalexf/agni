@@ -32,13 +32,17 @@ public class SecurityManager {
 		// Set rights
 		modSet.addAll(userSet);
 		modSet.add("see_private_occurrences");
+		modSet.add("see_user_profile");
+		modSet.add("edit_user_occurrence");
+		modSet.add("delete_user_occurrence");
 		////////////////////////////////////////////
 		
 		//////////////// ADMIN /////////////////////
 		Set<String> adminSet = new HashSet<String>();
 		map.put("ADMIN", adminSet);
 		// Set rights
-		modSet.addAll(modSet);
+		adminSet.addAll(modSet);
+		adminSet.add("edit_user_profile");
 		////////////////////////////////////////////
 		
 		// Create the immutable map

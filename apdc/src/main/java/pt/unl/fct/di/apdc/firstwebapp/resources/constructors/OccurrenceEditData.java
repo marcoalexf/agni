@@ -1,8 +1,10 @@
-package pt.unl.fct.di.apdc.firstwebapp.util;
+package pt.unl.fct.di.apdc.firstwebapp.resources.constructors;
 
-public class OccurrenceData {
+public class OccurrenceEditData {
 	
 	public AuthToken token;
+	public String username;
+	public String id;
 	public String title;
 	public String description;
 	public String type;
@@ -13,20 +15,19 @@ public class OccurrenceData {
 	public boolean notificationOnResolve;
 
 	
-	public OccurrenceData() {
+	public OccurrenceEditData() {
 		
 	}
 	
-	public OccurrenceData(AuthToken token, String title, String description, String type, int level, 
-			boolean visibility, double lat, double lon, boolean notificationOnResolve) {
+	public OccurrenceEditData(AuthToken token, String username,  String id, String title, 
+			String description, int level, boolean visibility, boolean notificationOnResolve) {
 		this.token = token;
+		this.username = username;
+		this.id = id;
 		this.title = title;
 		this.description = description;
-		this.type = type;
 		this.level = level;
 		this.visibility = visibility;
-		this.lat = lat;
-		this.lon = lon;
 		this.notificationOnResolve = notificationOnResolve;
 	}
 	
@@ -34,8 +35,8 @@ public class OccurrenceData {
 		return field != null && !field.isEmpty();
 	}
 	
-	public boolean validRegistration() {
-		return nonEmptyField(title) && nonEmptyField(description) && nonEmptyField(type);
+	public boolean valid() {
+		return nonEmptyField(id) && nonEmptyField(username);
 	}
 	
 }
