@@ -24,7 +24,7 @@ import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 
-import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
+import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.AuthToken;
 
 @Path("/logout")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
