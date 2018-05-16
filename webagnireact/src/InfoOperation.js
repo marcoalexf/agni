@@ -7,7 +7,7 @@ import CommentBorderIcon from '@material-ui/icons/ChatBubbleOutline';
 import CommentIcon from '@material-ui/icons/ChatBubble';
 import Typography from 'material-ui/Typography';
 import Checkbox from 'material-ui/Checkbox';
-import { FormGroup, FormControlLabel } from 'material-ui/Form';
+import { FormControlLabel } from 'material-ui/Form';
 import {withStyles} from "material-ui/styles/index";
 
 const styles =  theme => ({

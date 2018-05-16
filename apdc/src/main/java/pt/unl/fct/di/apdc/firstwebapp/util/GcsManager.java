@@ -68,9 +68,7 @@ public class GcsManager {
 
   public static boolean gcsPost(String contentType, InputStream inputStream, String filename, boolean publicFile, boolean temporary) {
     try {
-    	Builder builder = new GcsFileOptions
-    		.Builder()
-    		.mimeType(contentType);
+    	Builder builder = new GcsFileOptions.Builder().mimeType(contentType);
     	if(publicFile) {
     		builder.acl("public-read");
     	}

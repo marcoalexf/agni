@@ -1,4 +1,4 @@
-package pt.unl.fct.di.apdc.firstwebapp.util;
+package pt.unl.fct.di.apdc.firstwebapp.resources.constructors;
 
 public class RegisterData {
 
@@ -31,8 +31,10 @@ public class RegisterData {
 	private boolean nonEmptyField(String field) {
 		return field != null && !field.isEmpty();
 	}
-	public boolean validRegistration() {
+	
+	public boolean valid() {
 		return nonEmptyField(username) && nonEmptyField(password) && nonEmptyField(email) 
 				&& nonEmptyField(name) && email.contains("@") && nonEmptyField(role);
 	}
+	
 }

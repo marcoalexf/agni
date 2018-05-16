@@ -1,27 +1,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Typography from 'material-ui/Typography';
+import TextField from 'material-ui/TextField';
 import { withStyles } from 'material-ui/styles';
 import { Manager, Target, Popper } from 'react-popper';
 import Paper from 'material-ui/Paper';
 import Button from 'material-ui/Button';
 import IconButton from 'material-ui/IconButton';
-import PhotoIcon from '@material-ui/icons/Photo';
 import ProfileIcon from '@material-ui/icons/Create';
 import SettingsIcon from '@material-ui/icons/Settings';
 import ClickAwayListener from 'material-ui/utils/ClickAwayListener';
 import Grow from 'material-ui/transitions/Grow';
 import { MenuItem, MenuList } from 'material-ui/Menu';
 import classNames from 'classnames';
+import WallpaperIcon from '@material-ui/icons/Wallpaper';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import ReportsIcon from '@material-ui/icons/ViewList';
 import PersonPinIcon from '@material-ui/icons/PersonPin';
 import Tabs, { Tab } from 'material-ui/Tabs';
-import Avatar from 'material-ui/Avatar';
 import {Link} from 'react-router-dom';
-import Dialog, {DialogActions, DialogContent, DialogContentText, DialogTitle,} from 'material-ui/Dialog';
-import TextField from 'material-ui/TextField';
-import List from 'material-ui/List';
+import Avatar from 'material-ui/Avatar';
 
 function TabContainer(props) {
     return (
@@ -54,6 +52,9 @@ const styles =  theme => ({
     popperClose: {
         pointerEvents: 'none',
     },
+    picture : {
+        fontSize: 90,
+    },
     informations:{
         display: 'inline-block',
         marginLeft: 80,
@@ -83,50 +84,145 @@ const styles =  theme => ({
         // width: 200,
         // heigth: 200,
     },
-    textField:{
-        margin: 10,
+    textFieldUsername: {
+        marginLeft: theme.spacing.unit,
+        marginRight: theme.spacing.unit,
+        marginBottom: theme.spacing.unit,
+        width: 200,
+        fontFamily: 'Montserrat',
+        fontSize: 20,
+    },
+    bootstrapRoot: {
+        // padding: 0,
+        // 'label + &': {
+        //     marginTop: theme.spacing.unit * 3,
+        // },
+    },
+    bootstrapInputUsername: {
+        borderRadius: 4,
+        // backgroundColor: theme.palette.common.white,
+        border: '1px solid #ced4da',
+        // padding: '10px 12px',
         width: 400,
+        // transition: theme.transitions.create(['border-color', 'box-shadow']),
+        fontFamily: 'Montserrat',
+        fontSize: 48,
+        // '&:focus': {
+        //     borderColor: '#80bdff',
+        //     boxShadow: '0 0 0 0.2rem rgba(0,123,255,.25)',
+        // },
     },
-    dialogProfile:{
-
+    bootstrapInputEmail: {
+        borderRadius: 4,
+        // backgroundColor: theme.palette.common.white,
+        border: '1px solid #ced4da',
+        // padding: '10px 12px',
+        width: 400,
+        // transition: theme.transitions.create(['border-color', 'box-shadow']),
+        // '&:focus': {
+        //     borderColor: '#80bdff',
+        //     boxShadow: '0 0 0 0.2rem rgba(0,123,255,.25)',
+        // },
     },
-    row: {
-        display: 'flex',
-        justifyContent: 'center',
+    bootstrapFormLabel: {
+        fontSize: 18,
     },
-    bigAvatar: {
-        width: 80,
-        height: 80,
-    }
 });
 
-class Profile extends React.Component {
-    constructor(props){
-        super(props);
+// const username = xmlRequest.then(
+//     <EditProfile username={'mar'}></EditProfile>
+// )
+
+let xmlRequest = new Promise(function(resolve, reject) {
+    var obj;
+    var token = window.localStorage.getItem('token');
+
+    if (token != null) {
+        var uname = JSON.parse(token).username;
+        var tokenObj = JSON.parse(token);
+
+        // if(tokenObj.expirationData){
+        //  tratar para o caso do token ter expirado
+        // }
+
+        var user = {
+            "username": uname,
+            "token": tokenObj
+        }
+
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open("POST", "http://localhost:8080/rest/profile/", true);
+        xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        var myJSON = JSON.stringify(user);
+        xmlHttp.send(myJSON);
+
+        xmlHttp.onreadystatechange = function () {
+            if (xmlHttp.readyState === XMLHttpRequest.DONE) {
+                if (xmlHttp.status === 200) {
+                    var response = xmlHttp.response;
+                    console.log("XML response: " + response);
+                    obj = JSON.parse(response);
+
+                    // var username = document.getElementById("showusername");
+                    // username.innerHTML = uname;
+                    resolve(obj.user_name);
+
+                    var name = document.getElementById("showname");
+                    name.innerHTML = obj.user_name;
+
+                    var email = document.getElementById("showemail");
+                    email.innerHTML = obj.user_email;
+
+                    var role = document.getElementById("showrole");
+                    role.innerHTML = obj.user_role;
+
+                    // var img = document.getElementById("profileimg");
+                    // img.innerHTML = obj.user_name.charAt(0);
+                }
+
+                else {
+                    //TO DO- ver se o tempo ja expirou antes de "chatear" o server
+                    console.log("tempo expirado");
+                    window.localStorage.removeItem('token');
+                    //document.location.href = '/login';
+                }
+            }
+        }
+    }
+    else {
+        //document.location.href = '/login';
+    }
+})
+
+class EditProfile extends React.Component {
+    constructor(){
+        super();
 
         this.state = {
             accountOpen: false,
             value: 0,
-            editProfile: false,
-            editPass: false,
         };
 
-        this.loadInformations = this.loadInformations.bind(this);
+        xmlRequest.then((value) => {
+            console.log("value");
+            console.log(value);
+            this.setState({username: value});
+            console.log(this.state.username);
+        })
     }
+
 
     loadInformations = () =>{
         var obj;
         var token = window.localStorage.getItem('token');
-        var d = new Date();
-        var t = d.getTime();
-        // var expirationData = JSON.parse(token).expirationData;
-        // console.log(token);
-        // console.log(t);
-        // console.log(expirationData);
 
         if(token != null){
             var uname = JSON.parse(token).username;
             var tokenObj = JSON.parse(token);
+
+            // if(tokenObj.expirationData){
+            //  tratar para o caso do token ter expirado
+            // }
 
             var user = {
                 "username": uname,
@@ -146,47 +242,39 @@ class Profile extends React.Component {
                         console.log("XML response: " + response);
                         obj = JSON.parse(response);
 
-                        var username = document.getElementById("showusername");
-                        username.innerHTML = uname;
-                        console.log(uname.charAt(0));
-                        this.setState({username: uname});
-                        this.setState({firstLetter: uname.charAt(0)});
+                        // var username = document.getElementById("showusername");
+                        // username.innerHTML = uname;
 
                         var name = document.getElementById("showname");
                         name.innerHTML = obj.user_name;
-                        this.setState({name: obj.user_name});
 
                         var email = document.getElementById("showemail");
                         email.innerHTML = obj.user_email;
-                        this.setState({email: obj.user_email});
 
                         var role = document.getElementById("showrole");
                         role.innerHTML = obj.user_role;
-                        this.setState({role: obj.user_role});
 
                         // var img = document.getElementById("profileimg");
                         // img.innerHTML = obj.user_name.charAt(0);
                     }
 
                     else{
+                        //TO DO- ver se o tempo ja expirou antes de "chatear" o server
                         console.log("tempo expirado");
                         window.localStorage.removeItem('token');
-                        {/*<Link to={'/login'}/>*/}
+                        // document.location.href = '/login';
                     }
                 }
-            }.bind(this)
+            }
         }
         else{
-            if(token != null){
-                window.localStorage.removeItem('token');
-                console.log("Tempo expirado - faca login");
-            }
-            else
-                console.log("Sem sessao iniciada");
-            {/*<Link to={'/login'}/>*/}
-            //document.location.href = '/login';
+            // document.location.href = '/login';
         }
     }
+
+    handleUsernameChange = username => event => {
+        this.setState({[username]: event.target.value,});
+    };
 
     handleToggle = () => {
         this.setState({ accountOpen: !this.state.accountOpen });
@@ -204,38 +292,6 @@ class Profile extends React.Component {
         this.setState({ value });
     };
 
-    handleOpenEdit = () => {
-        this.setState({ editProfile: true });
-    };
-
-    handleOpenPassword = () => {
-        this.setState({ editPass: true });
-    };
-
-    handleCloseEdit = () => {
-        this.setState({ editProfile: false });
-    };
-
-    handleClosePassword = () => {
-        this.setState({ editPass: false });
-    };
-
-    handleEditChange = username => event => {
-        this.setState({[username]: event.target.value,});
-    };
-
-    handleVerifyPass = event => {
-        this.setState({oldpass: event.target.value,});
-    };
-
-    handleNewPassword = event => {
-        this.setState({newpass: event.target.value,});
-    };
-
-    handleConfirmPass = event => {
-        return event.target.value == this.state.newpass;
-    };
-
     render() {
         const { classes } = this.props;
         const { accountOpen, value } = this.state;
@@ -246,40 +302,7 @@ class Profile extends React.Component {
 
                 <Paper className={classes.paper} style={{margin: '0 auto'}} >
 
-                    <Button className={classes.editProfile} onClick={this.handleOpenEdit}> <ProfileIcon /> Editar Perfil </Button>
-
-                    <Dialog
-                        open={this.state.editProfile}
-                        onClose={this.handleCloseEdit}
-                        aria-labelledby="simple-dialog-title"
-                        aria-describedby="simple-dialog-description"
-                        className={classes.dialogProfile}
-                    >
-                        <DialogTitle id="simple-dialog-title">{"Editar Perfil"}</DialogTitle>
-
-                        <DialogContent>
-                            {/*<img src={require('./img/user.png')} alt="Avatar" className={classes.media} width="100"/>*/}
-                            <div className={classes.row}>
-                                <Avatar className={classes.bigAvatar}>{this.state.firstLetter}</Avatar>
-                            </div>
-                            <div className="imgcontainer"><Button ><PhotoIcon/>Atualizar Foto</Button></div>
-
-                            <TextField id="editusername" label="Username" className={classes.textField} value={this.state.username}
-                                       onChange={this.handleEditChange('username')}/><br/>
-                            <TextField id="editemail" label="Email" className={classes.textField} value={this.state.email}
-                                       onChange={this.handleEditChange('email')}/><br/>
-                            <TextField id="editname" label="Nome" className={classes.textField} value={this.state.name}
-                                       onChange={this.handleEditChange('name')}/><br/>
-                        </DialogContent>
-                        <DialogActions>
-                            <Button onClick={this.handleCloseEdit} color="primary">
-                                Cancelar
-                            </Button>
-                            <Button onClick={this.handleCloseEdit} color="primary" autoFocus>
-                                Guardar alteracoes
-                            </Button>
-                        </DialogActions>
-                    </Dialog>
+                    <Button disabled className={classes.editProfile}> <ProfileIcon /> Editar Perfil </Button>
 
                     <div className={classes.settings}>
                         <Manager>
@@ -290,12 +313,13 @@ class Profile extends React.Component {
                                     }}
                                 >
                                     <IconButton
+                                        disabled
                                         aria-owns={accountOpen ? 'menu-list-grow' : null}
                                         aria-haspopup="true"
                                         className={classes.settings}
                                         onClick={this.handleToggle}>
                                         <SettingsIcon/>
-                                    </IconButton>
+                                    </IconButton >
                                 </div>
                             </Target>
                             <Popper
@@ -307,7 +331,7 @@ class Profile extends React.Component {
                                     <Grow in={accountOpen} id="menu-list-grow" style={{ transformOrigin: '0 0 0' }}>
                                         <Paper>
                                             <MenuList role="menu">
-                                                <MenuItem onClick={this.handleOpenPassword}>Mudar password</MenuItem>
+                                                <MenuItem onClick={this.handleProfileOption}>Mudar password</MenuItem>
                                                 <MenuItem onClick={this.handleLogout}>Terminar Sessao</MenuItem>
                                             </MenuList>
                                         </Paper>
@@ -317,36 +341,49 @@ class Profile extends React.Component {
                         </Manager>
                     </div>
 
-                    <Dialog
-                        open={this.state.editPass}
-                        onClose={this.handleClosePassword}
-                        aria-labelledby="alert-dialog-title"
-                        aria-describedby="alert-dialog-description"
-                    >
-                        <DialogTitle id="alert-dialog-title">{"Mudar Password"}</DialogTitle>
-                        <DialogContent>
-                            <TextField id="verifypass" label="Password atual" type="password" className={classes.textField}
-                                       onChange={this.handleVerifyPass}/><br/>
-                            <TextField id="newpass" label="Nova password" type="password" className={classes.textField}
-                                       onChange={this.handleNewPassword}/><br/>
-                            <TextField id="confirmpass" label="Confirmar nova password" type="password" className={classes.textField}
-                                       onChange={this.handleConfirmPass}/><br/>
-                        </DialogContent>
-                        <DialogActions>
-                            <Button onClick={this.handleClosePassword} color="primary">
-                                Cancelar
-                            </Button>
-                            <Button onClick={this.handleClosePassword} color="primary" autoFocus>
-                                Guardar alteracoes
-                            </Button>
-                        </DialogActions>
-                    </Dialog>
-
                     <img src={require('./img/user.png')} alt="Avatar" className={classes.media} width="200"/>
                     {/*<div><Avatar id={"profileimg"} className={classes.avatar}></Avatar></div>*/}
+                    {/*<IconButton><WallpaperIcon className={classes.picture}/></IconButton>*/}
 
                     <div className={classes.informations}>
-                        <div id="showusername" className={classes.username}></div>
+                        {/*<TextField id="username" label="Username" className={classes.textFieldUsername} value={this.state.username}*/}
+                                   {/*onChange={this.handleUsernameChange('username')}/>*/}
+
+                        <TextField
+                            defaultValue={this.state.username}
+                            label="Username"
+                            id="username"
+                            InputProps={{
+                                disableUnderline: true,
+                                classes: {
+                                    root: classes.bootstrapRoot,
+                                    input: classes.bootstrapInputUsername,
+                                },
+                            }}
+                            InputLabelProps={{
+                                shrink: true,
+                                className: classes.bootstrapFormLabel,
+                            }}
+                        />
+
+                        <TextField
+                            defaultValue={this.state.email}
+                            label="Email"
+                            id="email"
+                            InputProps={{
+                                disableUnderline: true,
+                                classes: {
+                                    root: classes.bootstrapRoot,
+                                    input: classes.bootstrapInputEmail,
+                                },
+                            }}
+                            InputLabelProps={{
+                                shrink: true,
+                                className: classes.bootstrapFormLabel,
+                            }}
+                        />
+
+
                         <Typography id="showemail" component="p"></Typography>
                         <div className={classes.basicInfo}>
                             <b id="reports">0</b> Reportes de Problemas
@@ -363,24 +400,6 @@ class Profile extends React.Component {
 
                     </div>
 
-                </Paper><br/>
-
-                <Paper className={classes.paper} style={{margin: '0 auto'}}>
-                    <Tabs
-                        value={this.state.value}
-                        onChange={this.handleChange}
-                        fullWidth
-                        indicatorColor="primary"
-                        textColor="primary"
-                    >
-                        <Tab icon={<ReportsIcon />} label="REPORTES" />
-                        <Tab icon={<FavoriteIcon />} label="A APOIAR" />
-                        <Tab icon={<PersonPinIcon />} label="AMIGOS" />
-                    </Tabs>
-
-                    {value === 0 && <TabContainer>Sem reportes de momento</TabContainer>}
-                    {value === 1 && <TabContainer>Sem apoios de momento</TabContainer>}
-                    {value === 2 && <TabContainer>Sem amigos de momento</TabContainer>}
                 </Paper>
             </div>
 
@@ -388,8 +407,8 @@ class Profile extends React.Component {
     }
 }
 
-Profile.propTypes = {
+EditProfile.propTypes = {
     classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(Profile);
+export default withStyles(styles)(EditProfile);

@@ -7,8 +7,6 @@ import {withStyles} from "material-ui/styles/index";
 import blue from 'material-ui/colors/blue';
 import grey from 'material-ui/colors/grey';
 import Paper from 'material-ui/Paper';
-import Typography from 'material-ui/Typography';
-import axios from "axios/index";
 
 const styles = theme => ({
     textField: {
@@ -82,14 +80,14 @@ class Login extends Component {
              var myJSON = JSON.stringify(user);
              xmlHttp.send(myJSON);
              xmlHttp.onreadystatechange = function() {//Call a function when the state changes.
-                 if (xmlHttp.readyState == XMLHttpRequest.DONE) {
-                     if(xmlHttp.status == 200){
+                 if (xmlHttp.readyState === XMLHttpRequest.DONE) {
+                     if(xmlHttp.status === 200){
                          var response = xmlHttp.responseText;
                          console.log("XML response: " + response);
                          localstorage.setItem('token', response);
                          console.log(localstorage.getItem('token'));
                          console.log("Welcome");
-                         document.location.href = '/';
+                         //document.location.href = '/';
                      }
                      else{
                          console.log("User does not exist or password is not correct");
@@ -105,7 +103,6 @@ class Login extends Component {
     }
 
     render() {
-        const {theme} = this.props;
         const { loggingIn } = this.props;
         const { username, password, submitted } = this.state;
         const { classes } = this.props;

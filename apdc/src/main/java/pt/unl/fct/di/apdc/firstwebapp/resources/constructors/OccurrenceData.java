@@ -1,4 +1,4 @@
-package pt.unl.fct.di.apdc.firstwebapp.util;
+package pt.unl.fct.di.apdc.firstwebapp.resources.constructors;
 
 public class OccurrenceData {
 	
@@ -29,4 +29,13 @@ public class OccurrenceData {
 		this.lon = lon;
 		this.notificationOnResolve = notificationOnResolve;
 	}
+	
+	private boolean nonEmptyField(String field) {
+		return field != null && !field.isEmpty();
+	}
+	
+	public boolean valid() {
+		return nonEmptyField(title) && nonEmptyField(description) && nonEmptyField(type) && level != 0;
+	}
+	
 }
