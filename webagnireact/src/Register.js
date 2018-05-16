@@ -11,6 +11,8 @@ import grey from 'material-ui/colors/grey';
 import FaceIcon from '@material-ui/icons/Face';
 import Paper from 'material-ui/Paper';
 import Typography from 'material-ui/Typography';
+import CheckIcon from '@material-ui/icons/Check';
+import CloseIcon from '@material-ui/icons/Close';
 
 const styles = theme => ({
     textField: {
@@ -64,11 +66,18 @@ class Register extends Component {
             confirmPass: '',
             value: 'User',
             submitted: false,
+            valid: false,
         };
     }
 
     handleUsernameChange = username => event => {
         this.setState({[username]: event.target.value,});
+        if(event.target.value == null)
+            this.setState({valid: false});
+        else
+            this.setState({valid: true});
+
+        console.log(this.state.username);
     };
 
     handleEmailChange = email => event => {
@@ -143,9 +152,11 @@ class Register extends Component {
     }
 
 
+
+
     render() {
         const { loggingIn } = this.props;
-        const { username, email, password, confirmPass, submitted } = this.state;
+        const { username, email, password, confirmPass, submitted, valid } = this.state;
         const { classes } = this.props;
 
         return (
@@ -173,6 +184,7 @@ class Register extends Component {
                         <div className={'form-group' + (submitted && !username ? ' has-error' : '')}>
                             <TextField required id="username" label="Username" className={classes.textField} value={this.state.username}
                                        onChange={this.handleUsernameChange('username')}/>
+                            {valid ? <CheckIcon/> : <CloseIcon/>}
                             {submitted && !username &&
                             <div className="help-block">Username is required</div>
                             }

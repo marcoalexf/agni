@@ -16,6 +16,7 @@ import classNames from 'classnames';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import ReportsIcon from '@material-ui/icons/ViewList';
 import PersonPinIcon from '@material-ui/icons/PersonPin';
+import CheckIcon from '@material-ui/icons/Check';
 import Tabs, { Tab } from 'material-ui/Tabs';
 import Avatar from 'material-ui/Avatar';
 import {Link} from 'react-router-dom';
@@ -97,7 +98,10 @@ const styles =  theme => ({
     bigAvatar: {
         width: 80,
         height: 80,
-    }
+    },
+    input: {
+        display: 'none',
+    },
 });
 
 class Profile extends React.Component {
@@ -262,7 +266,16 @@ class Profile extends React.Component {
                             <div className={classes.row}>
                                 <Avatar className={classes.bigAvatar}>{this.state.firstLetter}</Avatar>
                             </div>
-                            <div className="imgcontainer"><Button ><PhotoIcon/>Atualizar Foto</Button></div>
+                            <div className="imgcontainer">
+                                <input
+                                    accept="image/*"
+                                    className={classes.input}
+                                    id="raised-button-file"
+                                    multiple
+                                    type="file"
+                                />
+                                <label htmlFor="raised-button-file"><Button component="span"><PhotoIcon/>Atualizar Foto</Button></label>
+                            </div>
 
                             <TextField id="editusername" label="Username" className={classes.textField} value={this.state.username}
                                        onChange={this.handleEditChange('username')}/><br/>
