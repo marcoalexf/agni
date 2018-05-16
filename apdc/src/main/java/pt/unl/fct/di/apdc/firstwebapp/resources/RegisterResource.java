@@ -18,9 +18,10 @@ import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Transaction;
-import org.apache.commons.codec.digest.DigestUtils;
 
-import pt.unl.fct.di.apdc.firstwebapp.util.RegisterData;
+import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.RegisterData;
+
+import org.apache.commons.codec.digest.DigestUtils;
 
 @Path("/register")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -36,7 +37,7 @@ public class RegisterResource {
 	public Response registerUser(RegisterData data) {
 		LOG.fine("Attempt to register user: " + data.username);
 		
-		if(!data.validRegistration()) {
+		if(!data.valid()) {
 			return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
 		}
 		
@@ -45,7 +46,7 @@ public class RegisterResource {
 			// If the entity does not exist an Exception is thrown. Otherwise,
 			Key userKey = KeyFactory.createKey("User", data.username);
 			@SuppressWarnings("unused")
-			Entity user = datastore.get(userKey);
+			Entity user = datastore.get(txn, userKey);
 			txn.rollback();
 			return Response.status(Status.BAD_REQUEST).entity("User already exists.").build();
 		} catch (EntityNotFoundException e) {
