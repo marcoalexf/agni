@@ -13,7 +13,7 @@ import deepOrange from 'material-ui/colors/deepOrange';
 import FaceIcon from '@material-ui/icons/Face';
 import Paper from 'material-ui/Paper';
 import Typography from 'material-ui/Typography';
-import CheckIcon from '@material-ui/icons/Check';
+import CheckIcon from '@material-ui/icons/CheckCircle';
 import CloseIcon from '@material-ui/icons/Close';
 
 const styles = theme => ({
@@ -77,37 +77,95 @@ class Register extends Component {
             confirmPass: '',
             value: 'User',
             submitted: false,
-            started: true,
+            startedUsername: true,
+            startedEmail: true,
+            startedName: true,
+            startedPassword: true,
+            startedConfPass: true,
         };
     }
 
     handleUsernameChange = username => event => {
         this.setState({[username]: event.target.value});
 
-        if(event.target.value.length == 0 || event.target.value != event.target.value.toLowerCase()){
-            this.setState({valid: false});
+        if(event.target.value.length < 5 || event.target.value.length > 25 || event.target.value != event.target.value.toLowerCase()){
+            this.setState({validUsername: false});
             // document.getElementById("showvalidation").innerHTML = <CloseIcon/>;
         }
 
         else{
-            this.setState({valid: true});
+            this.setState({validUsername: true});
             // document.getElementById("showvalidation").innerHTML = <CheckIcon/>;
         }
-        this.setState({started: false});
+        this.setState({startedUsername: false});
 
         console.log(this.state.username);
     };
 
+    handleNameChange = name => event => {
+        this.setState({[name]: event.target.value});
+
+        if(event.target.value.length < 2 || event.target.value.length > 50 || event.target.value.charAt(0) == event.target.value.charAt(0).toLowerCase()){
+            this.setState({validName: false});
+            // document.getElementById("showvalidation").innerHTML = <CloseIcon/>;
+        }
+
+        else{
+            this.setState({validName: true});
+            // document.getElementById("showvalidation").innerHTML = <CheckIcon/>;
+        }
+        this.setState({startedName: false});
+    };
+
     handleEmailChange = email => event => {
+        var specialChars = "<>!#$%^&*()+[]{}?:;|'\"\\,/~`-=";
         this.setState({ [email]: event.target.value });
+
+        if(event.target.value.indexOf('@') <= -1 || event.target.value.length < 9 || event.target.value.length > 30){
+        //|| specialChars.test(event.target.value)){
+            this.setState({validEmail: false});
+        }
+        else{
+            this.setState({validEmail: true});
+        }
+        this.setState({startedEmail: false});
     };
 
     handlePasswordChange = password => event => {
+        var specialChars = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
         this.setState({ [password]: event.target.value });
+
+        //password tem que conter pelo menos um caracter especial, uma letra maiuscula, e ser entre 6 a 30 caracteres
+        if(event.target.value.length < 6 || event.target.value.length > 30 || !specialChars.test(event.target.value)
+        || event.target.value == event.target.value.toLowerCase()){
+            this.setState({validPassword: false});
+        }
+        else{
+            this.setState({validPassword: true});
+        }
+
+        if(event.target.value != this.state.confirmPass || !this.state.validPassword){
+            this.setState({validConfPass: false});
+        }
+        else{
+            this.setState({validConfPass: true});
+        }
+
+        this.setState({startedPassword: false});
+        console.log(event.target.value);
     };
 
     handleConfirmPassChange = confirmPass => event => {
         this.setState({ [confirmPass]: event.target.value });
+
+        if(this.state.password != event.target.value || !this.state.validPassword){
+            this.setState({validConfPass: false});
+        }
+        else{
+            this.setState({validConfPass: true});
+        }
+
+        this.setState({startedConfPass: false});
     };
 
     handleRoleChange = value => event => {
@@ -137,35 +195,46 @@ class Register extends Component {
         console.log(this.state.password);
         console.log(this.state.confirmPass);
 
-        var user = {
-            "username": this.state.username,
-            "name": this.state.name,
-            "email": this.state.email,
-            "role": this.state.value,
-            "password": this.state.password
-        }
+        console.log(this.state.validName);
+        console.log(this.state.validEmail);
 
-        console.log(user);
-        var xmlHttp = new XMLHttpRequest();
-        xmlHttp.open( "POST", 'http://localhost:8080/rest/register');
-        xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        var myJSON = JSON.stringify(user);
-        xmlHttp.send(myJSON);
-        console.log("XML response:" + xmlHttp.responseText);
+        if(this.state.validUsername && this.state.validName && this.state.validEmail
+            && this.state.validPassword && this.state.validConfPass){
+            console.log("valid informations");
 
-        xmlHttp.onreadystatechange = function() {//Call a function when the state changes.
-            if(xmlHttp.readyState === XMLHttpRequest.DONE) {
-                if(xmlHttp.status === 200){
-                    console.log("Sucesso");
-                    document.getElementById("errorMessage").innerHTML = "";
-                    // document.location.href = '/login';
-                }
-
-                else{
-                    document.getElementById("errorMessage").innerHTML = "Parâmetros incorretos ou utilizador já existe";
-                }
+            var user = {
+                "username": this.state.username,
+                "name": this.state.name,
+                "email": this.state.email,
+                "role": this.state.value,
+                "password": this.state.password
             }
 
+            console.log(user);
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.open( "POST", 'http://localhost:8080/rest/register');
+            xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            var myJSON = JSON.stringify(user);
+            xmlHttp.send(myJSON);
+            console.log("XML response:" + xmlHttp.responseText);
+
+            xmlHttp.onreadystatechange = function() {//Call a function when the state changes.
+                if(xmlHttp.readyState === XMLHttpRequest.DONE) {
+                    if(xmlHttp.status === 200){
+                        console.log("Sucesso");
+                        document.getElementById("errorMessage").innerHTML = "";
+                        // document.location.href = '/login';
+                    }
+
+                    else{
+                        document.getElementById("errorMessage").innerHTML = "Parâmetros incorretos ou utilizador já existe";
+                    }
+                }
+
+            }
+        }
+        else{
+            document.getElementById("errorMessage").innerHTML = "Parâmetros incorretos";
         }
     }
 
@@ -176,11 +245,13 @@ class Register extends Component {
 
     render() {
         const { loggingIn } = this.props;
-        const { username, email, password, confirmPass, submitted, valid, started} = this.state;
+        const { username, email, password, confirmPass, submitted, validUsername, startedUsername,
+            startedEmail, startedName, startedPassword, startedConfPass, validEmail, validName, validPassword,
+        validConfPass} = this.state;
         const { classes } = this.props;
 
         return (
-            <div id="login">
+            <div id="register">
                 <Paper className={classes.paper} style={{margin: '0 auto', backgroundColor: '#f2f2f2'}} >
                 <h4>Criar Conta</h4>
 
@@ -205,7 +276,7 @@ class Register extends Component {
                             <TextField required id="username" label="Username" className={classes.textField} value={this.state.username}
                                        onChange={this.handleUsernameChange('username')}/>
                             <div id={"showvalidation"} className={classes.showValidation}></div>
-                            {!started && (valid ? <CheckIcon className={classes.validIcon}/> : <CloseIcon className={classes.nonValidIcon}/> )}
+                            {!startedUsername && (validUsername ? <CheckIcon className={classes.validIcon}/> : <CloseIcon className={classes.nonValidIcon}/> )}
                             {/*{!started && !valid && <div style={{margin: '0 auto'}}>O username nao pode ser vazio e apenas pode conter letras minusculas</div>}*/}
                             {/*{!this.isValid('username') && <div>Deu</div>}*/}
                             {submitted && !username &&
@@ -217,7 +288,9 @@ class Register extends Component {
                     <div className="input-group">
                         <div className={'form-group' + (submitted && !username ? ' has-error' : '')}>
                             <TextField required id="name" label="Name" className={classes.textField} value={this.state.name}
-                                       onChange={this.handleUsernameChange('name')}/>
+                                       onChange={this.handleNameChange('name')}/>
+                            {!startedName &&
+                            (validName ? <CheckIcon className={classes.validIcon}/> : <CloseIcon className={classes.nonValidIcon}/> )}
                             {submitted && !username &&
                             <div className="help-block">Name is required</div>
                             }
@@ -228,6 +301,8 @@ class Register extends Component {
                         <div className={'form-group' + (submitted && !email ? ' has-error' : '')}>
                             <TextField required id="email" label="Email" type="email" className={classes.textField} value={this.state.email}
                                        onChange={this.handleEmailChange('email')}/>
+                            {!startedEmail &&
+                            (validEmail ? <CheckIcon className={classes.validIcon}/> : <CloseIcon className={classes.nonValidIcon}/> )}
                             {submitted && !email &&
                             <div className="help-block">Email is required</div>
                             }
@@ -247,6 +322,8 @@ class Register extends Component {
                         <div className={'form-group' + (submitted && !password ? ' has-error' : '')}>
                             <TextField required id="password" label="Password" type="password" className={classes.textField} value={this.state.password}
                                        onChange={this.handlePasswordChange('password')}/>
+                            {!startedPassword &&
+                            (validPassword ? <CheckIcon className={classes.validIcon}/> : <CloseIcon className={classes.nonValidIcon}/> )}
                             {submitted && !password &&
                             <div className="help-block">Password is required</div>
                             }
@@ -257,6 +334,8 @@ class Register extends Component {
                         <div className={'form-group' + (submitted && !confirmPass ? ' has-error' : '')}>
                             <TextField required id="confirmpassword" label="Confirmar Password" type="password" className={classes.textField} value={this.state.confirmPass}
                                        onChange={this.handleConfirmPassChange('confirmPass')}/>
+                            {!startedConfPass &&
+                            (validConfPass ? <CheckIcon className={classes.validIcon}/> : <CloseIcon className={classes.nonValidIcon}/> )}
                             {submitted && !confirmPass &&
                             <div className="help-block">Confirmation of password is required</div>
                             }
