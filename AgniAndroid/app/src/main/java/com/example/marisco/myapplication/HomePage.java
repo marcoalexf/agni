@@ -117,8 +117,11 @@ public class HomePage extends AppCompatActivity
 
             fman.beginTransaction().replace(R.id.fragment, profile).commit();
         } else if (id == R.id.nav_occurencies) {
-            //ocurrencias..
+            setTitle("Registar ocorrência");
 
+            OccurrenceFragment of = new OccurrenceFragment();
+            FragmentManager fman = getSupportFragmentManager();
+            fman.beginTransaction().replace(R.id.fragment, of).commit();
         } else if (id == R.id.nav_map) {
             setTitle("Map");
 
