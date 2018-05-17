@@ -34,8 +34,8 @@ import com.google.appengine.api.datastore.Transaction;
 import org.apache.commons.codec.digest.DigestUtils;
 import com.google.gson.Gson;
 
-import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
-import pt.unl.fct.di.apdc.firstwebapp.util.LoginData;
+import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.AuthToken;
+import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.LoginData;
 
 @Path("/login")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")

@@ -87,7 +87,7 @@ class Login extends Component {
                          localstorage.setItem('token', response);
                          console.log(localstorage.getItem('token'));
                          console.log("Welcome");
-                         document.location.href = '/';
+                         //document.location.href = '/';
                      }
                      else{
                          console.log("User does not exist or password is not correct");

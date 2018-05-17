@@ -1,11 +1,15 @@
 package com.example.marisco.myapplication;
 
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,13 +35,13 @@ public class ProfileFragment extends Fragment {
 
     //@BindView(R.id.profile_edit_avatar) ImageView profile_edit_avatar;
 
-    @BindView(R.id.profile_username) TextView profile_username;
-    @BindView(R.id.profile_type) TextView profile_type;
-    @BindView(R.id.profile_name) TextView profile_name;
-    @BindView(R.id.profile_email) TextView profile_email;
-    @BindView(R.id.profile_locality) TextView profile_locality;
-    @BindView(R.id.profile_county) TextView profile_county;
-    @BindView(R.id.profile_district) TextView profile_district;
+    @BindView(R.id.profile_username) EditText profile_username;
+    @BindView(R.id.profile_role) EditText profile_type;
+    @BindView(R.id.profile_name) EditText profile_name;
+    @BindView(R.id.profile_email) EditText profile_email;
+    @BindView(R.id.profile_locality) EditText profile_locality;
+    @BindView(R.id.profile_county) EditText profile_county;
+    @BindView(R.id.profile_district) EditText profile_district;
 
     public ProfileFragment() {
 
@@ -53,11 +57,64 @@ public class ProfileFragment extends Fragment {
         if(b != null){
             this.token = (LoginResponse) b.getSerializable(TOKEN);
         }
-
         this.username = token.getUsername();
-       //profile_username.setText(this.username);
         getProfile();
+        fieldsSetup();
+
         return v;
+    }
+
+    //Sets up all the EditText fields in this fragment to be un-editable.
+    public void fieldsSetup(){
+        profile_username.setInputType(InputType.TYPE_NULL);
+        profile_username.setEnabled(false);
+        profile_username.setTextIsSelectable(false);
+
+        profile_name.setInputType(InputType.TYPE_NULL);
+        profile_name.setEnabled(false);
+        profile_name.setTextIsSelectable(false);
+
+        profile_county.setInputType(InputType.TYPE_NULL);
+        profile_county.setEnabled(false);
+        profile_county.setTextIsSelectable(false);
+
+        profile_district.setInputType(InputType.TYPE_NULL);
+        profile_district.setEnabled(false);
+        profile_district.setTextIsSelectable(false);
+
+        profile_email.setInputType(InputType.TYPE_NULL);
+        profile_email.setEnabled(false);
+        profile_email.setTextIsSelectable(false);
+
+        profile_locality.setInputType(InputType.TYPE_NULL);
+        profile_locality.setEnabled(false);
+        profile_locality.setTextIsSelectable(false);
+    }
+
+    public void editProfile(){
+        profile_username.setInputType(InputType.TYPE_CLASS_TEXT);
+        profile_username.setEnabled(true);
+        profile_username.setTextIsSelectable(true);
+
+        profile_name.setInputType(InputType.TYPE_CLASS_TEXT);
+        profile_name.setEnabled(true);
+        profile_name.setTextIsSelectable(true);
+
+        profile_county.setInputType(InputType.TYPE_CLASS_TEXT);
+        profile_county.setEnabled(true);
+        profile_county.setTextIsSelectable(true);
+
+        profile_district.setInputType(InputType.TYPE_CLASS_TEXT);
+        profile_district.setEnabled(true);
+        profile_district.setTextIsSelectable(true);
+
+        profile_email.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+        profile_email.setEnabled(true);
+        profile_email.setTextIsSelectable(true);
+
+        profile_locality.setInputType(InputType.TYPE_CLASS_TEXT);
+        profile_locality.setEnabled(true);
+        profile_locality.setTextIsSelectable(true);
     }
 
     public void getProfile() {
@@ -100,10 +157,10 @@ public class ProfileFragment extends Fragment {
         profile_type.setText(response.getRole());
         profile_username.setText(username);
 
-        profile_name.append(" " + response.getName());
-        profile_email.append(" " + response.getEmail());
-        profile_locality.append(" " + response.getLocality());
-        profile_county.append(" " + response.getCounty());
-        profile_district.append(" " + response.getDistrict());
+        profile_name.setText(response.getName());
+        profile_email.setText(response.getEmail());
+        profile_locality.setText(response.getLocality());
+        profile_county.setText(response.getCounty());
+        profile_district.setText(response.getDistrict());
     }
 }

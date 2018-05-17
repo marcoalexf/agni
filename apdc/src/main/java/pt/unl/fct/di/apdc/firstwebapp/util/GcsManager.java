@@ -68,9 +68,7 @@ public class GcsManager {
 
   public static boolean gcsPost(String contentType, InputStream inputStream, String filename, boolean publicFile, boolean temporary) {
     try {
-    	Builder builder = new GcsFileOptions
-    		.Builder()
-    		.mimeType(contentType);
+    	Builder builder = new GcsFileOptions.Builder().mimeType(contentType);
     	if(publicFile) {
     		builder.acl("public-read");
     	}
@@ -80,7 +78,7 @@ public class GcsManager {
     		:new GcsFilename("liquid-layout-196103.appspot.com", filename);
     	GcsOutputChannel outputChannel;
     	outputChannel = gcsService.createOrReplace(fileName, instance);
-		copy(inputStream, Channels.newOutputStream(outputChannel));	
+		copy(inputStream, Channels.newOutputStream(outputChannel));
 		return true;
     } catch (IOException e) {
 		return false;

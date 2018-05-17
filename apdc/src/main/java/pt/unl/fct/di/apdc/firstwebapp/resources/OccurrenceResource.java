@@ -18,6 +18,7 @@ import javax.ws.rs.core.Response.Status;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
@@ -28,8 +29,9 @@ import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.gson.Gson;
 
-import pt.unl.fct.di.apdc.firstwebapp.util.ListOccurrenceData;
-import pt.unl.fct.di.apdc.firstwebapp.util.OccurrenceData;
+import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.ListOccurrenceData;
+import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceData;
+import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceEditData;
 import pt.unl.fct.di.apdc.firstwebapp.util.SecurityManager;
 
 @Path("/occurrence")
@@ -47,6 +49,9 @@ public class OccurrenceResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response registerOccurrence(OccurrenceData data) {
 		LOG.fine("Attempt to register ocurrence: " + data.title + " by user: " + data.token.username);
+		if(!data.valid()) {
+			return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
+		}
 		if(!data.token.isTokenValid()) {
 			LOG.warning("Failed to register occurrence, token for user: " + data.token.username + "is invalid");
 			return Response.status(Status.FORBIDDEN).build();
@@ -58,6 +63,7 @@ public class OccurrenceResource {
 			// Save occurrence
 			Entity occurrenceEntity = new Entity("UserOccurrence", userKey);
 			occurrenceEntity.setProperty("user_occurrence_title", data.title);
+			occurrenceEntity.setProperty("user_occurrence_description", data.description);
 			occurrenceEntity.setProperty("user_occurrence_data", new Date());
 			occurrenceEntity.setProperty("user_occurrence_type", data.type);
 			occurrenceEntity.setProperty("user_occurrence_level", data.level);
@@ -154,6 +160,89 @@ public class OccurrenceResource {
 	@Path("/list")
 	public Response listOccurrences() {
 		return listOccurrences(new ListOccurrenceData());
+	}
+	
+	@POST
+	@Path("/edit")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response editOccurrence(OccurrenceEditData data) {
+		Transaction txn = datastore.beginTransaction();
+		try {
+			LOG.fine("Attempt to edit ocurrence with id: " + data.id + " by user: " + data.token.username);
+			if(!data.valid()) {
+				return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
+			}
+			if(!data.token.isTokenValid()) {
+				LOG.warning("Failed to edit occurrence, token for user: " + data.token.username + "is invalid");
+				return Response.status(Status.FORBIDDEN).build();
+			}
+			if(!data.token.username.equals(data.username) && !SecurityManager.userHasAccess("edit_user_occurrence", data.token.username)) {
+				LOG.warning("Failed to edit occurrence, user: " + data.token.username + " does not have the rights to do it");
+				return Response.status(Status.FORBIDDEN).build();
+			}
+		
+			Key userKey = KeyFactory.createKey("User", data.token.username);
+			Key occurrenceKey = KeyFactory.createKey(userKey, "UserOccurrence", data.id);
+			
+			// Save occurrence
+			Entity occurrenceEntity = datastore.get(txn, occurrenceKey);
+			if(data.title != null && data.title != "") {
+				occurrenceEntity.setProperty("user_occurrence_title", data.title);
+			}
+			if(data.description != null && data.description != "") {
+				occurrenceEntity.setProperty("user_occurrence_description", data.description);
+			}
+			if(data.level != 0) {
+				occurrenceEntity.setProperty("user_occurrence_level", data.level);
+			}
+			occurrenceEntity.setProperty("user_occurrence_visibility", data.visibility);
+			datastore.put(txn, occurrenceEntity);
+			
+			txn.commit();
+			LOG.info("User " + data.token.username + " edited occurrence with id: " + data.id);
+			return Response.ok().build();
+		} catch (EntityNotFoundException e) {
+			return Response.status(Status.BAD_REQUEST).entity("Occurrence not found.").build();
+		} finally {
+			if (txn.isActive() ) {
+				txn.rollback();
+			}
+		}
+	}
+	
+	@POST
+	@Path("/delete")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response deleteOccurrence(OccurrenceEditData data) {
+		Transaction txn = datastore.beginTransaction();
+		try {
+			LOG.fine("Attempt to delete ocurrence with id: " + data.id + " by user: " + data.token.username);
+			if(!data.valid()) {
+				return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
+			}
+			if(!data.token.isTokenValid()) {
+				LOG.warning("Failed to delete occurrence, token for user: " + data.token.username + "is invalid");
+				return Response.status(Status.FORBIDDEN).build();
+			}
+			if(!data.token.username.equals(data.username) && !SecurityManager.userHasAccess("delete_user_occurrence", data.token.username)) {
+				LOG.warning("Failed to delete occurrence, user: " + data.token.username + " does not have the rights to do it");
+				return Response.status(Status.FORBIDDEN).build();
+			}
+		
+			Key userKey = KeyFactory.createKey("User", data.token.username);
+			Key occurrenceKey = KeyFactory.createKey(userKey, "UserOccurrence", data.id);
+			
+			// Delete occurrence
+			datastore.delete(txn, occurrenceKey);
+			
+			txn.commit();
+			LOG.info("User " + data.token.username + " deleted occurrence with id: " + data.id);
+			return Response.ok().build();
+		} finally {
+			if (txn.isActive() ) {
+				txn.rollback();
+			}
+		}
 	}
 
 }

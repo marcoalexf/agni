@@ -20,11 +20,14 @@ import {Link, Route, Switch} from 'react-router-dom';
 import Register from './Register';
 import Login from './Login';
 import Home from './Home';
+import HomePage from './HomePage';
 import News from './News';
 import Profile from './Profile';
+import EditProfile from './EditProfile';
 import RegistProblem from './RegistProblem';
 import ThankYou from './ThankYou';
 import Operations from './Operations';
+import TestOperations from './TestOperations';
 import Map from './Map';
 import Statistics from './Statistics';
 import Operation from './InfoOperation';
@@ -191,7 +194,7 @@ class MiniDrawer extends React.Component {
                         console.log("XML response: " + response);
                         //window.localStorage.removeItem('token');
                         console.log("sucesso");
-                        document.location.href = '/login';
+                        // document.location.href = '/login';
                     }
                     else{
                         //TO DO- ver se o tempo ja expirou antes de "chatear" o server
@@ -294,11 +297,12 @@ class MiniDrawer extends React.Component {
                 <main className={classes.content}>
                     <div className={classes.toolbar} />
                     <Switch>
-                        <Route exact path='/' component={Home}/>
+                        <Route exact path='/' component={HomePage}/>
                         <Route path='/login' component={Login}/>
                         <Route path='/register' component={Register}/>
                         <Route path='/noticias' component={News}/>
                         <Route path='/perfil' component={Profile}/>
+                        <Route path='/editarperfil' component={EditProfile}/>
                         <Route path='/registarproblema' component={RegistProblem}/>
                         <Route path='/operacoes' component={Operations}/>
                         <Route path='/mapa' component={Map}/>
@@ -306,6 +310,7 @@ class MiniDrawer extends React.Component {
                         <Route path='/operacao' component={Operation}/>
                         <Route path='/obrigada' component={ThankYou}/>
                         <Route path='/sobrenos' component={AboutUs}/>
+                        <Route path='/testarope' component={TestOperations}/>
                     </Switch>
                 </main>
             </div>

@@ -1,4 +1,4 @@
-package pt.unl.fct.di.apdc.firstwebapp.util;
+package pt.unl.fct.di.apdc.firstwebapp.resources.constructors;
 
 import java.util.List;
 import java.util.UUID;
