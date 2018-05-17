@@ -101,7 +101,7 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback, 
         if (b != null) {
             this.token = (LoginResponse) b.getSerializable(TOKEN);
         }
-        type.check(R.id.occurrence_clean);
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -141,7 +141,7 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback, 
         String occ_title = title.getText().toString();
         String occ_description = description.getText().toString();
 
-        boolean cancel = true;
+        boolean cancel = false;
         View focusView = null;
 
         if (TextUtils.isEmpty(occ_title) && !cancel) {
@@ -199,7 +199,22 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback, 
         }
         boolean notificationOn = notification.isChecked();
 
-        double lat = mp.getPosition().latitude, lon = mp.getPosition().longitude;
+        //double lat = mp.getPosition().latitude, lon = mp.getPosition().longitude;
+        double lat = 38.39403, lon = 9.12135;
+
+
+        Toast toast5 = Toast.makeText(getActivity(), "titulo: " + occ_title , Toast.LENGTH_SHORT);
+        toast5.show();
+        Toast toast6 = Toast.makeText(getActivity(), "Descrição: " + occ_description, Toast.LENGTH_SHORT);
+        toast6.show();
+        Toast toast = Toast.makeText(getActivity(), "Tipo: " + occ_type , Toast.LENGTH_SHORT);
+        toast.show();
+        Toast toast2 = Toast.makeText(getActivity(), "Nivel: " + level, Toast.LENGTH_SHORT);
+        toast2.show();
+        Toast toast3 = Toast.makeText(getActivity(), "Visibilidade: " + visibility , Toast.LENGTH_SHORT);
+        toast3.show();
+        Toast toast4 = Toast.makeText(getActivity(), "Notificação: " + notificationOn, Toast.LENGTH_SHORT);
+        toast4.show();
 
         OccurrenceData data = new OccurrenceData(token, occ_title, occ_description, occ_type, level,
                 visibility, lat, lon, notificationOn);
@@ -223,11 +238,14 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback, 
                     toast.show();
                 }
                 else {
-                    Toast toast = Toast.makeText(getActivity(), "Register occurrence failed"
-                            + response.code(), Toast.LENGTH_SHORT);
-                    toast.show();
+                    try{
+                        Toast toast = Toast.makeText(getActivity(), "Código de erro: " + response.code(), Toast.LENGTH_SHORT);
+                        toast.show();
+                    } catch (Exception e){
+                        Toast toast = Toast.makeText(getActivity(), "excecao", Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
                 }
-
             }
 
             @Override

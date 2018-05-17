@@ -49,6 +49,13 @@
     <string name="occurrence_area">Area:</string>
     <string name="occurrence_public">Public</string>
     <string name="occurrence_private">Private</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="occurrence_severity">Severity:</string>
+    <string name="occurrence_notification">Notificate when resolved:</string>
+    <string name="occurrence_location">Location:</string>
+    <string name="register_occurrence">Register occurrence</string>
+    <string name="occurrence_type">Occurrence type:</string>
+    <string name="occurrence_type_clean">Cleaning of woods</string>
+    <string name="occurrence_type_zone">Difficult access</string>
+    <string name="occurrence_type_other">Other</string>
+
 </resources>

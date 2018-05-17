@@ -1,21 +1,26 @@
 package com.example.marisco.myapplication;
 
-public class OccurrenceData {
-	
-	public LoginResponse token;
-	public String title;
-	public String description;
-	public String type;
-	public int level;
-	public boolean visibility;
-	public double lat;
-	public double lon;
-	public boolean notificationOnResolve;
+import com.google.gson.annotations.SerializedName;
 
-	
-	public OccurrenceData() {
-		
-	}
+public class OccurrenceData {
+
+	@SerializedName("token") LoginResponse token;
+
+	@SerializedName("title") String title;
+
+	@SerializedName("description") String description;
+
+	@SerializedName("type")	 String type;
+
+	@SerializedName("level") int level;
+
+	@SerializedName("visibility") boolean visibility;
+
+	@SerializedName("lat") double lat;
+
+	@SerializedName("lon") double lon;
+
+	@SerializedName("notificationOnResolve") boolean notificationOnResolve;
 	
 	public OccurrenceData(LoginResponse token, String title, String description, String type, int level,
 			boolean visibility, double lat, double lon, boolean notificationOnResolve) {
@@ -29,13 +34,76 @@ public class OccurrenceData {
 		this.lon = lon;
 		this.notificationOnResolve = notificationOnResolve;
 	}
-	
-	private boolean nonEmptyField(String field) {
-		return field != null && !field.isEmpty();
+
+	public LoginResponse getToken() {
+		return token;
 	}
-	
-	public boolean validRegistration() {
-		return nonEmptyField(title) && nonEmptyField(description) && nonEmptyField(type);
+
+	public void setToken(LoginResponse token) {
+		this.token = token;
 	}
-	
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public int getLevel() {
+		return level;
+	}
+
+	public void setLevel(int level) {
+		this.level = level;
+	}
+
+	public boolean isVisibility() {
+		return visibility;
+	}
+
+	public void setVisibility(boolean visibility) {
+		this.visibility = visibility;
+	}
+
+	public double getLat() {
+		return lat;
+	}
+
+	public void setLat(double lat) {
+		this.lat = lat;
+	}
+
+	public double getLon() {
+		return lon;
+	}
+
+	public void setLon(double lon) {
+		this.lon = lon;
+	}
+
+	public boolean isNotificationOnResolve() {
+		return notificationOnResolve;
+	}
+
+	public void setNotificationOnResolve(boolean notificationOnResolve) {
+		this.notificationOnResolve = notificationOnResolve;
+	}
 }
