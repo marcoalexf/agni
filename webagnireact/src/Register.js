@@ -47,8 +47,13 @@ const styles = theme => ({
         padding: 40,
     }),
     error:{
+        margin: 10,
         textAlign: 'center',
-        color: 'red',
+        color: deepOrange[600],
+        fontSize: 15,
+        // borderRadius: 4,
+        // border: '1px solid #ced4da',
+        // padding: '10px 12px',
     },
     input: {
         display: 'none',
@@ -61,6 +66,12 @@ const styles = theme => ({
     },
     validIcon:{
         color: lightGreen[400],
+    },
+    helperMessage:{
+        textAlign: 'center',
+        color: 'grey',
+        //fontFamily: 'Roboto Mono',
+        fontSize: 12,
     },
 });
 
@@ -86,43 +97,55 @@ class Register extends Component {
     }
 
     handleUsernameChange = username => event => {
+        var specialChars = /[!#$%^&*()+\-=\[\]{};':"\\|,<>\/?]+/;
+        var usedSpecialChars = "@._";
         this.setState({[username]: event.target.value});
 
-        if(event.target.value.length < 5 || event.target.value.length > 25 || event.target.value != event.target.value.toLowerCase()){
+        if(event.target.value != event.target.value.toLowerCase()){
             this.setState({validUsername: false});
-            // document.getElementById("showvalidation").innerHTML = <CloseIcon/>;
+            document.getElementById("helperMessageUser").innerHTML = "O nome de utilizador apenas pode conter letras" +
+                " minusculas";
+        }
+
+        else if(event.target.value.length < 5 || event.target.value.length > 25 || specialChars.test(event.target.value)
+            || event.target.value != event.target.value.toLowerCase() ){
+            //|| usedSpecialChars.indexOf(event.target.value) > 2){
+            this.setState({validUsername: false});
+            document.getElementById("helperMessageUser").innerHTML = "O nome de utilizador tem que conter entre " +
+                "5 a 25 caracteres";
         }
 
         else{
             this.setState({validUsername: true});
-            // document.getElementById("showvalidation").innerHTML = <CheckIcon/>;
+            document.getElementById("helperMessageUser").innerHTML = "";
         }
+
         this.setState({startedUsername: false});
 
-        console.log(this.state.username);
+        // console.log(this.state.username);
     };
 
     handleNameChange = name => event => {
+        var specialChars = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
         this.setState({[name]: event.target.value});
 
-        if(event.target.value.length < 2 || event.target.value.length > 50 || event.target.value.charAt(0) == event.target.value.charAt(0).toLowerCase()){
+        if(event.target.value.length < 2 || event.target.value.length > 50 || specialChars.test(event.target.value)
+            || event.target.value.charAt(0) == event.target.value.charAt(0).toLowerCase()){
             this.setState({validName: false});
-            // document.getElementById("showvalidation").innerHTML = <CloseIcon/>;
         }
-
         else{
             this.setState({validName: true});
-            // document.getElementById("showvalidation").innerHTML = <CheckIcon/>;
         }
+
         this.setState({startedName: false});
     };
 
     handleEmailChange = email => event => {
-        var specialChars = "<>!#$%^&*()+[]{}?:;|'\"\\,/~`-=";
+        var specialChars = /[!#$%^&*()+\-=\[\]{};':"\\|,<>\/?]+/;
         this.setState({ [email]: event.target.value });
 
-        if(event.target.value.indexOf('@') <= -1 || event.target.value.length < 9 || event.target.value.length > 30){
-        //|| specialChars.test(event.target.value)){
+        if(event.target.value.indexOf('@') <= -1 || event.target.value.length < 9 || event.target.value.length > 30
+            || specialChars.test(event.target.value)){
             this.setState({validEmail: false});
         }
         else{
@@ -139,9 +162,12 @@ class Register extends Component {
         if(event.target.value.length < 6 || event.target.value.length > 30 || !specialChars.test(event.target.value)
         || event.target.value == event.target.value.toLowerCase()){
             this.setState({validPassword: false});
+            document.getElementById("helperMessagePass").innerHTML = "Password tem que conter pelo menos uma letra maiuscula " +
+                "e um caracter especial";
         }
         else{
             this.setState({validPassword: true});
+            document.getElementById("helperMessagePass").innerHTML = "";
         }
 
         if(event.target.value != this.state.confirmPass || !this.state.validPassword){
@@ -170,6 +196,13 @@ class Register extends Component {
 
     handleRoleChange = value => event => {
         this.setState({ [value]: event.target.value });
+    };
+
+    handleKeyUp = event =>{
+        event.preventDefault();
+        if(event.keyCode === 13){
+            document.getElementById("createAccount").click();
+        }
     };
 
     //handleRoleChange = (event, index, value) => this.setState({value});
@@ -273,12 +306,13 @@ class Register extends Component {
 
                     <div className="input-group">
                         <div className={'form-group' + (submitted && !username ? ' has-error' : '')}>
-                            <TextField required id="username" label="Username" className={classes.textField} value={this.state.username}
+                            <TextField required id="username" label="Nome de utilizador" className={classes.textField} value={this.state.username}
                                        onChange={this.handleUsernameChange('username')}/>
                             <div id={"showvalidation"} className={classes.showValidation}></div>
                             {!startedUsername && (validUsername ? <CheckIcon className={classes.validIcon}/> : <CloseIcon className={classes.nonValidIcon}/> )}
                             {/*{!started && !valid && <div style={{margin: '0 auto'}}>O username nao pode ser vazio e apenas pode conter letras minusculas</div>}*/}
                             {/*{!this.isValid('username') && <div>Deu</div>}*/}
+                            <div id="helperMessageUser" className={classes.helperMessage}></div>
                             {submitted && !username &&
                             <div className="help-block">Username is required</div>
                             }
@@ -324,6 +358,7 @@ class Register extends Component {
                                        onChange={this.handlePasswordChange('password')}/>
                             {!startedPassword &&
                             (validPassword ? <CheckIcon className={classes.validIcon}/> : <CloseIcon className={classes.nonValidIcon}/> )}
+                            <div id="helperMessagePass" className={classes.helperMessage}></div>
                             {submitted && !password &&
                             <div className="help-block">Password is required</div>
                             }
@@ -333,7 +368,7 @@ class Register extends Component {
                     <div className="input-group">
                         <div className={'form-group' + (submitted && !confirmPass ? ' has-error' : '')}>
                             <TextField required id="confirmpassword" label="Confirmar Password" type="password" className={classes.textField} value={this.state.confirmPass}
-                                       onChange={this.handleConfirmPassChange('confirmPass')}/>
+                                       onKeyUp={this.handleKeyUp} onChange={this.handleConfirmPassChange('confirmPass')}/>
                             {!startedConfPass &&
                             (validConfPass ? <CheckIcon className={classes.validIcon}/> : <CloseIcon className={classes.nonValidIcon}/> )}
                             {submitted && !confirmPass &&
@@ -348,7 +383,7 @@ class Register extends Component {
                                 color="primary" className={classes.leftButton}>
                             Entrar
                         </Button>
-                        <Button variant="raised" color={"primary"} className={classes.button} onClick={this.handleCreateAccount}>
+                        <Button id={"createAccount"} variant="raised" color={"primary"} className={classes.button} onClick={this.handleCreateAccount}>
                             Criar Conta
                         </Button>
                         {loggingIn &&

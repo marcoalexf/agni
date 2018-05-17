@@ -23,7 +23,6 @@ import Home from './Home';
 import HomePage from './HomePage';
 import News from './News';
 import Profile from './Profile';
-import EditProfile from './EditProfile';
 import RegistProblem from './RegistProblem';
 import ThankYou from './ThankYou';
 import Operations from './Operations';
@@ -302,7 +301,6 @@ class MiniDrawer extends React.Component {
                         <Route path='/register' component={Register}/>
                         <Route path='/noticias' component={News}/>
                         <Route path='/perfil' component={Profile}/>
-                        <Route path='/editarperfil' component={EditProfile}/>
                         <Route path='/registarproblema' component={RegistProblem}/>
                         <Route path='/operacoes' component={Operations}/>
                         <Route path='/mapa' component={Map}/>

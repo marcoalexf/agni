@@ -7,6 +7,7 @@ import {withStyles} from "material-ui/styles/index";
 import blue from 'material-ui/colors/blue';
 import grey from 'material-ui/colors/grey';
 import Paper from 'material-ui/Paper';
+import deepOrange from "material-ui/colors/deepOrange";
 
 const styles = theme => ({
     textField: {
@@ -31,8 +32,10 @@ const styles = theme => ({
         padding: 40,
     }),
     error:{
+        margin: 10,
         textAlign: 'center',
-        color: 'red',
+        color: deepOrange[600],
+        fontSize: 15,
     },
 });
 
@@ -55,6 +58,13 @@ class Login extends Component {
 
     handlePasswordChange = prop => event => {
         this.setState({ [prop]: event.target.value });
+    };
+
+    handleKeyUp = event =>{
+        event.preventDefault();
+        if(event.keyCode === 13){
+            document.getElementById("doLogin").click();
+        }
     };
 
     handleLogin = () => {
@@ -131,7 +141,7 @@ class Login extends Component {
                     <div className="input-group">
                         <div className={'form-group' + (submitted && !password ? ' has-error' : '')}>
                             <TextField id="password" label="Password" type="password" className={classes.textField} value={this.state.password}
-                                       onChange={this.handlePasswordChange('password')}/>
+                                       onKeyUp={this.handleKeyUp} onChange={this.handlePasswordChange('password')}/>
                             {submitted && !password &&
                             <div className="help-block">Password is required</div>
                             }
@@ -144,7 +154,7 @@ class Login extends Component {
                                 color="primary">
                             Criar conta
                         </Button>
-                        <Button variant="raised" color={"primary"} className={classes.button} onClick={this.handleLogin}>
+                        <Button id={"doLogin"} variant="raised" color={"primary"} className={classes.button} onClick={this.handleLogin}>
                             Entrar
                         </Button>
                         {loggingIn &&
