@@ -78,7 +78,7 @@ public class GcsManager {
     		:new GcsFilename("liquid-layout-196103.appspot.com", filename);
     	GcsOutputChannel outputChannel;
     	outputChannel = gcsService.createOrReplace(fileName, instance);
-		copy(inputStream, Channels.newOutputStream(outputChannel));	
+		copy(inputStream, Channels.newOutputStream(outputChannel));
 		return true;
     } catch (IOException e) {
 		return false;
