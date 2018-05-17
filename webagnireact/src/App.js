@@ -234,39 +234,39 @@ class MiniDrawer extends React.Component {
                             Menos florestas negras, mais caminhos verdes e céus mais azuis
                         </q>
 
-                        {/*<Manager>*/}
-                            {/*<Target>*/}
-                                {/*<div*/}
-                                    {/*ref={node => {*/}
-                                        {/*this.target1 = node;*/}
-                                    {/*}}*/}
-                                {/*>*/}
-                                    {/*<IconButton*/}
-                                        {/*aria-owns={accountOpen ? 'menu-list-grow' : null}*/}
-                                        {/*aria-haspopup="true"*/}
-                                        {/*color="inherit"*/}
-                                        {/*onClick={this.handleToggle}>*/}
-                                        {/*<AccountIcon/>*/}
-                                    {/*</IconButton>*/}
-                                {/*</div>*/}
-                            {/*</Target>*/}
-                            {/*<Popper*/}
-                                {/*placement="bottom-start"*/}
-                                {/*eventsEnabled={accountOpen}*/}
-                                {/*className={classNames({ [classes.popperClose]: !accountOpen })}*/}
-                            {/*>*/}
-                                {/*<ClickAwayListener onClickAway={this.handleClose}>*/}
-                                    {/*<Grow in={accountOpen} id="menu-list-grow" style={{ transformOrigin: '0 0 0' }}>*/}
-                                        {/*<Paper>*/}
-                                            {/*<MenuList role="menu">*/}
-                                                {/*<MenuItem onClick={this.handleProfileOption}>Perfil</MenuItem>*/}
-                                                {/*<MenuItem onClick={this.handleLogout}><LogoutIcon/>Terminar Sessao</MenuItem>*/}
-                                            {/*</MenuList>*/}
-                                        {/*</Paper>*/}
-                                    {/*</Grow>*/}
-                                {/*</ClickAwayListener>*/}
-                            {/*</Popper>*/}
-                        {/*</Manager>*/}
+                        <Manager>
+                            <Target>
+                                <div
+                                    ref={node => {
+                                        this.target1 = node;
+                                    }}
+                                >
+                                    <IconButton
+                                        aria-owns={accountOpen ? 'menu-list-grow' : null}
+                                        aria-haspopup="true"
+                                        color="inherit"
+                                        onClick={this.handleToggle}>
+                                        <AccountIcon/>
+                                    </IconButton>
+                                </div>
+                            </Target>
+                            <Popper
+                                placement="bottom-start"
+                                eventsEnabled={accountOpen}
+                                className={classNames({ [classes.popperClose]: !accountOpen })}
+                            >
+                                <ClickAwayListener onClickAway={this.handleClose}>
+                                    <Grow in={accountOpen} id="menu-list-grow" style={{ transformOrigin: '0 0 0' }}>
+                                        <Paper>
+                                            <MenuList role="menu">
+                                                <MenuItem onClick={this.handleProfileOption}>Perfil</MenuItem>
+                                                <MenuItem onClick={this.handleLogout}><LogoutIcon/>Terminar Sessao</MenuItem>
+                                            </MenuList>
+                                        </Paper>
+                                    </Grow>
+                                </ClickAwayListener>
+                            </Popper>
+                        </Manager>
 
                         <Button component={Link} to="/login" color="inherit">
                             Entrar

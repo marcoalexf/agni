@@ -8,6 +8,8 @@ import { MenuItem } from 'material-ui/Menu';
 import {withStyles} from "material-ui/styles/index";
 import blue from 'material-ui/colors/blue';
 import grey from 'material-ui/colors/grey';
+import lightGreen from 'material-ui/colors/lightGreen';
+import deepOrange from 'material-ui/colors/deepOrange';
 import FaceIcon from '@material-ui/icons/Face';
 import Paper from 'material-ui/Paper';
 import Typography from 'material-ui/Typography';
@@ -51,6 +53,15 @@ const styles = theme => ({
     input: {
         display: 'none',
     },
+    showValidation:{
+        display: 'inline-block'
+    },
+    nonValidIcon:{
+        color: deepOrange[600],
+    },
+    validIcon:{
+        color: lightGreen[400],
+    },
 });
 
 class Register extends Component {
@@ -66,16 +77,23 @@ class Register extends Component {
             confirmPass: '',
             value: 'User',
             submitted: false,
-            valid: false,
+            started: true,
         };
     }
 
     handleUsernameChange = username => event => {
-        this.setState({[username]: event.target.value,});
-        if(event.target.value == null)
+        this.setState({[username]: event.target.value});
+
+        if(event.target.value.length == 0 || event.target.value != event.target.value.toLowerCase()){
             this.setState({valid: false});
-        else
+            // document.getElementById("showvalidation").innerHTML = <CloseIcon/>;
+        }
+
+        else{
             this.setState({valid: true});
+            // document.getElementById("showvalidation").innerHTML = <CheckIcon/>;
+        }
+        this.setState({started: false});
 
         console.log(this.state.username);
     };
@@ -151,12 +169,14 @@ class Register extends Component {
         }
     }
 
-
+    isValid = value => {
+        return false;
+    };
 
 
     render() {
         const { loggingIn } = this.props;
-        const { username, email, password, confirmPass, submitted, valid } = this.state;
+        const { username, email, password, confirmPass, submitted, valid, started} = this.state;
         const { classes } = this.props;
 
         return (
@@ -184,7 +204,10 @@ class Register extends Component {
                         <div className={'form-group' + (submitted && !username ? ' has-error' : '')}>
                             <TextField required id="username" label="Username" className={classes.textField} value={this.state.username}
                                        onChange={this.handleUsernameChange('username')}/>
-                            {valid ? <CheckIcon/> : <CloseIcon/>}
+                            <div id={"showvalidation"} className={classes.showValidation}></div>
+                            {!started && (valid ? <CheckIcon className={classes.validIcon}/> : <CloseIcon className={classes.nonValidIcon}/> )}
+                            {/*{!started && !valid && <div style={{margin: '0 auto'}}>O username nao pode ser vazio e apenas pode conter letras minusculas</div>}*/}
+                            {/*{!this.isValid('username') && <div>Deu</div>}*/}
                             {submitted && !username &&
                             <div className="help-block">Username is required</div>
                             }
