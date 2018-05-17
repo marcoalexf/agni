@@ -75,6 +75,22 @@ const styles = theme => ({
     },
 });
 
+function uploadFile(id) {
+    var file = document.forms["putFile"]["files"].files[0];
+    var filename = file.name;
+
+    if (filename == null || filename == "") {
+        alert("FileName is required");
+        return false;
+    } else {
+        document.forms["putFile"]["fileName"].value = filename;
+        var request = new XMLHttpRequest();
+        request.open("POST", 'http://localhost:8080/rest/upload/' + id, false);
+        request.setRequestHeader("Content-Type", '');
+        request.send(file);
+    }
+}
+
 class Register extends Component {
     constructor(props) {
         super(props)
@@ -94,6 +110,8 @@ class Register extends Component {
             startedPassword: true,
             startedConfPass: true,
         };
+
+        this.handleCreateAccount = this.handleCreateAccount.bind(this);
     }
 
     handleUsernameChange = username => event => {
@@ -249,27 +267,36 @@ class Register extends Component {
             xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             var myJSON = JSON.stringify(user);
             xmlHttp.send(myJSON);
-            console.log("XML response:" + xmlHttp.responseText);
 
             xmlHttp.onreadystatechange = function() {//Call a function when the state changes.
                 if(xmlHttp.readyState === XMLHttpRequest.DONE) {
                     if(xmlHttp.status === 200){
                         console.log("Sucesso");
+                        var response = xmlHttp.response;
+                        console.log("XML response: " + response);
+                        var obj = JSON.parse(response);
+                        console.log("obj");
+                        console.log(obj);
                         document.getElementById("errorMessage").innerHTML = "";
-                        // document.location.href = '/login';
+
+                        uploadFile(obj);
                     }
 
                     else{
                         document.getElementById("errorMessage").innerHTML = "Parâmetros incorretos ou utilizador já existe";
                     }
                 }
-
-            }
+            }.bind(this)
         }
         else{
             document.getElementById("errorMessage").innerHTML = "Parâmetros incorretos";
         }
-    }
+    };
+
+    savePhoto = id => {
+        var photo = document.getElementById("raised-button-file");
+        console.log(photo);
+    };
 
     isValid = value => {
         return false;
@@ -291,14 +318,25 @@ class Register extends Component {
                 <div className="imgcontainer">
                     <img src={require('./img/registUser2.png')} alt="Avatar2" width={100} heigth={100} />
                     <div>
-                        <input
-                            accept="image/*"
-                            className={classes.input}
-                            id="raised-button-file"
-                            multiple
-                            type="file"
-                        />
-                        <label htmlFor="raised-button-file"><Button component={"span"}> <FaceIcon /> Carregar Foto </Button></label>
+                        <form encType="text/plain" method="get" name="putFile" id="putFile">
+                            <div>
+                                <input type="file" name="files"/>
+                                <input type="hidden" name="fileName"/>
+                                {/*<input*/}
+                                {/*accept="image/*"*/}
+                                {/*className={classes.input}*/}
+                                {/*id="raised-button-file"*/}
+                                {/*multiple*/}
+                                {/*type="file"*/}
+                                {/*/>*/}
+                                {/*<label htmlFor="raised-button-file">*/}
+                                {/*<Button > <FaceIcon /> Carregar Foto </Button>*/}
+                                {/*component={"span"}*/}
+                                {/*</label>*/}
+                                {/*<input type="submit" onClick={uploadFile(this)} value="Upload Content"/>*/}
+                            </div>
+                        </form>
+
                     </div>
                 </div>
 
