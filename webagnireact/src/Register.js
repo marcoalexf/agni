@@ -198,6 +198,13 @@ class Register extends Component {
         this.setState({ [value]: event.target.value });
     };
 
+    handleKeyUp = event =>{
+        event.preventDefault();
+        if(event.keyCode === 13){
+            document.getElementById("createAccount").click();
+        }
+    };
+
     //handleRoleChange = (event, index, value) => this.setState({value});
 
     handleCreateAccount = () => {
@@ -361,7 +368,7 @@ class Register extends Component {
                     <div className="input-group">
                         <div className={'form-group' + (submitted && !confirmPass ? ' has-error' : '')}>
                             <TextField required id="confirmpassword" label="Confirmar Password" type="password" className={classes.textField} value={this.state.confirmPass}
-                                       onChange={this.handleConfirmPassChange('confirmPass')}/>
+                                       onKeyUp={this.handleKeyUp} onChange={this.handleConfirmPassChange('confirmPass')}/>
                             {!startedConfPass &&
                             (validConfPass ? <CheckIcon className={classes.validIcon}/> : <CloseIcon className={classes.nonValidIcon}/> )}
                             {submitted && !confirmPass &&
@@ -376,7 +383,7 @@ class Register extends Component {
                                 color="primary" className={classes.leftButton}>
                             Entrar
                         </Button>
-                        <Button variant="raised" color={"primary"} className={classes.button} onClick={this.handleCreateAccount}>
+                        <Button id={"createAccount"} variant="raised" color={"primary"} className={classes.button} onClick={this.handleCreateAccount}>
                             Criar Conta
                         </Button>
                         {loggingIn &&
