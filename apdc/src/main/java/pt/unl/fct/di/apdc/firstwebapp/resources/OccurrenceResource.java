@@ -211,7 +211,7 @@ public class OccurrenceResource {
 	}
 	
 	@POST
-	@Path("/edit")
+	@Path("/delete")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response deleteOccurrence(OccurrenceEditData data) {
 		Transaction txn = datastore.beginTransaction();
