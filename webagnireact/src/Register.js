@@ -75,21 +75,22 @@ const styles = theme => ({
     },
 });
 
-function uploadFile(id) {
-    var file = document.forms["putFile"]["files"].files[0];
-    var filename = file.name;
-
-    if (filename == null || filename == "") {
-        alert("FileName is required");
-        return false;
-    } else {
-        document.forms["putFile"]["fileName"].value = filename;
-        var request = new XMLHttpRequest();
-        request.open("POST", 'http://localhost:8080/rest/upload/' + id, false);
-        request.setRequestHeader("Content-Type", file.type);
-        request.send(file);
-    }
-}
+//TODO
+// function uploadFile(id) {
+//     var file = document.forms["putFile"]["files"].files[0];
+//     var filename = file.name;
+//
+//     if (filename == null || filename == "") {
+//         alert("FileName is required");
+//         return false;
+//     } else {
+//         document.forms["putFile"]["fileName"].value = filename;
+//         var request = new XMLHttpRequest();
+//         request.open("POST", 'https://liquid-layout-196103.appspot.com/rest/upload/' + id, false);
+//         request.setRequestHeader("Content-Type", file.type);
+//         request.send(file);
+//     }
+// }
 
 class Register extends Component {
     constructor(props) {
@@ -263,7 +264,7 @@ class Register extends Component {
 
             console.log(user);
             var xmlHttp = new XMLHttpRequest();
-            xmlHttp.open( "POST", 'http://localhost:8080/rest/register');
+            xmlHttp.open( "POST", 'https://liquid-layout-196103.appspot.com/rest/register');
             xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             var myJSON = JSON.stringify(user);
             xmlHttp.send(myJSON);
@@ -279,7 +280,8 @@ class Register extends Component {
                         console.log(obj);
                         document.getElementById("errorMessage").innerHTML = "";
 
-                        uploadFile(obj);
+                        //TODO
+                        //uploadFile(obj);
                     }
 
                     else{
@@ -340,7 +342,8 @@ class Register extends Component {
                     </div>
                 </div>
 
-                <form name="form" onSubmit={this.handleSubmit}>
+                <form name="form" >
+                      {/*//onSubmit={this.handleSubmit}>*/}
 
                     <div className="input-group">
                         <div className={'form-group' + (submitted && !username ? ' has-error' : '')}>

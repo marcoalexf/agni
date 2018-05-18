@@ -138,7 +138,7 @@ class Profile extends React.Component {
             }
 
             var xmlHttp = new XMLHttpRequest();
-            xmlHttp.open( "POST", "http://localhost:8080/rest/profile/", true);
+            xmlHttp.open( "POST", "https://liquid-layout-196103.appspot.com/rest/profile/", true);
             xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             var myJSON = JSON.stringify(user);
             xmlHttp.send(myJSON);

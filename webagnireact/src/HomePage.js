@@ -55,7 +55,7 @@ class HomePage extends Component {
                     <Badge color={"primary"} badgeContent={1}>
                         <OperationsIcon className={classes.icons}/>
                     </Badge><br/>
-                    <Button component={Link} to={'/operacoes'}>
+                    <Button component={Link} to={'/testarope'}>
                         Tabela de Operacoes
                     </Button>
                 </section>

@@ -85,7 +85,7 @@ class Login extends Component {
 
          if(informations == null){
              var xmlHttp = new XMLHttpRequest();
-             xmlHttp.open( "POST", "http://localhost:8080/rest/login");
+             xmlHttp.open( "POST", "https://liquid-layout-196103.appspot.com/rest/login");
              xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
              var myJSON = JSON.stringify(user);
              xmlHttp.send(myJSON);
@@ -123,7 +123,7 @@ class Login extends Component {
                 <h4>Entrar</h4>
 
                 <div className="imgcontainer">
-                    <img src={require('./img/user.png')} alt="Avatar" className="avatar"/>
+                    <img src={require('./img/agniNoBack.png')} alt="Avatar" width="300"/>
                 </div>
 
                 <form name="form" onSubmit={this.handleSubmit}>
