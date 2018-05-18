@@ -86,7 +86,7 @@ function uploadFile(id) {
         document.forms["putFile"]["fileName"].value = filename;
         var request = new XMLHttpRequest();
         request.open("POST", 'http://localhost:8080/rest/upload/' + id, false);
-        request.setRequestHeader("Content-Type", '');
+        request.setRequestHeader("Content-Type", file.type);
         request.send(file);
     }
 }
