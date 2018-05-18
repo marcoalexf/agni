@@ -121,6 +121,10 @@ public class HomePage extends AppCompatActivity
 
             OccurrenceFragment of = new OccurrenceFragment();
             FragmentManager fman = getSupportFragmentManager();
+            Bundle args = new Bundle();
+            args.putSerializable(TOKEN, token);
+
+            of.setArguments(args);
             fman.beginTransaction().replace(R.id.fragment, of).commit();
         } else if (id == R.id.nav_map) {
             setTitle("Map");

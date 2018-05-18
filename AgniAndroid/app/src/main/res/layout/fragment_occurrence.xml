@@ -196,7 +196,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/occurrence_notification" />
 
-        <com.google.android.gms.maps.MapView
+        <com.example.marisco.myapplication.CustomMapView
             android:id="@+id/mapView"
             android:layout_width="349dp"
             android:layout_height="214dp"
