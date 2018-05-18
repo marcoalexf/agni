@@ -123,7 +123,8 @@ let xmlRequest = new Promise(function(resolve, reject) {
             }
             else {
                 console.log("tempo expirado");
-                reject(Error('Tempo expirado'));
+                // reject(Error('Tempo expirado'));
+                //TODO - Link to Login
             }
         }
     }
@@ -150,79 +151,6 @@ class TestOperations extends React.Component {
             {user_occurrence_title: 'titulo1'},
             {user_occurrence_title: 'titulo2'}]
     };
-    // constructor () {
-    //     super();
-    //     this.state = {
-    //         // object: 'titulo1'
-    //     }
-    //     // prom.then((value) => {
-    //     //     this.setState({val: value})
-    //     // })
-    //
-    //
-    //
-    //     // xmlRequest.then((value) => {
-    //     // //     this.obj = value;
-    //     //     this.setState({obj: value})
-    //     // })
-    //
-    //     // xmlRequest.then((value) => {
-    //     //     this.setState({val: value})
-    //     // })
-    // }
-
-    xmlHttpRequest = () => {
-        var that = this;
-        console.log("xmlHttpRequest");
-        var t = true;
-        var token = window.localStorage.getItem('token');
-        var uname = JSON.parse(token).username;
-        var tokenObj = JSON.parse(token);
-        var map;
-
-        var user = {
-            "username": uname,
-            "token": tokenObj,
-            "showPrivate": true //MUDAR ISTO DEPOIS
-        }
-
-        console.log("pedido");
-        var xmlHttp = new XMLHttpRequest();
-        xmlHttp.open("POST", "http://localhost:8080/rest/occurrence/list", true);
-        xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        var myJSON = JSON.stringify(user);
-        xmlHttp.send(myJSON);
-
-        console.log("esperar pelo estado");
-        xmlHttp.onreadystatechange = function () {
-            console.log("1");
-            if (xmlHttp.readyState === 4) {
-                console.log("2");
-                if (xmlHttp.status === 200) {
-                    console.log("3");
-                    var response = xmlHttp.response;
-                    var obj = JSON.parse(response);
-                    console.log("obj:");
-                    console.log(obj);
-                    that.setState({object: obj});
-                    console.log("state object");
-                    console.log(that.state.object);
-                    map = obj[0];
-                    console.log("map:");
-                    console.log(map);
-                    // var array = Object.values(map);
-                    // console.log(array);
-                    // console.log(operationsData);
-                    // resolve(obj);
-                    // resolve('xml value')
-                }
-                else {
-                    console.log("tempo expirado");
-                    // reject(Error('Tempo expirado'));
-                }
-            }
-        }
-    }
 
     componentDidMount () {
         xmlRequest.then((value) =>{
@@ -234,7 +162,6 @@ class TestOperations extends React.Component {
     }
 
     render () {
-        // const {object} = this.state.object;
         return (
             <div>
                 <Table>
@@ -267,16 +194,6 @@ class TestOperations extends React.Component {
                         })}
                     </TableBody>
                 </Table>
-
-                {/*<p>{obj}</p>*/}
-                {/*{this.state.object.map(info => {*/}
-                    {/*return (*/}
-                        {/*<p>{info.user_occurrence_title}</p>*/}
-                    {/*)*/}
-                {/*}*/}
-                {/*)}*/}
-
-
             </div>
         )
     }

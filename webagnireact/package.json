@@ -3,18 +3,22 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@material-ui/core": "^1.0.0",
     "@material-ui/icons": "^1.0.0-beta.42",
     "axios": "^0.18.0",
     "google-map-react": "^1.0.0",
     "google-maps-react": "^2.0.2",
+    "material-steppers": "^2.0.0",
     "material-ui": "^1.0.0-beta.42",
     "react": "^16.3.2",
     "react-browser-router": "^2.1.1",
     "react-dom": "^16.3.2",
     "react-google-maps": "^9.4.5",
+    "react-motion": "^0.5.2",
     "react-promise": "^2.0.2",
     "react-router-dom": "^4.2.2",
-    "react-scripts": "1.1.4"
+    "react-scripts": "1.1.4",
+    "react-swipeable-views": "^0.12.13"
   },
   "scripts": {
     "start": "react-scripts start",
