@@ -1,6 +1,7 @@
 package pt.unl.fct.di.apdc.firstwebapp.resources;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.ListOccurrenceData;
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceData;
+import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceDeleteData;
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceEditData;
 import pt.unl.fct.di.apdc.firstwebapp.util.SecurityManager;
 
@@ -48,10 +50,10 @@ public class OccurrenceResource {
 	@Path("/register")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response registerOccurrence(OccurrenceData data) {
-		LOG.fine("Attempt to register ocurrence: " + data.title + " by user: " + data.token.username);
 		if(!data.valid()) {
 			return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
 		}
+		LOG.fine("Attempt to register ocurrence: " + data.title + " by user: " + data.token.username);
 		if(!data.token.isTokenValid()) {
 			LOG.warning("Failed to register occurrence, token for user: " + data.token.username + "is invalid");
 			return Response.status(Status.FORBIDDEN).build();
@@ -148,9 +150,14 @@ public class OccurrenceResource {
 		else if(!data.token.username.equals(data.username) && !SecurityManager.userHasAccess("see_private_occurrences", data.token.username)) {
 			return Response.status(Status.FORBIDDEN).build();
 		}
+		Map<String, Object> occurrenceMap;
 		List<Entity> results = datastore.prepare(ctrQuery).asList(FetchOptions.Builder.withDefaults());
 		for(Entity occurrenceEntity: results) {
-			occurrences.add(occurrenceEntity.getProperties());
+			occurrenceMap = new HashMap<String, Object>();
+			occurrenceMap.putAll(occurrenceEntity.getProperties());
+			occurrenceMap.put("username", occurrenceEntity.getParent().getName());
+			occurrenceMap.put("occurrenceID", occurrenceEntity.getKey().getId());
+			occurrences.add(occurrenceMap);
 		}
 		LOG.info("List of occurrences sent");
 		return Response.ok(g.toJson(occurrences)).build();
@@ -213,7 +220,7 @@ public class OccurrenceResource {
 	@POST
 	@Path("/delete")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response deleteOccurrence(OccurrenceEditData data) {
+	public Response deleteOccurrence(OccurrenceDeleteData data) {
 		Transaction txn = datastore.beginTransaction();
 		try {
 			LOG.fine("Attempt to delete ocurrence with id: " + data.id + " by user: " + data.token.username);

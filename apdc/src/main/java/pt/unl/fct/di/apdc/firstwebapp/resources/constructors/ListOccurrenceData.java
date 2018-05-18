@@ -16,14 +16,4 @@ public class ListOccurrenceData {
 		this.username = username;
 	}
 	
-	public ListOccurrenceData(AuthToken token) {
-		this.token = token;
-		this.showPrivate = true;
-	}
-	
-	
-	public ListOccurrenceData(String username) {
-		this.username = username;
-	}
-	
 }

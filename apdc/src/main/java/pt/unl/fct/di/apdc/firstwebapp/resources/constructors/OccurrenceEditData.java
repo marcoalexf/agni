@@ -4,7 +4,7 @@ public class OccurrenceEditData {
 	
 	public AuthToken token;
 	public String username;
-	public String id;
+	public long id;
 	public String title;
 	public String description;
 	public String type;
@@ -19,7 +19,7 @@ public class OccurrenceEditData {
 		
 	}
 	
-	public OccurrenceEditData(AuthToken token, String username,  String id, String title, 
+	public OccurrenceEditData(AuthToken token, String username,  long id, String title, 
 			String description, int level, boolean visibility, boolean notificationOnResolve) {
 		this.token = token;
 		this.username = username;
@@ -36,7 +36,7 @@ public class OccurrenceEditData {
 	}
 	
 	public boolean valid() {
-		return nonEmptyField(id) && nonEmptyField(username);
+		return id != 0 && nonEmptyField(username);
 	}
 	
 }
