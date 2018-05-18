@@ -1,5 +1,7 @@
 package com.example.marisco.myapplication;
 
+import android.Manifest;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -102,6 +104,11 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback, 
             this.token = (LoginResponse) b.getSerializable(TOKEN);
         }
 
+        map.onCreate(savedInstanceState);
+        map.onResume(); // needed to get the map to display immediately
+        map.getMapAsync(this);
+        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -110,12 +117,6 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback, 
         });
 
         setRadioIds();
-
-        map.onCreate(savedInstanceState);
-
-        map.onResume(); // needed to get the map to display immediately
-
-        map.getMapAsync(this);
         return v;
     }
 
@@ -200,11 +201,6 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback, 
         boolean notificationOn = notification.isChecked();
 
         double lat = mp.getPosition().latitude, lon = mp.getPosition().longitude;
-        //double lat = 38.39403, lon = 9.12135;
-        Toast toast = Toast.makeText(getActivity(), "Lat: " + lat, Toast.LENGTH_SHORT);
-        toast.show();
-        Toast toast2 = Toast.makeText(getActivity(), "Lon: " + lon, Toast.LENGTH_SHORT);
-        toast2.show();
 
         OccurrenceData data = new OccurrenceData(token, occ_title, occ_description, occ_type, level,
                 visibility, lat, lon, notificationOn);
@@ -246,14 +242,25 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback, 
         });
     }
 
+    @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) throws SecurityException {
         switch (requestCode) {
             case 1: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
                     mapG.setMyLocationEnabled(true);
 
+                    mapG.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
+
+                        public void onMyLocationChange(Location location) {
+                            if (initialLoc == null) {
+                                putMarker(new LatLng(location.getLatitude(), location.getLongitude()));
+                                initialLoc = location;
+                            }
+                        }
+                    });
                 } else {
                     //meter map em local standard
                 }
@@ -268,44 +275,31 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback, 
         mapG.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng location) {
-                mapG.clear();
-
-                mp = new MarkerOptions();
-
-                mp.position(new LatLng(location.latitude, location.longitude));
-
-                mp.title(MARKER_NAME);
-
-                mapG.addMarker(mp);
-
-                mapG.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                        new LatLng(location.latitude, location.longitude), 16));
+              putMarker(location);
             }
         });
+
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
-
-        if (initialLoc == null) {
-            putMarker(location);
-            initialLoc = location;
-        }
-    }
-
-    private void putMarker(Location location) {
+    private void putMarker(LatLng location) {
         mapG.clear();
 
         mp = new MarkerOptions();
 
-        mp.position(new LatLng(location.getLatitude(), location.getLongitude()));
+        mp.position(new LatLng(location.latitude, location.longitude));
 
         mp.title(MARKER_NAME);
 
         mapG.addMarker(mp);
 
         mapG.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                new LatLng(location.getLatitude(), location.getLongitude()), 16));
+                new LatLng(location.latitude, location.longitude), 16));
+    }
+
+
+    @Override
+    public void onLocationChanged(Location location) {
+
     }
 
     @Override
