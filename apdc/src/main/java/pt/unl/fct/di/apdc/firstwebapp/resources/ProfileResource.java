@@ -19,10 +19,12 @@ import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Transaction;
+import com.google.appengine.api.datastore.TransactionOptions;
 import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.ProfileEditData;
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.ProfileData;
+import pt.unl.fct.di.apdc.firstwebapp.util.GcsManager;
 import pt.unl.fct.di.apdc.firstwebapp.util.SecurityManager;
 
 @Path("/profile")
@@ -81,7 +83,8 @@ public class ProfileResource {
 			LOG.warning("Failed to edit profile, user: " + data.token.username + " does not have the rights to do it");
 			return Response.status(Status.FORBIDDEN).build();
 		}
-		Transaction txn = datastore.beginTransaction();
+		TransactionOptions options = TransactionOptions.Builder.withXG(true);
+		Transaction txn = datastore.beginTransaction(options);
 		try {
 			Key userKey = KeyFactory.createKey("User", data.username);
 			Entity user = datastore.get(userKey);
@@ -98,6 +101,17 @@ public class ProfileResource {
 				user.setProperty("user_locality", data.locality);
 			}
 			datastore.put(txn, user);
+			if(data.uploadPhoto) {
+				Entity fileUpload = new Entity("FileUpload");
+				fileUpload.setProperty("file_folder", "user/" + data.username + "/");
+				fileUpload.setProperty("file_name", "photo");
+				fileUpload.setProperty("file_expiration", System.currentTimeMillis() + GcsManager.EXPIRATION_TIME);
+				fileUpload.setProperty("file_type", "IMAGE");
+				datastore.put(txn, fileUpload);
+				txn.commit();
+				LOG.info("User " + data.username + " profile updated");
+				return Response.ok(g.toJson(fileUpload.getKey().getId())).build();
+			}
 			txn.commit();
 			LOG.info("User " + data.username + " profile updated");
 			return Response.ok().build();

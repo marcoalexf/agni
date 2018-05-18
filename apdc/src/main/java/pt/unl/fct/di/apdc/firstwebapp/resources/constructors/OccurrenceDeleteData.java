@@ -4,14 +4,14 @@ public class OccurrenceDeleteData {
 	
 	public AuthToken token;
 	public String username;
-	public String id;
+	public long id;
 
 	
 	public OccurrenceDeleteData() {
 		
 	}
 	
-	public OccurrenceDeleteData(AuthToken token, String username,  String id) {
+	public OccurrenceDeleteData(AuthToken token, String username,  long id) {
 		this.token = token;
 		this.username = username;
 		this.id = id;
@@ -22,7 +22,7 @@ public class OccurrenceDeleteData {
 	}
 	
 	public boolean valid() {
-		return nonEmptyField(id) && nonEmptyField(username);
+		return id != 0 && nonEmptyField(username);
 	}
 	
 }

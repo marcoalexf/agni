@@ -50,7 +50,11 @@ public class SecurityManager {
     }
 	
 	public static boolean roleHasAccess(String request, String role) {
-		return accesses.get(role).contains(request);
+		Set<String> roleRights = accesses.get(role);
+		if(roleRights == null) {
+			return false;
+		}
+		return roleRights.contains(request);
 	}
 	
 	public static boolean userHasAccess(String request, String username) {
