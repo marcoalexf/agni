@@ -9,18 +9,20 @@ public class ProfileEditData {
 	public String county;
 	public String locality;
 	public String email;
+	public boolean uploadPhoto;
 	
 	public ProfileEditData() {
 		
 	}
 	
-	public ProfileEditData(AuthToken token, String username, String email, String district, String county, String locality) {
+	public ProfileEditData(AuthToken token, String username, String email, String district, String county, String locality, boolean uploadPhoto) {
 		this.username = username;
 		this.token = token;
 		this.email = email;
 		this.district = district;
 		this.county = county;
 		this.locality = locality;
+		this.uploadPhoto = uploadPhoto;
 	}
 
 	public boolean valid() {

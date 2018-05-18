@@ -22,6 +22,7 @@ import com.google.appengine.api.datastore.TransactionOptions;
 import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.RegisterData;
+import pt.unl.fct.di.apdc.firstwebapp.util.GcsManager;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -32,7 +33,6 @@ public class RegisterResource {
 	private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
 	private final Gson g = new Gson();
 	private static final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-	public static final long EXPIRATION_TIME = 1000*60*30; //30min
 	
 	public RegisterResource() { } //Nothing to be done here...
 	
@@ -68,7 +68,7 @@ public class RegisterResource {
 			Entity fileUpload = new Entity("FileUpload");
 			fileUpload.setProperty("file_folder", "user/" + data.username + "/");
 			fileUpload.setProperty("file_name", "photo");
-			fileUpload.setProperty("file_expiration", System.currentTimeMillis() + EXPIRATION_TIME);
+			fileUpload.setProperty("file_expiration", System.currentTimeMillis() + GcsManager.EXPIRATION_TIME);
 			fileUpload.setProperty("file_type", "IMAGE");
 			datastore.put(txn, fileUpload);
 			txn.commit();
