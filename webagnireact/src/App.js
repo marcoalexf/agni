@@ -28,6 +28,7 @@ import ThankYou from './ThankYou';
 import Operations from './Operations';
 import TestOperations from './TestOperations';
 import Map from './Map';
+import MapTwo from './MapTwo';
 import Statistics from './Statistics';
 import Operation from './InfoOperation';
 import AboutUs from './AboutUs';
@@ -303,7 +304,7 @@ class MiniDrawer extends React.Component {
                         <Route path='/perfil' component={Profile}/>
                         <Route path='/registarproblema' component={RegistProblem}/>
                         <Route path='/operacoes' component={Operations}/>
-                        <Route path='/mapa' component={Map}/>
+                        <Route path='/mapa' component={MapTwo}/>
                         <Route path='/estatisticas' component={Statistics}/>
                         <Route path='/operacao' component={Operation}/>
                         <Route path='/obrigada' component={ThankYou}/>
