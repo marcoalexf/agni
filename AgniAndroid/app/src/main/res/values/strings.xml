@@ -42,7 +42,6 @@
     <string name="profile_comments">Comments: </string>
 
 
-
     <!--Occurrence info-->
     <string name="occurrence_title">Title:</string>
     <string name="occurrence_description">Occurrence description:</string>
@@ -57,5 +56,8 @@
     <string name="occurrence_type_clean">Cleaning of woods</string>
     <string name="occurrence_type_zone">Difficult access</string>
     <string name="occurrence_type_other">Other</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>
