@@ -144,11 +144,11 @@ class RegistProblem extends React.Component {
             "description": this.state.description,
             "type": this.state.problem,
             "level": this.state.urgency,
-            "visibility": this.state.private,
+            "visibility": !this.state.private,
             "lat": 59.95,
             "lon": 30.33,
             "notificationOnResolve": this.state.open,
-        }
+        };
 
         console.log(data);
 

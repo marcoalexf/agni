@@ -264,7 +264,7 @@ class SwipeableTextMobileStepper extends React.Component {
                     enableMouseEvents
                 >
                     {object.map(step => (
-                        <img key={step.user_occurrence_title} className={classes.img} src={img2} style={{margin: '0 auto'}} alt={step.user_occurrence_title} />
+                        <img key={step.user_occurrence_data} className={classes.img} src={img2} style={{margin: '0 auto'}} alt={step.user_occurrence_title} />
                     ))}
                 </SwipeableViews>
 
