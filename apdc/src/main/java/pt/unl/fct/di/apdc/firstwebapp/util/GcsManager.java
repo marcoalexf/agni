@@ -22,8 +22,6 @@ import javax.servlet.http.HttpServletResponse;
 
 
 public class GcsManager {
-	
-	public static final long EXPIRATION_TIME = 1000*60*30; //30min
 
 	private static final boolean SERVE_USING_BLOBSTORE_API = true;
 

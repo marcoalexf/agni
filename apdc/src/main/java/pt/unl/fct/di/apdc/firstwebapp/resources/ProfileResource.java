@@ -24,7 +24,6 @@ import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.ProfileEditData;
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.ProfileData;
-import pt.unl.fct.di.apdc.firstwebapp.util.GcsManager;
 import pt.unl.fct.di.apdc.firstwebapp.util.SecurityManager;
 
 @Path("/profile")
@@ -102,11 +101,11 @@ public class ProfileResource {
 			}
 			datastore.put(txn, user);
 			if(data.uploadPhoto) {
-				Entity fileUpload = new Entity("FileUpload");
-				fileUpload.setProperty("file_folder", "user/" + data.username + "/");
-				fileUpload.setProperty("file_name", "photo");
-				fileUpload.setProperty("file_expiration", System.currentTimeMillis() + GcsManager.EXPIRATION_TIME);
-				fileUpload.setProperty("file_type", "IMAGE");
+				Entity fileUpload = UploadResource.newUploadFileEntity(
+						"user/" + data.username + "/", 
+						"photo", 
+						"IMAGE"
+						);
 				datastore.put(txn, fileUpload);
 				txn.commit();
 				LOG.info("User " + data.username + " profile updated");

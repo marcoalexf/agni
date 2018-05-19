@@ -22,7 +22,6 @@ import com.google.appengine.api.datastore.TransactionOptions;
 import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.RegisterData;
-import pt.unl.fct.di.apdc.firstwebapp.util.GcsManager;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -65,11 +64,11 @@ public class RegisterResource {
 			user.setProperty("user_county", data.county);
 			user.setProperty("user_locality", data.locality);
 			datastore.put(txn, user);
-			Entity fileUpload = new Entity("FileUpload");
-			fileUpload.setProperty("file_folder", "user/" + data.username + "/");
-			fileUpload.setProperty("file_name", "photo");
-			fileUpload.setProperty("file_expiration", System.currentTimeMillis() + GcsManager.EXPIRATION_TIME);
-			fileUpload.setProperty("file_type", "IMAGE");
+			Entity fileUpload = UploadResource.newUploadFileEntity(
+					"user/" + data.username + "/", 
+					"photo", 
+					"IMAGE"
+					);
 			datastore.put(txn, fileUpload);
 			txn.commit();
 			LOG.info("User registered " + data.username);

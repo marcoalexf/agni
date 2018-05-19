@@ -27,6 +27,7 @@ public class UploadResource {
 
 	private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
 	private static final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+	private static final long EXPIRATION_TIME = 1000*60*30; //30min
 	
 	//public UploadResource() { } //Nothing to be done here...
 	
@@ -77,6 +78,15 @@ public class UploadResource {
 				txn.rollback();
 			}
 		}
+	}
+	
+	public static Entity newUploadFileEntity(String folder, String name, String type) {
+		Entity fileUpload = new Entity("FileUpload");
+		fileUpload.setProperty("file_folder", folder);
+		fileUpload.setProperty("file_name", name);
+		fileUpload.setProperty("file_expiration", System.currentTimeMillis() + EXPIRATION_TIME);
+		fileUpload.setProperty("file_type", type);
+		return fileUpload;
 	}
 
 }
