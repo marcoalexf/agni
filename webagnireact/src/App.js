@@ -153,7 +153,7 @@ class MiniDrawer extends React.Component {
     };
 
     handleProfileOption = () => {
-        document.location.href = '/perfil';
+        // document.location.href = '/perfil';
     }
 
     handleToggle = () => {

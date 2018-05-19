@@ -264,7 +264,7 @@ class Register extends Component {
 
             console.log(user);
             var xmlHttp = new XMLHttpRequest();
-            xmlHttp.open( "POST", 'https://liquid-layout-196103.appspot.com/rest/register');
+            xmlHttp.open( "POST", '/rest/register');
             xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             var myJSON = JSON.stringify(user);
             xmlHttp.send(myJSON);

@@ -85,7 +85,7 @@ class Login extends Component {
 
          if(informations == null){
              var xmlHttp = new XMLHttpRequest();
-             xmlHttp.open( "POST", "https://liquid-layout-196103.appspot.com/rest/login");
+             xmlHttp.open( "POST", "/rest/login");
              xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
              var myJSON = JSON.stringify(user);
              xmlHttp.send(myJSON);
