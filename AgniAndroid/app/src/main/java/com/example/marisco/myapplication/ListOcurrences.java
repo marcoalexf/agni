@@ -70,8 +70,8 @@ public class ListOcurrences extends Fragment {
                     for (Map m: map_list) {
                         Log.d("OCCURENCE: ", m.toString());
                     }
-                    //ListAdapaterOccurrence adapter = new ListAdapaterOccurrence(values_list);
-                    //lv.setAdapter(adapter);
+                    ListAdapaterOccurrence adapter = new ListAdapaterOccurrence(getContext(), map_list);
+                    lv.setAdapter(adapter);
                 }
                 else {
                     Toast toast = Toast.makeText(getActivity(), "Failed to get public occurrences" + response.code(), Toast.LENGTH_SHORT);

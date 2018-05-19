@@ -1,8 +1,11 @@
 package com.example.marisco.myapplication;
 
+import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
@@ -14,11 +17,14 @@ import java.util.Map;
 
 public class ListAdapaterOccurrence extends BaseAdapter {
 
-    private ArrayList<Object> mData;
+    private ArrayList<Map<String, Object>> mData;
+    Context context;
 
-    public ListAdapaterOccurrence(ArrayList<Object> list) {
+    public ListAdapaterOccurrence(Context context, List<Map<String, Object>> list) {
+       // super(context, -1, list);
         mData = new ArrayList<>();
         mData.addAll(list);
+        this.context = context;
     }
 
     @Override
@@ -27,7 +33,7 @@ public class ListAdapaterOccurrence extends BaseAdapter {
     }
 
     @Override
-    public Object getItem(int i) {
+    public Map<String, Object> getItem(int i) {
         return mData.get(i);
     }
 
@@ -46,10 +52,23 @@ public class ListAdapaterOccurrence extends BaseAdapter {
             result = view;
         }
 
-        OccurrenceData o = new Gson().fromJson(getItem(i).toString(), OccurrenceData.class);
+        /* @FRANCISCO, LISTEN WELL PEASENT IM ABOUT TO DROP SOME MAD KNOWLEDGE ON YOU
 
-        ((TextView) result.findViewById(R.id.occurence_title)).setText(o.getTitle());
-        ((TextView) result.findViewById(R.id.occurence_description)).setText(o.getDescription());
+            SO TENS DE COPIAR ISTO: ((TextView) result.findViewById(R.id.user_occurrence_title)).setText(getItem(i).get("user_occurrence_title").toString());
+            PARA CADA CENA QUE QUERES QUE APARECA NO LIST VIEW
+            DEPOIS VAIS AO adapter_occurrence_item.xml E ACRESCENTAS LA TEXTVIEW's PARA CADA MERDA QUE QUERES MOSTRAR CARALHO
+            MUDAS ALI O R.id.xxxxxxxxxxxxxxxxxxxxx ACCORDINGLY SEBEM?
+            ALI O get("xxxxxxxxxxxxxxxxxxxxxxxxxxxx") MUDAS PARA AS VARIAS MERDAS QUE O DANIEL DEU NOME, ESSE PAANDULA.
+            FODASSE DEPOIS DESTRE BREAKTHROUGH VOU ANDAR NU EM CASA
+            VEMONOS LOGO
+            PEACE
+            -marisco
+         */
+
+        Map<String, Object> temp = getItem(i);
+        Log.d("user_occurrence_title", temp.get("user_occurrence_title").toString());
+        ((TextView) result.findViewById(R.id.user_occurrence_title)).setText(getItem(i).get("user_occurrence_title").toString());
+       // ((TextView) result.findViewById(R.id.occurence_description)).setText(o.getDescription());
 
         return result;
     }
