@@ -109,10 +109,6 @@ public class HomePage extends AppCompatActivity
 
             Bundle args = new Bundle();
             args.putSerializable(TOKEN, token);
-            //args.putString("username", username);
-            //args.putString("name", name);
-            //args.putString("type", type);
-            //args.putString("email", email);
             profile.setArguments(args);
 
             fman.beginTransaction().replace(R.id.fragment, profile).commit();
@@ -136,6 +132,13 @@ public class HomePage extends AppCompatActivity
 
         } else if (id == R.id.nav_view) {
 
+        }
+        else if(id == R.id.occurences_list){
+            setTitle("List Occurrences");
+
+            ListOcurrences lo = new ListOcurrences();
+            FragmentManager fman = getSupportFragmentManager();
+            fman.beginTransaction().replace(R.id.fragment, lo).commit();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
