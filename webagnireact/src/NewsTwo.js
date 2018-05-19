@@ -42,23 +42,23 @@ class NewsTwo extends Component {
                         {newsData.map(news => (
                             <GridListTile key={news.img}>
                                 <img src={news.img} alt={news.title} />
-                                <GridListTileBar
-                                    title=''
-                                    titlePosition="top"
-                                    actionIcon={
-                                        <IconButton className={classes.iconStar}>
-                                            <StarBorderIcon />
-                                        </IconButton>
-                                    }
-                                    actionPosition="left"
-                                    className={classes.titleBar}
-                                />
+                                {/*<GridListTileBar*/}
+                                    {/*title=''*/}
+                                    {/*titlePosition="top"*/}
+                                    {/*actionIcon={*/}
+                                        {/*<IconButton className={classes.iconStar}>*/}
+                                            {/*<StarBorderIcon />*/}
+                                        {/*</IconButton>*/}
+                                    {/*}*/}
+                                    {/*actionPosition="left"*/}
+                                    {/*className={classes.titleBar}*/}
+                                {/*/>*/}
                                 <GridListTileBar
                                     title={news.title}
                                     subtitle={<span>by: {news.author}</span>}
                                     actionIcon={
                                         <IconButton className={classes.icon}>
-                                            <InfoIcon />
+                                            <StarBorderIcon />
                                         </IconButton>
                                     }
                                 />
