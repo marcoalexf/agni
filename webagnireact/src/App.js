@@ -154,7 +154,7 @@ class MiniDrawer extends React.Component {
 
     handleProfileOption = () => {
         // document.location.href = '/perfil';
-    }
+    };
 
     handleToggle = () => {
         this.setState({ accountOpen: !this.state.accountOpen });
@@ -184,7 +184,7 @@ class MiniDrawer extends React.Component {
 
             if(uname!= null){
                 var xmlHttp = new XMLHttpRequest();
-                xmlHttp.open( "POST", "http://localhost:8080/rest/logout");
+                xmlHttp.open( "POST", "https://custom-tine-204615.appspot.com/rest/logout");
                 xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
                 var myJSON = JSON.stringify(data);
                 xmlHttp.send(myJSON);
@@ -260,7 +260,7 @@ class MiniDrawer extends React.Component {
                                     <Grow in={accountOpen} id="menu-list-grow" style={{ transformOrigin: '0 0 0' }}>
                                         <Paper>
                                             <MenuList role="menu">
-                                                <MenuItem onClick={this.handleProfileOption}>Perfil</MenuItem>
+                                                <MenuItem component={Link} to={'/perfil'}>Perfil</MenuItem>
                                                 <MenuItem onClick={this.handleLogout}><LogoutIcon/>Terminar Sessao</MenuItem>
                                             </MenuList>
                                         </Paper>

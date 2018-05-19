@@ -264,7 +264,7 @@ class Register extends Component {
 
             console.log(user);
             var xmlHttp = new XMLHttpRequest();
-            xmlHttp.open( "POST", '/rest/register');
+            xmlHttp.open( "POST", 'https://custom-tine-204615.appspot.com/rest/register');
             xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             var myJSON = JSON.stringify(user);
             xmlHttp.send(myJSON);
@@ -279,6 +279,7 @@ class Register extends Component {
                         console.log("obj");
                         console.log(obj);
                         document.getElementById("errorMessage").innerHTML = "";
+                        document.getElementById("tologin").click();
 
                         //TODO
                         //uploadFile(obj);
@@ -435,6 +436,10 @@ class Register extends Component {
                     <Typography id="errorMessage" className={classes.error} component="p"></Typography>
                 </form>
                 </Paper>
+
+                <Button id={"tologin"} component={Link} to='/login' className={classes.input} color={"primary"}>
+                    Sem sessao iniciada
+                </Button>
             </div>
         );
     }

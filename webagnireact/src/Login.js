@@ -37,6 +37,9 @@ const styles = theme => ({
         color: deepOrange[600],
         fontSize: 15,
     },
+    input: {
+        display: 'none',
+    },
 });
 
 class Login extends Component {
@@ -85,7 +88,7 @@ class Login extends Component {
 
          if(informations == null){
              var xmlHttp = new XMLHttpRequest();
-             xmlHttp.open( "POST", "/rest/login");
+             xmlHttp.open( "POST", "https://custom-tine-204615.appspot.com/rest/login");
              xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
              var myJSON = JSON.stringify(user);
              xmlHttp.send(myJSON);
@@ -98,6 +101,7 @@ class Login extends Component {
                          console.log(localstorage.getItem('token'));
                          console.log("Welcome");
                          //document.location.href = '/';
+                         document.getElementById("tohome").click();
                      }
                      else{
                          console.log("User does not exist or password is not correct");
@@ -164,6 +168,10 @@ class Login extends Component {
                     <div id="errorMessage" className={classes.error}></div>
                 </form>
                 </Paper>
+
+                <Button id={"tohome"} component={Link} to='/' className={classes.input} color={"primary"}>
+                    Sem sessao iniciada
+                </Button>
             </div>
         );
     }

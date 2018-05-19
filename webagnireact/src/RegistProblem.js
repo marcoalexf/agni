@@ -22,6 +22,7 @@ import { FormLabel, FormControlLabel } from 'material-ui/Form';
 import Dialog, {DialogActions, DialogContent, DialogContentText, DialogTitle,} from 'material-ui/Dialog';
 import {withStyles} from "material-ui/styles/index";
 import GoogleMapReact from 'google-map-react';
+import {Link} from "react-router-dom";
 
 const AnyReactComponent = ({ text }) => <div>{text}</div>;
 
@@ -153,7 +154,7 @@ class RegistProblem extends React.Component {
         console.log(data);
 
         var xmlHttp = new XMLHttpRequest();
-        xmlHttp.open( "POST", '/rest/occurrence/register');
+        xmlHttp.open( "POST", 'https://custom-tine-204615.appspot.com/rest/occurrence/register');
         xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         var myJSON = JSON.stringify(data);
         xmlHttp.send(myJSON);
@@ -163,7 +164,8 @@ class RegistProblem extends React.Component {
 
                 if(xmlHttp.status === 200){
                     console.log("Sucesso");
-                    document.location.href = '/obrigada';
+                    document.getElementById("tothankyou").click();
+                    //document.location.href = '/obrigada';
                 }
 
                 else{
@@ -369,6 +371,10 @@ class RegistProblem extends React.Component {
                         </Dialog>
                     </div>
                 </Paper>
+
+                <Button id={"tothankyou"} component={Link} to='/obrigada' className={classes.input} color={"primary"}>
+                    Sem sessao iniciada
+                </Button>
             </div>
         );
     }

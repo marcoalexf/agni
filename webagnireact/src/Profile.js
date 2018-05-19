@@ -138,7 +138,7 @@ class Profile extends React.Component {
             }
 
             var xmlHttp = new XMLHttpRequest();
-            xmlHttp.open( "POST", "/rest/profile/", true);
+            xmlHttp.open( "POST", "https://custom-tine-204615.appspot.com/rest/profile/", true);
             xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             var myJSON = JSON.stringify(user);
             xmlHttp.send(myJSON);
@@ -175,6 +175,7 @@ class Profile extends React.Component {
                     else{
                         console.log("tempo expirado");
                         window.localStorage.removeItem('token');
+                        document.getElementById("tologin").click();
                         {/*<Link to={'/login'}/>*/}
                     }
                 }
@@ -184,9 +185,13 @@ class Profile extends React.Component {
             if(token != null){
                 window.localStorage.removeItem('token');
                 console.log("Tempo expirado - faca login");
+                document.getElementById("tologin").click();
             }
-            else
+            else{
                 console.log("Sem sessao iniciada");
+                document.getElementById("tologin").click();
+            }
+
             {/*<Link to={'/login'}/>*/}
             //document.location.href = '/login';
         }
@@ -395,6 +400,10 @@ class Profile extends React.Component {
                     {value === 1 && <TabContainer>Sem apoios de momento</TabContainer>}
                     {value === 2 && <TabContainer>Sem amigos de momento</TabContainer>}
                 </Paper>
+
+                <Button id={"tologin"} component={Link} to='/login' className={classes.input} color={"primary"}>
+                    Sem sessao iniciada
+                </Button>
             </div>
 
         );
