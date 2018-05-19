@@ -12,9 +12,13 @@
     <string name="error_field_required">Campo obrigatório</string>
     <string name="permission_rationale">É necessário acesso aos contactos para completar sugestões
         de e-mail</string>
+
+
     <string name="action_sign_in">Entrar</string>
-    <string name="action_sign_in_short">Entrar</string>
     <string name="action_register">Registar</string>
+    <string name="forgotten_password">Esqueceu-se da sua password?</string>
+    <string name="remember_credencials">Lembrar credenciais</string>
+
     <string name="prompt_email">Email</string>
     <string name="prompt_user_type">Tipo de utilizador</string>
     <string name="prompt_name">Nome</string>
@@ -28,6 +32,7 @@
     </string-array>
 
     <!--Profile info-->
+    <string name="profile">Perfil</string>
     <string name="profile_name">Nome: </string>
     <string name="profile_email">Email: </string>
     <string name="profile_locality">Localidade: </string>
@@ -46,10 +51,17 @@
     <string name="occurrence_severity">Gravidade:</string>
     <string name="occurrence_notification">Notificar quando for resolvida:</string>
     <string name="occurrence_location">Localização:</string>
-    <string name="register_occurrence">Registar ocurrência</string>
+    <string name="register_occurrence">Registar ocorrência</string>
     <string name="occurrence_type">Tipo da ocorrência:</string>
     <string name="occurrence_type_clean">Limpeza de matas</string>
     <string name="occurrence_type_zone">Zona de difícil acesso</string>
     <string name="occurrence_type_other">Outro</string>
+
+
+    <string name="map">Mapa</string>
+
+    <string name="list_occurrences">Listar ocorrências</string>
+
+    <string name="statistics">Estatísticas</string>
 
 </resources>

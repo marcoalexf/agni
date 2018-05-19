@@ -103,7 +103,7 @@ public class HomePage extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_profile) {
-            setTitle("Profile");
+            setTitle(R.string.profile);
             ProfileFragment profile = new ProfileFragment();
             FragmentManager fman = getSupportFragmentManager();
 
@@ -113,7 +113,7 @@ public class HomePage extends AppCompatActivity
 
             fman.beginTransaction().replace(R.id.fragment, profile).commit();
         } else if (id == R.id.nav_occurencies) {
-            setTitle("Registar ocorrência");
+            setTitle(R.string.register_occurrence);
 
             OccurrenceFragment of = new OccurrenceFragment();
             FragmentManager fman = getSupportFragmentManager();
@@ -123,7 +123,7 @@ public class HomePage extends AppCompatActivity
             of.setArguments(args);
             fman.beginTransaction().replace(R.id.fragment, of).commit();
         } else if (id == R.id.nav_map) {
-            setTitle("Map");
+            setTitle(R.string.map);
 
             MapFragment map = new MapFragment();
             FragmentManager fman = getSupportFragmentManager();
@@ -134,7 +134,7 @@ public class HomePage extends AppCompatActivity
 
         }
         else if(id == R.id.occurences_list){
-            setTitle("List Occurrences");
+            setTitle(R.string.list_occurrences);
 
             ListOcurrences lo = new ListOcurrences();
             FragmentManager fman = getSupportFragmentManager();

@@ -1,13 +1,15 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">Agni</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_login">Sign in</string>
 
     <!-- Strings related to login -->
+    <string name="login_username">utilizador</string>
+    <string name="login_password">palavra-passe</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Sign in or register</string>
-    <string name="action_sign_in_short">Sign in</string>
+    <string name="action_sign_in">Sign in </string>
+    <string name="action_register">Register</string>
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
@@ -17,6 +19,9 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+    <string name="forgotten_password">Forgot your password?</string>
+    <string name="remember_credencials">Remember credencials</string>
+
 
     <string name="prompt_name">Name</string>
     <string name="prompt_username">Username</string>
@@ -24,7 +29,7 @@
     <string name="prompt_county">County</string>
     <string name="prompt_district">District</string>
 
-    <string name="title_activity_home_page">HomePage</string>
+    <string name="title_activity_home_page">Agni</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Android Studio</string>
@@ -32,6 +37,7 @@
     <string name="nav_header_desc">Navigation header</string>
 
     <!--Profile info-->
+    <string name="profile">Profile</string>
     <string name="profile_name">Name: </string>
     <string name="profile_email">Email: </string>
     <string name="profile_locality">Locality: </string>
@@ -57,7 +63,10 @@
     <string name="occurrence_type_zone">Difficult access</string>
     <string name="occurrence_type_other">Other</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="map">Map</string>
+
+    <string name="list_occurrences">List occurrences</string>
+
+    <string name="statistics">Statistics</string>
 
 </resources>
