@@ -19,6 +19,13 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+    <string-array name="user_types">
+        <item>Civilian</item>
+        <item>Worker</item>
+        <item>Firefighter</item>
+    </string-array>
+
+
     <string name="forgotten_password">Forgot your password?</string>
     <string name="remember_credencials">Remember credencials</string>
 

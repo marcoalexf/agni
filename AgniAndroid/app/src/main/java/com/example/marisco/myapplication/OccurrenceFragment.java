@@ -220,7 +220,7 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback, 
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if(response.code() == 200){
                     Toast toast = Toast.makeText(getActivity(), "Nova ocorrência registada"
-                            + response.code(), Toast.LENGTH_SHORT);
+                            , Toast.LENGTH_SHORT);
                     toast.show();
                 }
                 else {

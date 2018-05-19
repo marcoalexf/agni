@@ -15,6 +15,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import java.io.Serializable;
 
@@ -61,14 +62,14 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
                     attemptRegister();
                 }
             });
-/*
-        // Create an ArrayAdapter using the string array and a default spinner layout
+
+        //Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.user_types, android.R.layout.simple_spinner_item);
         // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
-        spinner_user_type.setAdapter(adapter);*/
+        spinner_user_type.setAdapter(adapter);
     }
 
     /*private void populateAutoComplete() {
@@ -205,6 +206,9 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
         String locality = locality_input.getText().toString();
         String district = district_input.getText().toString();
         String county = county_input.getText().toString();
+        String type = spinner_user_type.getSelectedItem().toString();
+        Toast toast = Toast.makeText(getApplicationContext(), "tipo " + type, Toast.LENGTH_SHORT);
+        toast.show();
 
         if (retrofit == null) {
             retrofit = new Retrofit.Builder()
@@ -215,14 +219,18 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
 
         AgniAPI agniAPI = retrofit.create(AgniAPI.class);
 
-        UserRegister ur = new UserRegister(name, username, password, email, "basic", locality, county, district);
+        UserRegister ur = new UserRegister(name, username, password, email, type, locality, county, district);
         Call<ResponseBody> call = agniAPI.registerUser(ur);
 
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if(response.code() == 200)
+                if(response.code() == 200) {
+                    Toast toast = Toast.makeText(getApplicationContext(), "Novo utilizador registado"
+                            , Toast.LENGTH_SHORT);
+                    toast.show();
                     finish();
+                }
             }
 
             @Override
