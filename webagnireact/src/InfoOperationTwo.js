@@ -269,30 +269,30 @@ class SwipeableTextMobileStepper extends React.Component {
                 </SwipeableViews>
 
                 {/*MAPA*/}
-                <div className={classes.map} style={{ height: '40vh', width: '100%' }}>
-                    <GoogleMapReact
-                        bootstrapURLKeys={{ key: 'AIzaSyAM-jV8q7-FWs7RdP0G4cH938jWgQwlGVo' }}
-                        defaultCenter={center}
-                        defaultZoom={zoom}
-                    >
-                    <Marker onClick={this.onMarkerClick}
-                            title={'The marker`s title will appear as a tooltip.'}
-                            name={'SOMA'}
-                            position={{lat: 59.95, lng: 30.33}} />
-                    <InfoWindow
-                        marker={this.state.activeMarker}
-                        visible={this.state.showingInfoWindow}>
-                        <div>
-                            <h1>{this.state.selectedPlace.name}</h1>
-                        </div>
-                    </InfoWindow>
+                {/*<div className={classes.map} style={{ height: '40vh', width: '100%' }}>*/}
+                    {/*<GoogleMapReact*/}
+                        {/*bootstrapURLKeys={{ key: 'AIzaSyAM-jV8q7-FWs7RdP0G4cH938jWgQwlGVo' }}*/}
+                        {/*defaultCenter={center}*/}
+                        {/*defaultZoom={zoom}*/}
+                    {/*>*/}
+                    {/*<Marker onClick={this.onMarkerClick}*/}
+                            {/*title={'The marker`s title will appear as a tooltip.'}*/}
+                            {/*name={'SOMA'}*/}
+                            {/*position={{lat: 59.95, lng: 30.33}} />*/}
+                    {/*<InfoWindow*/}
+                        {/*marker={this.state.activeMarker}*/}
+                        {/*visible={this.state.showingInfoWindow}>*/}
+                        {/*<div>*/}
+                            {/*<h1>{this.state.selectedPlace.name}</h1>*/}
+                        {/*</div>*/}
+                    {/*</InfoWindow>*/}
                         {/*/!*<AnyReactComponent*!/*/}
                             {/*/!*lat={59.955413}*!/*/}
                             {/*/!*lng={30.337844}*!/*/}
                             {/*/!*text={'Kreyser Avrora'}*!/*/}
                         {/*/>*/}
-                    </GoogleMapReact>
-                </div>
+                    {/*</GoogleMapReact>*/}
+                {/*</div>*/}
 
                 <div className={classes.rootTwo}>
                     <Stepper activeStep={activeStepTwo} alternativeLabel>
