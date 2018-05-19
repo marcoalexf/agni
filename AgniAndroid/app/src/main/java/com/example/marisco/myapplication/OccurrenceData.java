@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class OccurrenceData {
 
-	@SerializedName("token") LoginResponse token;
+	//@SerializedName("token") LoginResponse token;
 
 	@SerializedName("title") String title;
 
@@ -24,7 +24,7 @@ public class OccurrenceData {
 	
 	public OccurrenceData(LoginResponse token, String title, String description, String type, int level,
 			boolean visibility, double lat, double lon, boolean notificationOnResolve) {
-		this.token = token;
+		//this.token = token;
 		this.title = title;
 		this.description = description;
 		this.type = type;
@@ -35,13 +35,13 @@ public class OccurrenceData {
 		this.notificationOnResolve = notificationOnResolve;
 	}
 
-	public LoginResponse getToken() {
-		return token;
-	}
+	//public LoginResponse getToken() {
+		//return token;
+	//}
 
-	public void setToken(LoginResponse token) {
-		this.token = token;
-	}
+	//public void setToken(LoginResponse token) {
+		//this.token = token;
+	//}
 
 	public String getTitle() {
 		return title;

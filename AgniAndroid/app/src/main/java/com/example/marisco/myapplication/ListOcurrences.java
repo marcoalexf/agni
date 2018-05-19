@@ -10,7 +10,11 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -33,6 +37,8 @@ public class ListOcurrences extends Fragment {
 
     @BindView(R.id.list_occurrences) ListView lv;
 
+    List<Map<String, Object>> occurrences = new ArrayList<Map<String, Object>>();
+
     public ListOcurrences() { }
 
 
@@ -54,19 +60,26 @@ public class ListOcurrences extends Fragment {
 
         AgniAPI agniAPI = retrofit.create(AgniAPI.class);
 
-        Call<ResponseBody> call = agniAPI.getAllPublicOccurrences();
+        Call<List<Map<String, Object>>> call = agniAPI.getOccurrences();
 
-        call.enqueue(new Callback<ResponseBody>() {
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if (response.code() == 200)
+        call.enqueue(new Callback<List<Map<String, Object>>>() {
+            public void onResponse(Call<List<Map<String, Object>>> call, Response<List<Map<String, Object>>> response) {
+                if (response.code() == 200) {
                     Log.d("GET_PUBLIC_OCCURRENCES", response.toString());
+                    ArrayList<Map<String, Object>> map_list = new ArrayList<>(response.body());
+                    for (Map m: map_list) {
+                        Log.d("OCCURENCE: ", m.toString());
+                    }
+                    //ListAdapaterOccurrence adapter = new ListAdapaterOccurrence(values_list);
+                    //lv.setAdapter(adapter);
+                }
                 else {
                     Toast toast = Toast.makeText(getActivity(), "Failed to get public occurrences" + response.code(), Toast.LENGTH_SHORT);
                     toast.show();
                 }
             }
 
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(Call<List<Map<String, Object>>> call, Throwable t) {
                 Log.e("ERROR", t.toString());
             }
         });
