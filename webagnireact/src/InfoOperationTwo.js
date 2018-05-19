@@ -88,7 +88,7 @@ let xmlRequest = new Promise(function(resolve, reject) {
 
         console.log("pedido");
         var xmlHttp = new XMLHttpRequest();
-        xmlHttp.open("GET", "https://liquid-layout-196103.appspot.com/rest/occurrence/list", true);
+        xmlHttp.open("GET", "/rest/occurrence/list", true);
         //xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         // var myJSON = JSON.stringify(user);
         // xmlHttp.send(myJSON);

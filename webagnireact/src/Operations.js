@@ -39,7 +39,7 @@ function makeAJAXCall(){
 
         console.log("pedido");
         var xmlHttp = new XMLHttpRequest();
-        xmlHttp.open("POST", "http://localhost:8080/rest/occurrence/list", true);
+        xmlHttp.open("POST", "/rest/occurrence/list", true);
         xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         var myJSON = JSON.stringify(user);
         xmlHttp.send(myJSON);
