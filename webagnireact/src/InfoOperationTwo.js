@@ -12,6 +12,7 @@ import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import SwipeableViews from 'react-swipeable-views';
 import img2 from './img/news2.jpg';
+import {Map, InfoWindow, Marker, GoogleApiWrapper, Listing} from 'google-maps-react';
 import GoogleMapReact from 'google-map-react';
 
 const AnyReactComponent = ({ text }) => <div>{text}</div>;
@@ -64,57 +65,67 @@ const styles = theme => ({
     },
 });
 
+const mapstyle = {
+    width: '50%',
+    height: '50%'
+};
+
 let xmlRequest = new Promise(function(resolve, reject) {
     console.log("xmlRequest");
     var t = true;
     var token = window.localStorage.getItem('token');
-    var uname = JSON.parse(token).username;
-    var tokenObj = JSON.parse(token);
-    var map;
 
-    var user = {
-        "username": uname,
-        "token": tokenObj,
-        "showPrivate": true //MUDAR ISTO DEPOIS
-    }
+    if(token != null){
+        var uname = JSON.parse(token).username;
+        var tokenObj = JSON.parse(token);
+        var map;
 
-    console.log("pedido");
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open("POST", "http://localhost:8080/rest/occurrence/list", true);
-    xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    var myJSON = JSON.stringify(user);
-    xmlHttp.send(myJSON);
+        var user = {
+            "username": uname,
+            "token": tokenObj,
+            "showPrivate": true //MUDAR ISTO DEPOIS
+        }
 
-    console.log("esperar pelo estado");
-    xmlHttp.onreadystatechange = function () {
-        console.log("1");
-        if (xmlHttp.readyState === 4) {
-            console.log("2");
-            if (xmlHttp.status === 200) {
-                console.log("3");
-                var response = xmlHttp.response;
-                var obj = JSON.parse(response);
-                console.log("obj:");
-                console.log(obj);
-                map = obj[0];
-                console.log("map:");
-                console.log(map);
-                // var array = Object.values(map);
-                // console.log(array);
-                // console.log(operationsData);
-                resolve(obj);
-                // resolve('xml value')
-            }
-            else {
-                console.log("tempo expirado");
-                // reject(Error('Tempo expirado'));
-                //TODO - Link to Login
+        console.log("pedido");
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open("GET", "https://liquid-layout-196103.appspot.com/rest/occurrence/list", true);
+        //xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        // var myJSON = JSON.stringify(user);
+        // xmlHttp.send(myJSON);
+        xmlHttp.send();
+
+        console.log("esperar pelo estado");
+        xmlHttp.onreadystatechange = function () {
+            console.log("1");
+            if (xmlHttp.readyState === 4) {
+                console.log("2");
+                if (xmlHttp.status === 200) {
+                    console.log("3");
+                    var response = xmlHttp.response;
+                    var obj = JSON.parse(response);
+                    console.log("obj:");
+                    console.log(obj);
+                    map = obj[0];
+                    console.log("map:");
+                    console.log(map);
+                    // var array = Object.values(map);
+                    // console.log(array);
+                    // console.log(operationsData);
+                    resolve(obj);
+                    // resolve('xml value')
+                }
+                else {
+                    console.log("tempo expirado");
+                    // reject(Error('Tempo expirado'));
+                    //TODO - Link to Login
+                }
             }
         }
+
+        // if(t=true)
+        //     resolve('xml value')
     }
 
-    // if(t=true)
-    //     resolve('xml value')
 });
 
 function getSteps() {
@@ -144,10 +155,13 @@ class SwipeableTextMobileStepper extends React.Component {
         lat: 59.95,
         lng: 30.33,
         center: {
-            lat: 59.95,
-            lng: 30.33
-        },
-        zoom: 11,
+                    lat: 59.95,
+                    lng: 30.33
+                },
+        zoom: 14,
+        showingInfoWindow: false,
+        activeMarker: {},
+        selectedPlace: {},
     };
 
     componentDidMount () {
@@ -155,7 +169,7 @@ class SwipeableTextMobileStepper extends React.Component {
                 this.setState({object: value});
                 this.setState({lat: value.user_occurrence_lat});
                 this.setState({lng: value.user_occurrence_lon});
-                this.setState({center: {'lat': value.user_occurrence_lat, 'lng': value.user_occurrence_lon}});
+                // this.setState({center: {'lat': value.user_occurrence_lat, 'lng': value.user_occurrence_lon}});
                 console.log("state object");
                 console.log(this.state.object);
             }
@@ -206,6 +220,22 @@ class SwipeableTextMobileStepper extends React.Component {
     //     zoom: 11
     // };
 
+    onMarkerClick = (props, marker, e) =>
+        this.setState({
+            selectedPlace: props,
+            activeMarker: marker,
+            showingInfoWindow: true
+        });
+
+    onMapClicked = (props) => {
+        if (this.state.showingInfoWindow) {
+            this.setState({
+                showingInfoWindow: false,
+                activeMarker: null
+            })
+        }
+    };
+
     render() {
         const { classes, theme } = this.props;
         const { activeStep, object, activeStepTwo, center, zoom } = this.state;
@@ -238,19 +268,31 @@ class SwipeableTextMobileStepper extends React.Component {
                     ))}
                 </SwipeableViews>
 
-                <div className={classes.map} style={{ height: '40vh', width: '100%' }}>
-                    <GoogleMapReact
-                        bootstrapURLKeys={{ key: 'AIzaSyAM-jV8q7-FWs7RdP0G4cH938jWgQwlGVo' }}
-                        defaultCenter={center}
-                        defaultZoom={zoom}
-                    >
-                        {/*<AnyReactComponent*/}
-                            {/*lat={59.955413}*/}
-                            {/*lng={30.337844}*/}
-                            {/*text={'Kreyser Avrora'}*/}
+                {/*MAPA*/}
+                {/*<div className={classes.map} style={{ height: '40vh', width: '100%' }}>*/}
+                    {/*<GoogleMapReact*/}
+                        {/*bootstrapURLKeys={{ key: 'AIzaSyAM-jV8q7-FWs7RdP0G4cH938jWgQwlGVo' }}*/}
+                        {/*defaultCenter={center}*/}
+                        {/*defaultZoom={zoom}*/}
+                    {/*>*/}
+                    {/*<Marker onClick={this.onMarkerClick}*/}
+                            {/*title={'The marker`s title will appear as a tooltip.'}*/}
+                            {/*name={'SOMA'}*/}
+                            {/*position={{lat: 59.95, lng: 30.33}} />*/}
+                    {/*<InfoWindow*/}
+                        {/*marker={this.state.activeMarker}*/}
+                        {/*visible={this.state.showingInfoWindow}>*/}
+                        {/*<div>*/}
+                            {/*<h1>{this.state.selectedPlace.name}</h1>*/}
+                        {/*</div>*/}
+                    {/*</InfoWindow>*/}
+                        {/*/!*<AnyReactComponent*!/*/}
+                            {/*/!*lat={59.955413}*!/*/}
+                            {/*/!*lng={30.337844}*!/*/}
+                            {/*/!*text={'Kreyser Avrora'}*!/*/}
                         {/*/>*/}
-                    </GoogleMapReact>
-                </div>
+                    {/*</GoogleMapReact>*/}
+                {/*</div>*/}
 
                 <div className={classes.rootTwo}>
                     <Stepper activeStep={activeStepTwo} alternativeLabel>

@@ -23,56 +23,56 @@ const styles = theme => ({
     },
 });
 
-function makeAJAXCall(){
-    //return new Promise(function(resolve, reject) {
-            console.log("comeco da funcao");
-            var map;
-            var token = window.localStorage.getItem('token');
-            var uname = JSON.parse(token).username;
-            var tokenObj = JSON.parse(token);
-
-            var user = {
-                "username": uname,
-                "token": tokenObj,
-                "showPrivate": true //MUDAR ISTO DEPOIS
-            }
-
-            console.log("pedido");
-            var xmlHttp = new XMLHttpRequest();
-            xmlHttp.open("POST", "http://localhost:8080/rest/occurrence/list", true);
-            xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            var myJSON = JSON.stringify(user);
-            xmlHttp.send(myJSON);
-
-            console.log("esperar pelo estado");
-            xmlHttp.onreadystatechange = function () {
-                console.log("1");
-                if (xmlHttp.readyState === 4) {
-                    console.log("2");
-                    if (xmlHttp.status === 200) {
-                        console.log("3");
-                        var response = xmlHttp.response;
-                        var obj = JSON.parse(response);
-                        map = obj[0];
-                        console.log(map);
-                        // resolve(map);
-
-                    }
-                    else {
-                        console.log("tempo expirado");
-                        // reject(Error('Tempo expirado'));
-                    }
-                }
-                else {
-                    console.log("4");
-                }
-                //  }.bind(this);
-            }
-            // .bind(this);
-        //}.bind(this)
-    // );
-
-}
+// function makeAJAXCall(){
+//     //return new Promise(function(resolve, reject) {
+//             console.log("comeco da funcao");
+//             var map;
+//             var token = window.localStorage.getItem('token');
+//             var uname = JSON.parse(token).username;
+//             var tokenObj = JSON.parse(token);
+//
+//             var user = {
+//                 "username": uname,
+//                 "token": tokenObj,
+//                 "showPrivate": true //MUDAR ISTO DEPOIS
+//             }
+//
+//             console.log("pedido");
+//             var xmlHttp = new XMLHttpRequest();
+//             xmlHttp.open("POST", "https://liquid-layout-196103.appspot.com/rest/occurrence/list", true);
+//             xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+//             var myJSON = JSON.stringify(user);
+//             xmlHttp.send(myJSON);
+//
+//             console.log("esperar pelo estado");
+//             xmlHttp.onreadystatechange = function () {
+//                 console.log("1");
+//                 if (xmlHttp.readyState === 4) {
+//                     console.log("2");
+//                     if (xmlHttp.status === 200) {
+//                         console.log("3");
+//                         var response = xmlHttp.response;
+//                         var obj = JSON.parse(response);
+//                         map = obj[0];
+//                         console.log(map);
+//                         // resolve(map);
+//
+//                     }
+//                     else {
+//                         console.log("tempo expirado");
+//                         // reject(Error('Tempo expirado'));
+//                     }
+//                 }
+//                 else {
+//                     console.log("4");
+//                 }
+//                 //  }.bind(this);
+//             }
+//             // .bind(this);
+//         //}.bind(this)
+//     // );
+//
+// }
 
 let prom = new Promise(function(resolve, reject) {
     setTimeout(function() {
@@ -84,54 +84,58 @@ let xmlRequest = new Promise(function(resolve, reject) {
     console.log("xmlRequest");
     var t = true;
     var token = window.localStorage.getItem('token');
-    var uname = JSON.parse(token).username;
     var tokenObj = JSON.parse(token);
-    var map;
+    if(token != null){
+        var uname = JSON.parse(token).username;
+        var map;
 
-    var user = {
-        "username": uname,
-        "token": tokenObj,
-        "showPrivate": true //MUDAR ISTO DEPOIS
-    }
+        var user = {
+            //"username": uname,
+            "token": tokenObj,
+            "showPrivate": true //MUDAR ISTO DEPOIS
+        }
 
-    console.log("pedido");
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open("POST", "http://localhost:8080/rest/occurrence/list", true);
-    xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    var myJSON = JSON.stringify(user);
-    xmlHttp.send(myJSON);
+        console.log("pedido");
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open("GET", "https://liquid-layout-196103.appspot.com/rest/occurrence/list", true);
+        //xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        //var myJSON = JSON.stringify(user);
+        //xmlHttp.send(myJSON);
+        xmlHttp.send();
 
-    console.log("esperar pelo estado");
-    xmlHttp.onreadystatechange = function () {
-        console.log("1");
-        if (xmlHttp.readyState === 4) {
-            console.log("2");
-            if (xmlHttp.status === 200) {
-                console.log("3");
-                var response = xmlHttp.response;
-                var obj = JSON.parse(response);
-                console.log("obj:");
-                console.log(obj);
-                map = obj[0];
-                console.log("map:");
-                console.log(map);
-                // var array = Object.values(map);
-                // console.log(array);
-                // console.log(operationsData);
-                resolve(obj);
-                // resolve('xml value')
-            }
-            else {
-                console.log("tempo expirado");
-                // reject(Error('Tempo expirado'));
-                //TODO - Link to Login
+        console.log("esperar pelo estado");
+        xmlHttp.onreadystatechange = function () {
+            console.log("1");
+            if (xmlHttp.readyState === 4) {
+                console.log("2");
+                if (xmlHttp.status === 200) {
+                    console.log("3");
+                    var response = xmlHttp.response;
+                    var obj = JSON.parse(response);
+                    console.log("obj:");
+                    console.log(obj);
+                    map = obj[0];
+                    console.log("map:");
+                    console.log(map);
+                    // var array = Object.values(map);
+                    // console.log(array);
+                    // console.log(operationsData);
+                    resolve(obj);
+                    // resolve('xml value')
+                }
+                else {
+                    console.log("tempo expirado");
+                    // reject(Error('Tempo expirado'));
+                    //TODO - Link to Login
+                }
             }
         }
+
+        // if(t=true)
+        //     resolve('xml value')
     }
 
-    // if(t=true)
-    //     resolve('xml value')
-})
+});
 
 const obj = [
     // xmlRequest.then((value) => {
@@ -180,7 +184,7 @@ class TestOperations extends React.Component {
                     <TableBody>
                         {this.state.object.map(n => {
                             return (
-                                <TableRow key={n.user_occurrence_title}>
+                                <TableRow key={n.user_occurrence_data}>
                                     <TableCell> <IconButton component={Link}
                                                             to="/operacao"> <InfoIcon/> </IconButton></TableCell>
                                     <TableCell>{n.user_occurrence_title}</TableCell>

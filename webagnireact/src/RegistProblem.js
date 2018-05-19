@@ -153,7 +153,7 @@ class RegistProblem extends React.Component {
         console.log(data);
 
         var xmlHttp = new XMLHttpRequest();
-        xmlHttp.open( "POST", 'http://localhost:8080/rest/occurrence/register');
+        xmlHttp.open( "POST", 'https://liquid-layout-196103.appspot.com/rest/occurrence/register');
         xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         var myJSON = JSON.stringify(data);
         xmlHttp.send(myJSON);
