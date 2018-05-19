@@ -40,6 +40,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MainActivity extends AppCompatActivity implements Serializable{
 
     public static final String RESPONSE = "com.example.marisco.myapplication.RESPONSE";
+    public static final String ENDPOINT = "https://custom-tine-204615.appspot.com/rest/";
+
     SharedPreferences sharedPreferences;
 
     Retrofit retrofit;
@@ -108,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements Serializable{
 
         if (retrofit == null) {
             retrofit = new Retrofit.Builder()
-                    .baseUrl("https://liquid-layout-196103.appspot.com/rest/")
+                    .baseUrl(ENDPOINT)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }

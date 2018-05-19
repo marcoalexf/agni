@@ -28,7 +28,7 @@ public class ProfileFragment extends Fragment {
 
     private static final String TOKEN = "token";
     public static final String RESPONSE = "com.example.marisco.myapplication.RESPONSE";
-    private static final String ENDPOINT = "https://liquid-layout-196103.appspot.com/rest/";
+    public static final String ENDPOINT = "https://custom-tine-204615.appspot.com/rest/";
     private String username, email, type, name;
     private Retrofit retrofit;
     private LoginResponse token;

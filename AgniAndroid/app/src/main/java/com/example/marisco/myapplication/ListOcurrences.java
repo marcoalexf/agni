@@ -31,7 +31,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class ListOcurrences extends Fragment {
 
-    public static final String ENDPOINT = "https://liquid-layout-196103.appspot.com/rest/";
+    public static final String ENDPOINT = "https://custom-tine-204615.appspot.com/rest/";
 
     Retrofit retrofit;
 

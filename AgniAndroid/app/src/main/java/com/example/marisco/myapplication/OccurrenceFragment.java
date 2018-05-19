@@ -38,7 +38,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class OccurrenceFragment extends Fragment implements OnMapReadyCallback, LocationListener {
 
-    private static final String ENDPOINT = "https://liquid-layout-196103.appspot.com/rest/";
+    public static final String ENDPOINT = "https://custom-tine-204615.appspot.com/rest/";
     private static final String TOKEN = "token";
     private static final String MARKER_NAME = "Nova ocorrência";
     private static final int CLEAN_ID = 0, ZONE_ID = 1, OTHER_ID = 2;
@@ -188,7 +188,7 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback, 
         int level = severity.getCheckedRadioButtonId();
 
         int area_id = privacy.getCheckedRadioButtonId();
-        boolean visibility = false;
+        boolean visibility = r_public.isChecked();
 
         switch (area_id) {
             case PRIVATE_ID:

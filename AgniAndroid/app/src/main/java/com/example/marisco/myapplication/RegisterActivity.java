@@ -31,7 +31,7 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
 
 
     public static final String RESPONSE = "com.example.marisco.myapplication.RESPONSE";
-    private static final String REGISTER_ENDPOINT = "https://liquid-layout-196103.appspot.com/rest/";
+    public static final String ENDPOINT = "https://custom-tine-204615.appspot.com/rest/";
     private View mProgressView;
     private View mRegisterFormView;
     Retrofit retrofit;
@@ -55,12 +55,12 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
         ButterKnife.bind(this);
         // Set up the register form.
        // populateAutoComplete();
-        register_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                attemptRegister();
-            }
-        });
+            register_button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    attemptRegister();
+                }
+            });
 /*
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -208,7 +208,7 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
 
         if (retrofit == null) {
             retrofit = new Retrofit.Builder()
-                    .baseUrl(REGISTER_ENDPOINT)
+                    .baseUrl(ENDPOINT)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }
