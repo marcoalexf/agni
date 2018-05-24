@@ -72,23 +72,23 @@ const mapstyle = {
 
 let xmlRequest = new Promise(function(resolve, reject) {
     console.log("xmlRequest");
-    var t = true;
-    var token = window.localStorage.getItem('token');
-
-    if(token != null){
-        var uname = JSON.parse(token).username;
-        var tokenObj = JSON.parse(token);
+    // var t = true;
+    // var token = window.localStorage.getItem('token');
+    //
+    // if(token != null){
+    //     var uname = JSON.parse(token).username;
+    //     var tokenObj = JSON.parse(token);
         var map;
-
-        var user = {
-            "username": uname,
-            "token": tokenObj,
-            "showPrivate": true //MUDAR ISTO DEPOIS
-        }
+    //
+    //     var user = {
+    //         "username": uname,
+    //         "token": tokenObj,
+    //         "showPrivate": true //MUDAR ISTO DEPOIS
+    //     }
 
         console.log("pedido");
         var xmlHttp = new XMLHttpRequest();
-        xmlHttp.open("GET", "/rest/occurrence/list", true);
+        xmlHttp.open("GET", "https://custom-tine-204615.appspot.com/rest/occurrence/list", true);
         //xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         // var myJSON = JSON.stringify(user);
         // xmlHttp.send(myJSON);
@@ -124,7 +124,7 @@ let xmlRequest = new Promise(function(resolve, reject) {
 
         // if(t=true)
         //     resolve('xml value')
-    }
+    // }
 
 });
 

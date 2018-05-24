@@ -82,22 +82,22 @@ let prom = new Promise(function(resolve, reject) {
 
 let xmlRequest = new Promise(function(resolve, reject) {
     console.log("xmlRequest");
-    var t = true;
-    var token = window.localStorage.getItem('token');
-    var tokenObj = JSON.parse(token);
-    if(token != null){
-        var uname = JSON.parse(token).username;
+    // var t = true;
+    // var token = window.localStorage.getItem('token');
+    // var tokenObj = JSON.parse(token);
+    //if(token != null){
+    //     var uname = JSON.parse(token).username;
         var map;
 
-        var user = {
-            //"username": uname,
-            "token": tokenObj,
-            "showPrivate": true //MUDAR ISTO DEPOIS
-        }
+        // var user = {
+        //     //"username": uname,
+        //     "token": tokenObj,
+        //     "showPrivate": true //MUDAR ISTO DEPOIS
+        // }
 
         console.log("pedido");
         var xmlHttp = new XMLHttpRequest();
-        xmlHttp.open("GET", "/rest/occurrence/list", true);
+        xmlHttp.open("GET", "https://custom-tine-204615.appspot.com/rest/occurrence/list", true);
         //xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         //var myJSON = JSON.stringify(user);
         //xmlHttp.send(myJSON);
@@ -133,7 +133,7 @@ let xmlRequest = new Promise(function(resolve, reject) {
 
         // if(t=true)
         //     resolve('xml value')
-    }
+    //}
 
 });
 
@@ -152,7 +152,7 @@ const obj = [
 class TestOperations extends React.Component {
     state={
         object: [
-            {user_occurrence_title: 'nao funciona'}]
+            {user_occurrence_title: 'titulo1'}]
     };
 
     componentDidMount () {
