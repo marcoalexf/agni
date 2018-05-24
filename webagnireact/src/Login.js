@@ -8,6 +8,7 @@ import blue from 'material-ui/colors/blue';
 import grey from 'material-ui/colors/grey';
 import Paper from 'material-ui/Paper';
 import deepOrange from "material-ui/colors/deepOrange";
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const styles = theme => ({
     textField: {
@@ -27,7 +28,7 @@ const styles = theme => ({
     paper:theme.mixins.gutters({
         rounded: true,
         //margin: auto,
-        width: 600,
+        width: 648,
         //border-radius: 5,
         padding: 40,
     }),
@@ -49,7 +50,8 @@ class Login extends Component {
         this.state = {
             username: '',
             password: '',
-            submitted: false
+            submitted: false,
+            loading: false,
         };
     }
 
@@ -74,6 +76,8 @@ class Login extends Component {
         console.log("Login");
         console.log(this.state.username);
         console.log(this.state.password);
+
+        this.setState({loading: true});
 
         var localstorage = window.localStorage;
         var username = this.state.username;
@@ -101,24 +105,27 @@ class Login extends Component {
                          console.log(localstorage.getItem('token'));
                          console.log("Welcome");
                          //document.location.href = '/';
+                         this.setState({loading: false});
                          document.getElementById("tohome").click();
                      }
                      else{
+                         this.setState({loading: false});
                          console.log("User does not exist or password is not correct");
                          resultElement.innerHTML = "Nome de utilizador ou password incorretas";
                      }
                  }
-             }
+             }.bind(this)
          }
          else{
+             this.setState({loading: false});
              resultElement.innerHTML = "Primeiro faça logout para iniciar sessão";
          }
 
-    }
+    };
 
     render() {
         const { loggingIn } = this.props;
-        const { username, password, submitted } = this.state;
+        const { username, password, submitted, loading } = this.state;
         const { classes } = this.props;
 
         return (
@@ -158,7 +165,7 @@ class Login extends Component {
                                 color="primary">
                             Criar conta
                         </Button>
-                        <Button id={"doLogin"} variant="raised" color={"primary"} className={classes.button} onClick={this.handleLogin}>
+                        <Button id={"doLogin"} variant="raised" color={"primary"} disabled={loading} className={classes.button} onClick={this.handleLogin}>
                             Entrar
                         </Button>
                         {loggingIn &&

@@ -43,7 +43,7 @@ const styles = theme => ({
         width: 550,
     },
     paper:theme.mixins.gutters({
-        width: 600,
+        width: 648,
         padding: 40,
     }),
     error:{

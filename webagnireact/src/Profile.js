@@ -19,9 +19,11 @@ import PersonPinIcon from '@material-ui/icons/PersonPin';
 import CheckIcon from '@material-ui/icons/Check';
 import Tabs, { Tab } from 'material-ui/Tabs';
 import Avatar from 'material-ui/Avatar';
-import {Link} from 'react-router-dom';
+import {Link, Redirect} from 'react-router-dom';
 import Dialog, {DialogActions, DialogContent, DialogContentText, DialogTitle,} from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
+import SwipeableViews from 'react-swipeable-views';
+import img2 from './img/news2.jpg';
 import List from 'material-ui/List';
 
 function TabContainer(props) {
@@ -42,9 +44,14 @@ const styles =  theme => ({
     paper:theme.mixins.gutters({
         width: 800,
         padding: 40,
+        height: 400,
+    }),
+    paperTwo:theme.mixins.gutters({
+        width: 800,
+        padding: 40,
     }),
     editProfile:{
-        marginLeft: 550,
+        marginLeft: 500,
         marginBottom: 20,
     },
     settings: {
@@ -99,24 +106,91 @@ const styles =  theme => ({
         width: 80,
         height: 80,
     },
+    biggerAvatar: {
+        width: 180,
+        height: 180,
+        fontSize: 90,
+    },
     input: {
         display: 'none',
     },
+    img:{
+      width: 200,
+    },
 });
+
+let xmlRequest = new Promise(function(resolve, reject) {
+    console.log("xmlRequest");
+    // var t = true;
+    var token = window.localStorage.getItem('token');
+    var tokenObj = JSON.parse(token);
+    if(token != null){
+        var uname = JSON.parse(token).username;
+        var map;
+
+        var user = {
+            "username": uname,
+            "token": tokenObj,
+            "showPrivate": true //MUDAR ISTO DEPOIS
+        };
+
+        console.log("pedido");
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open("POST", "https://custom-tine-204615.appspot.com/rest/occurrence/list", true);
+        xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        var myJSON = JSON.stringify(user);
+        xmlHttp.send(myJSON);
+
+        console.log("esperar pelo estado");
+        xmlHttp.onreadystatechange = function () {
+            console.log("1");
+            if (xmlHttp.readyState === 4) {
+                console.log("2");
+                if (xmlHttp.status === 200) {
+                    console.log("3");
+                    var response = xmlHttp.response;
+                    var obj = JSON.parse(response);
+                    console.log("obj:");
+                    console.log(obj);
+                    map = obj[0];
+                    console.log("map:");
+                    console.log(map);
+                    // var array = Object.values(map);
+                    // console.log(array);
+                    // console.log(operationsData);
+                    resolve(obj);
+                    // resolve('xml value')
+                }
+                else {
+                    console.log("tempo expirado");
+                    window.localStorage.removeItem('token');
+                    // document.getElementById("tologin").click();
+                }
+            }
+        }.bind(this)
+    }
+    else{
+        console.log("Sem sessao iniciada");
+        // document.getElementById("tologin").click();
+    }
+}.bind(this));
 
 class Profile extends React.Component {
     constructor(props){
         super(props);
 
-        this.state = {
-            accountOpen: false,
-            value: 0,
-            editProfile: false,
-            editPass: false,
-        };
-
         this.loadInformations = this.loadInformations.bind(this);
     }
+
+    state = {
+        accountOpen: false,
+        value: 0,
+        editProfile: false,
+        editPass: false,
+        isLoggedIn: true,
+        reports: [
+            {user_occurrence_title: 'titulo1'}]
+    };
 
     loadInformations = () =>{
         var obj;
@@ -182,20 +256,20 @@ class Profile extends React.Component {
             }.bind(this)
         }
         else{
-            if(token != null){
-                window.localStorage.removeItem('token');
-                console.log("Tempo expirado - faca login");
-                document.getElementById("tologin").click();
-            }
-            else{
+            // if(token != null){
+            //     window.localStorage.removeItem('token');
+            //     console.log("Tempo expirado - faca login");
+            //     document.getElementById("tologin").click();
+            // }
+            // else{
                 console.log("Sem sessao iniciada");
                 document.getElementById("tologin").click();
-            }
+            // }
 
             {/*<Link to={'/login'}/>*/}
             //document.location.href = '/login';
         }
-    }
+    };
 
     handleToggle = () => {
         this.setState({ accountOpen: !this.state.accountOpen });
@@ -245,12 +319,36 @@ class Profile extends React.Component {
         return event.target.value == this.state.newpass;
     };
 
+    componentWillMount () {
+        xmlRequest.then((value) =>{
+            if(value != undefined){
+                this.setState({reports: value});
+                // if(this.isMounted())
+                //     this.setState({loggedIn: true});
+                console.log("loggedIn");
+                console.log(this.state.isLoggedIn);
+                console.log(value);
+            }
+            else{
+                console.log("not loggedIn");
+            }
+            console.log("state object");
+            console.log(this.state.reports);
+        });
+    }
+
     render() {
         const { classes } = this.props;
-        const { accountOpen, value } = this.state;
+        const { accountOpen, value, isLoggedIn, reports } = this.state;
+
+        if(!isLoggedIn){
+            return <Redirect to={"/login"}>Link</Redirect>;
+        }
 
         return (
             <div onLoad={this.loadInformations}>
+                {/*{isLoggedIn ? <div/> : <Link to={"/login"}>Link</Link>}*/}
+
                 <Typography variant="display1" className={classes.title}>Perfil</Typography>
 
                 <Paper className={classes.paper} style={{margin: '0 auto'}} >
@@ -360,10 +458,18 @@ class Profile extends React.Component {
                         </DialogActions>
                     </Dialog>
 
-                    <img src={require('./img/user.png')} alt="Avatar" className={classes.media} width="200"/>
-                    {/*<div><Avatar id={"profileimg"} className={classes.avatar}></Avatar></div>*/}
+                    <div className={"w3-row-padding"}>
+                    <div className={"w3-third"} style={{margin: '50'}}>
+                        {/*<img src={require('./img/user.png')} alt="Avatar" className={classes.media} width="200"/>*/}
+                        <Avatar className={classes.biggerAvatar} style={{margin: '0 auto'}}>
+                            {/*<div className={classes.textAvatar}>*/}
+                                {this.state.firstLetter}
+                                {/*</div>*/}
+                            </Avatar>
+                        {/*<div><Avatar id={"profileimg"} className={classes.avatar}></Avatar></div>*/}
+                    </div>
 
-                    <div className={classes.informations}>
+                    <div className={"w3-twothird"}>
                         <div id="showusername" className={classes.username}></div>
                         <Typography id="showemail" component="p"></Typography>
                         <div className={classes.basicInfo}>
@@ -380,10 +486,11 @@ class Profile extends React.Component {
                         <p id="showrole" className={classes.role}></p>
 
                     </div>
+                    </div>
 
                 </Paper><br/>
 
-                <Paper className={classes.paper} style={{margin: '0 auto'}}>
+                <Paper className={classes.paperTwo} style={{margin: '0 auto'}}>
                     <Tabs
                         value={this.state.value}
                         onChange={this.handleChange}
@@ -396,7 +503,22 @@ class Profile extends React.Component {
                         <Tab icon={<PersonPinIcon />} label="AMIGOS" />
                     </Tabs>
 
-                    {value === 0 && <TabContainer>Sem reportes de momento</TabContainer>}
+                    {value === 0 && <TabContainer>
+                        {/*{hasReports ? }*/}
+                        {reports.map(n => {
+                            return(
+                                <div style={{marginBottom: '50px'}}>
+                                    <h2>{n.user_occurrence_title}</h2>
+                                    <p>Tipo: {n.user_occurrence_type}</p>
+                                    <p>Grau: {n.user_occurrence_level}</p>
+                                    <p>Data do registo: {n.user_occurrence_data}</p>
+                                    <img key={n.user_occurrence_data} className={classes.img} src={img2} style={{margin: '0 auto'}} alt={n.user_occurrence_title} />
+                                </div>
+
+
+                            )
+                        })}
+                    </TabContainer>}
                     {value === 1 && <TabContainer>Sem apoios de momento</TabContainer>}
                     {value === 2 && <TabContainer>Sem amigos de momento</TabContainer>}
                 </Paper>

@@ -72,19 +72,19 @@ const mapstyle = {
 
 let xmlRequest = new Promise(function(resolve, reject) {
     console.log("xmlRequest");
-    var t = true;
-    var token = window.localStorage.getItem('token');
-
-    if(token != null){
-        var uname = JSON.parse(token).username;
-        var tokenObj = JSON.parse(token);
+    // var t = true;
+    // var token = window.localStorage.getItem('token');
+    //
+    // if(token != null){
+    //     var uname = JSON.parse(token).username;
+    //     var tokenObj = JSON.parse(token);
         var map;
-
-        var user = {
-            "username": uname,
-            "token": tokenObj,
-            "showPrivate": true //MUDAR ISTO DEPOIS
-        }
+    //
+    //     var user = {
+    //         "username": uname,
+    //         "token": tokenObj,
+    //         "showPrivate": true //MUDAR ISTO DEPOIS
+    //     }
 
         console.log("pedido");
         var xmlHttp = new XMLHttpRequest();
@@ -124,7 +124,7 @@ let xmlRequest = new Promise(function(resolve, reject) {
 
         // if(t=true)
         //     resolve('xml value')
-    }
+    // }
 
 });
 
