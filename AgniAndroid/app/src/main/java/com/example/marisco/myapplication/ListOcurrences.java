@@ -10,15 +10,12 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -70,7 +67,7 @@ public class ListOcurrences extends Fragment {
                     for (Map m: map_list) {
                         Log.d("OCCURENCE: ", m.toString());
                     }
-                    ListAdapaterOccurrence adapter = new ListAdapaterOccurrence(getContext(), map_list);
+                    ListAdapterOccurrence adapter = new ListAdapterOccurrence(getContext(), map_list);
                     lv.setAdapter(adapter);
                 }
                 else {
