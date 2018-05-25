@@ -64,15 +64,24 @@ public class RegisterResource {
 			user.setProperty("user_county", data.county);
 			user.setProperty("user_locality", data.locality);
 			datastore.put(txn, user);
-			Entity fileUpload = UploadResource.newUploadFileEntity(
-					"user/" + data.username + "/", 
-					"photo", 
-					"IMAGE"
-					);
-			datastore.put(txn, fileUpload);
-			txn.commit();
-			LOG.info("User registered " + data.username);
-			return Response.ok(g.toJson(fileUpload.getKey().getId())).build();
+			if(data.uploadPhoto) {
+				Entity fileUpload = UploadResource.newUploadFileEntity(
+						"user/" + data.username + "/", 
+						"photo", 
+						"IMAGE",
+						true,
+						false
+						);
+				datastore.put(txn, fileUpload);
+				txn.commit();
+				LOG.info("User registered " + data.username);
+				return Response.ok(g.toJson(fileUpload.getKey().getId())).build();
+			}
+			else {
+				txn.commit();
+				LOG.info("User registered " + data.username);
+				return Response.ok().build();
+			}
 		} finally {
 			if (txn.isActive() ) {
 				txn.rollback();

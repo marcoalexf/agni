@@ -11,6 +11,8 @@ public class OccurrenceData {
 	public double lat;
 	public double lon;
 	public boolean notificationOnResolve;
+	public boolean uploadMedia;
+	public int nUploads;
 
 	
 	public OccurrenceData() {
@@ -18,7 +20,8 @@ public class OccurrenceData {
 	}
 	
 	public OccurrenceData(AuthToken token, String title, String description, String type, int level, 
-			boolean visibility, double lat, double lon, boolean notificationOnResolve) {
+			boolean visibility, double lat, double lon, boolean notificationOnResolve, 
+			boolean uploadMedia, int nUploads) {
 		this.token = token;
 		this.title = title;
 		this.description = description;
@@ -28,6 +31,8 @@ public class OccurrenceData {
 		this.lat = lat;
 		this.lon = lon;
 		this.notificationOnResolve = notificationOnResolve;
+		this.uploadMedia = uploadMedia;
+		this.nUploads = nUploads;
 	}
 	
 	private boolean nonEmptyField(String field) {

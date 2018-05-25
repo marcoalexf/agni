@@ -104,7 +104,9 @@ public class ProfileResource {
 				Entity fileUpload = UploadResource.newUploadFileEntity(
 						"user/" + data.username + "/", 
 						"photo", 
-						"IMAGE"
+						"IMAGE",
+						true,
+						false
 						);
 				datastore.put(txn, fileUpload);
 				txn.commit();
