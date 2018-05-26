@@ -66,7 +66,8 @@ public class GcsManager {
 		return gcsGet(resp, filename, false);
 	}
 
-	public static boolean gcsPost(String contentType, InputStream inputStream, String filename, boolean publicFile, boolean temporary) {
+	public static boolean gcsPost(String contentType, InputStream inputStream, String filename, 
+			boolean publicFile, boolean temporary) {
 		try {
 			Builder builder = new GcsFileOptions.Builder().mimeType(contentType);
 			if(publicFile) {
@@ -83,6 +84,11 @@ public class GcsManager {
 		} catch (IOException e) {
 		return false;
 		}
+	}
+	
+	public static boolean gcsPost(String contentType, InputStream inputStream, String filename, 
+			boolean publicFile) {
+		return gcsPost(contentType, inputStream, filename, publicFile, false);
 	}
   
 	public static boolean gcsPost(String contentType, InputStream inputStream, String filename) {

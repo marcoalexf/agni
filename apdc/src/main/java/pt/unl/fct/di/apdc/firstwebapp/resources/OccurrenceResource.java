@@ -25,6 +25,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Transaction;
+import com.google.appengine.api.datastore.TransactionOptions;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
@@ -58,7 +59,8 @@ public class OccurrenceResource {
 			LOG.warning("Failed to register occurrence, token for user: " + data.token.username + "is invalid");
 			return Response.status(Status.FORBIDDEN).build();
 		}
-		Transaction txn = datastore.beginTransaction();
+		TransactionOptions options = TransactionOptions.Builder.withXG(true);
+		Transaction txn = datastore.beginTransaction(options);
 		try {
 			Key userKey = KeyFactory.createKey("User", data.token.username);
 			
@@ -72,12 +74,37 @@ public class OccurrenceResource {
 			occurrenceEntity.setProperty("user_occurrence_visibility", data.visibility);
 			occurrenceEntity.setProperty("user_occurrence_lat", data.lat);
 			occurrenceEntity.setProperty("user_occurrence_lon", data.lon);
-			// TODO occurrenceEntity.setProperty("user_occurrence_media", ????);
 			datastore.put(txn, occurrenceEntity);
 			
-			txn.commit();
-			LOG.info("User " + data.token.username + " registered occurrence " + data.title);
-			return Response.ok().build();
+			// Create occurrence media entities
+			if(data.uploadMedia) {
+				List<Entity> mediaEntities = new LinkedList<Entity>();
+				List<Long> uploadMediaIDs = new LinkedList<Long>();
+				Entity occurrenceMediaEntity;
+				long occurrenceID = occurrenceEntity.getKey().getId();
+				for(int i = 0; i < data.nUploads; i++) {
+					occurrenceMediaEntity = new Entity("UserOccurrenceMedia", occurrenceEntity.getKey());
+					mediaEntities.add(occurrenceMediaEntity);
+					Entity fileUpload = UploadResource.newUploadFileEntity(
+							"user/" + data.token.username + "/" + occurrenceID + "/", 
+							String.valueOf(occurrenceMediaEntity.getKey().getId()), 
+							"IMAGE&VIDEO",
+							data.visibility,
+							false
+							);
+					uploadMediaIDs.add(fileUpload.getKey().getId());
+					mediaEntities.add(fileUpload);
+				}
+				datastore.put(txn, mediaEntities);
+				txn.commit();
+				LOG.info("User " + data.token.username + " registered occurrence " + data.title);
+				return Response.ok(g.toJson(uploadMediaIDs)).build();
+			}
+			else {
+				txn.commit();
+				LOG.info("User " + data.token.username + " registered occurrence " + data.title);
+				return Response.ok().build();
+			}
 		} finally {
 			if (txn.isActive() ) {
 				txn.rollback();
