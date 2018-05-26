@@ -136,7 +136,7 @@ public class HomePage extends AppCompatActivity
         else if(id == R.id.occurences_list){
             setTitle(R.string.list_occurrences);
 
-            ListOcurrences lo = new ListOcurrences();
+            ListOccurrences lo = new ListOccurrences();
             FragmentManager fman = getSupportFragmentManager();
             fman.beginTransaction().replace(R.id.fragment, lo).commit();
         }

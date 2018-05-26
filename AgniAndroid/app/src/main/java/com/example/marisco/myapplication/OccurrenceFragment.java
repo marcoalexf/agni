@@ -1,7 +1,6 @@
 package com.example.marisco.myapplication;
 
 import android.Manifest;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
