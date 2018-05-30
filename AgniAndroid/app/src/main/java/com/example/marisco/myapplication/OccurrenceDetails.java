@@ -79,7 +79,9 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback, L
     private void fillInfo(String title, String description, double lat, double lon, boolean visibility, double level){
         o_title.setText(title);
         o_description.setText(description);
-        o_level.setText(level + "");
+
+        o_level.setText((int)level + "");
+
         if(visibility)
             o_visibility.setText(R.string.occurrence_public);
         else o_visibility.setText(R.string.occurrence_private);
