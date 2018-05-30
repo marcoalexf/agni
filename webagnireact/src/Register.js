@@ -110,9 +110,13 @@ class Register extends Component {
             startedName: true,
             startedPassword: true,
             startedConfPass: true,
+            file: '',
+            imagePreviewUrl: ''
         };
 
         this.handleCreateAccount = this.handleCreateAccount.bind(this);
+        this._handleImageChange = this._handleImageChange.bind(this);
+        this._handleSubmit = this._handleSubmit.bind(this);
     }
 
     handleUsernameChange = username => event => {
@@ -282,7 +286,7 @@ class Register extends Component {
                         document.getElementById("tologin").click();
 
                         //TODO
-                        //uploadFile(obj);
+                        // uploadFile(obj);
                     }
 
                     else{
@@ -305,6 +309,65 @@ class Register extends Component {
         return false;
     };
 
+    // handleSubmit(event) {
+    //     event.preventDefault();
+    //     // var uploadPhoto = {this.fileInput.files[0];
+    //     // this.setState({photo: ${this.fileInput.files[0});
+    //     alert(
+    //         `Selected file - ${this.fileInput.files[0].name}`
+    //     );
+    // }
+
+    // uploadFile(event){
+    //     let file = event.target.files[0];
+    //     console.log(file);
+    //
+    //     if(file){
+    //         let data = new FormData();
+    //         data.append('file', file);
+    //     }
+    //
+    // }
+
+//     uploadFile() {
+//         var file = this.refs.file.getDOMNode().files[0];
+//         var reader = new FileReader();
+//         reader.onload = function(output){
+//             fileUpload.set({
+//                 file: output.target.result
+//             });
+//             $.when(fileUpload.save())
+//                 .done(function(){
+//                     this.setState({
+//                         uploaded: true
+//                     });
+//                 }.bind(this));
+//         }
+//
+//     reader.readAsDataURL(file);
+// }
+
+    _handleSubmit(e) {
+        e.preventDefault();
+        // TODO: do something with -> this.state.file
+    }
+
+    _handleImageChange(e) {
+        e.preventDefault();
+
+        let reader = new FileReader();
+        let file = e.target.files[0];
+
+        reader.onloadend = () => {
+            this.setState({
+                file: file,
+                imagePreviewUrl: reader.result
+            });
+        };
+
+        reader.readAsDataURL(file)
+    }
+
 
     render() {
         const { loggingIn } = this.props;
@@ -312,6 +375,11 @@ class Register extends Component {
             startedEmail, startedName, startedPassword, startedConfPass, validEmail, validName, validPassword,
         validConfPass} = this.state;
         const { classes } = this.props;
+        let {imagePreviewUrl} = this.state;
+        let $imagePreview = null;
+        if (imagePreviewUrl) {
+            $imagePreview = (<img src={imagePreviewUrl} />);
+        }
 
         return (
             <div id="register">
@@ -321,10 +389,10 @@ class Register extends Component {
                 <div className="imgcontainer">
                     <img src={require('./img/registUser2.png')} alt="Avatar2" width={100} heigth={100} />
                     <div>
-                        <form encType="text/plain" method="get" name="putFile" id="putFile">
-                            <div>
-                                <input type="file" name="files"/>
-                                <input type="hidden" name="fileName"/>
+                        {/*<form encType="text/plain" method="get" name="putFile" id="putFile">*/}
+                            {/*<div>*/}
+                                {/*<input type="file" name="files"/>*/}
+                                {/*<input type="hidden" name="fileName"/>*/}
                                 {/*<input*/}
                                 {/*accept="image/*"*/}
                                 {/*className={classes.input}*/}
@@ -337,9 +405,28 @@ class Register extends Component {
                                 {/*component={"span"}*/}
                                 {/*</label>*/}
                                 {/*<input type="submit" onClick={uploadFile(this)} value="Upload Content"/>*/}
-                            </div>
+                            {/*</div>*/}
+                        {/*</form>*/}
+                        {/*<form onSubmit={this.uploadFile}>*/}
+                            {/*<label>*/}
+                                {/*Carregar Foto:*/}
+                                {/*<input*/}
+                                    {/*type="file"*/}
+                                    {/*name="file"*/}
+                                    {/*ref={input => {*/}
+                                        {/*this.fileInput = input;*/}
+                                    {/*}}*/}
+                                    {/*onChange={this.uploadFile}*/}
+                                {/*/>*/}
+                            {/*</label>*/}
+                            {/*<br />*/}
+                            {/*<button type="submit">Submit</button>*/}
+                        {/*</form>*/}
+                        <form onSubmit={this._handleSubmit}>
+                            <input type="file" onChange={this._handleImageChange} />
+                            <button type="submit" onClick={this._handleSubmit}>Upload Image</button>
                         </form>
-
+                        {$imagePreview}
                     </div>
                 </div>
 

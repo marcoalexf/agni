@@ -349,7 +349,7 @@ class Profile extends React.Component {
             <div onLoad={this.loadInformations}>
                 {/*{isLoggedIn ? <div/> : <Link to={"/login"}>Link</Link>}*/}
 
-                <Typography variant="display1" className={classes.title}>Perfil</Typography>
+                {/*<Typography variant="display1" className={classes.title}>Perfil</Typography>*/}
 
                 <Paper className={classes.paper} style={{margin: '0 auto'}} >
 
