@@ -36,11 +36,11 @@ public class ListOccurrences extends Fragment {
     private static final String VISIBILITY = "visibility";
     private static final String LEVEL = "level";
 
-    Retrofit retrofit;
+    private Retrofit retrofit;
 
     @BindView(R.id.list_occurrences) ListView lv;
 
-    ArrayList<Map<String, Object>> map_list;
+    private ArrayList<Map<String, Object>> map_list;
 
     public ListOccurrences() { }
 
@@ -100,9 +100,6 @@ public class ListOccurrences extends Fragment {
                 if (response.code() == 200) {
                     Log.d("GET_PUBLIC_OCCURRENCES", response.toString());
                     map_list = new ArrayList<>(response.body());
-                    for (Map m: map_list) {
-                        Log.d("OCCURENCE: ", m.toString());
-                    }
                     ListAdapterOccurrence adapter = new ListAdapterOccurrence(getContext(), map_list);
                     lv.setAdapter(adapter);
                 }

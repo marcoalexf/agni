@@ -79,7 +79,7 @@
             android:textSize="20dp" />
 
     </LinearLayout>
-    
+
         <com.example.marisco.myapplication.CustomMapView
             android:id="@+id/occurrence_map"
             android:layout_width="349dp"
