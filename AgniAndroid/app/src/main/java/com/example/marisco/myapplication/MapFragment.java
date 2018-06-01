@@ -4,19 +4,23 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,6 +38,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MapFragment extends Fragment implements OnMapReadyCallback{
 
     public static final String ENDPOINT = "https://custom-tine-204615.appspot.com/rest/";
+    private static final String TITLE = "title";
+    private static final String DESCRIPTION = "description";
+    private static final String LATITUDE = "latitude";
+    private static final String LONGITUDE = "longitude";
+    private static final String VISIBILITY = "visibility";
+    private static final String LEVEL = "level";
 
     private GoogleMap map;
     @BindView(R.id.mapView) MapView mapView;
@@ -41,9 +51,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
     private ArrayList<Map<String, Object>> map_list;
     private Retrofit retrofit;
 
-    private List<MarkerOptions> marker_list;
+    private Map<Marker, Map<String, Object>> marker_list;
 
-    public MapFragment() { }
+    public MapFragment() {
+        marker_list = new HashMap<>();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -56,10 +68,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
         mapView.onResume(); // needed to get the map to display immediately
         mapView.getMapAsync(this);
         requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-
-
-
-
 
         return v;
     }
@@ -116,17 +124,48 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
     }
 
     private void putAllMarkers(){
-
+        map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                listOccurrenceDetails(marker_list.get(marker));
+            }
+        });
         for(Map<String, Object> entry: map_list){
-            putMarker((String) entry.get("user_occurrence_title"), (double)entry.get("user_occurrence_lat"),
-                    (double)entry.get("user_occurrence_lon"));
+            putMarker(entry);
         }
     }
 
-    private void putMarker(String title, double lat, double lon) {
+    private void putMarker(Map<String, Object> entry) {
         MarkerOptions mp = new MarkerOptions();
-        mp.position(new LatLng(lat, lon));
-        mp.title(title);
-        map.addMarker(mp);
+        mp.position(new LatLng((double)entry.get("user_occurrence_lat"), (double)entry.get("user_occurrence_lon")));
+        mp.title((String) entry.get("user_occurrence_title"));
+        Marker m = map.addMarker(mp);
+        marker_list.put(m, entry);
+        if(entry == null ){
+            Toast toast = Toast.makeText(getActivity(), "entry é nula" , Toast.LENGTH_SHORT);
+            toast.show();
+        }
+    }
+
+
+
+    private void listOccurrenceDetails( Map<String, Object> entry){
+
+        OccurrenceDetails od = new OccurrenceDetails();
+        FragmentManager fman = getFragmentManager();
+        Bundle args = new Bundle();
+
+        if(entry!= null){
+            args.putSerializable(TITLE, (String) entry.get("user_occurrence_title"));
+            args.putSerializable(DESCRIPTION, (String) entry.get("user_occurrence_description"));
+            args.putSerializable(LEVEL, (double) entry.get("user_occurrence_level"));
+            args.putSerializable(VISIBILITY, (boolean) entry.get("user_occurrence_visibility"));
+            args.putSerializable(LATITUDE, (double) entry.get("user_occurrence_lat"));
+            args.putSerializable(LONGITUDE, (double) entry.get("user_occurrence_lon"));
+
+            od.setArguments(args);
+            fman.beginTransaction().replace(R.id.fragment, od).commit();
+        }
+
     }
 }
