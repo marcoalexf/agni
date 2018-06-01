@@ -115,7 +115,8 @@ class Register extends Component {
             startedPassword: true,
             startedConfPass: true,
             file: '',
-            imagePreviewUrl: ''
+            imagePreviewUrl: '',
+            wantUploadPhoto: false,
         };
 
         this.handleCreateAccount = this.handleCreateAccount.bind(this);
@@ -258,16 +259,23 @@ class Register extends Component {
         console.log(this.state.validName);
         console.log(this.state.validEmail);
 
+        // if(this.state.file != '') {
+        //     this.setState({uploadPhoto: !this.state.uploadPhoto});
+        //     console.log("uploadPhoto1 " + this.state.uploadPhoto);
+        // }
+
         if(this.state.validUsername && this.state.validName && this.state.validEmail
             && this.state.validPassword && this.state.validConfPass){
             console.log("valid informations");
+            console.log("uploadPhoto1 " + this.state.uploadPhoto);
 
             var user = {
                 "username": this.state.username,
                 "name": this.state.name,
                 "email": this.state.email,
                 "role": this.state.value,
-                "password": this.state.password
+                "password": this.state.password,
+                "uploadPhoto": this.state.wantUploadPhoto,
             };
 
             console.log(user);
@@ -323,6 +331,7 @@ class Register extends Component {
             if(xmlHttp.readyState === XMLHttpRequest.DONE) {
                 if(xmlHttp.status === 200){
                     console.log("uploadPhoto sucessfully!");
+                    document.getElementById("tologin").click();
                 }
 
                 else{
@@ -395,7 +404,8 @@ class Register extends Component {
             reader.onloadend = () => {
                 this.setState({
                     file: file,
-                    imagePreviewUrl: reader.result
+                    imagePreviewUrl: reader.result,
+                    wantUploadPhoto: true,
                 });
             };
 
