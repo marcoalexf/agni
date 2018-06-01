@@ -8,8 +8,8 @@ public class OccurrenceData {
 	public String type;
 	public int level;
 	public boolean visibility;
-	public double lat;
-	public double lon;
+	public float lat;
+	public float lon;
 	public boolean notificationOnResolve;
 	public boolean uploadMedia;
 	public int nUploads;
@@ -20,7 +20,7 @@ public class OccurrenceData {
 	}
 	
 	public OccurrenceData(AuthToken token, String title, String description, String type, int level, 
-			boolean visibility, double lat, double lon, boolean notificationOnResolve, 
+			boolean visibility, float lat, float lon, boolean notificationOnResolve, 
 			boolean uploadMedia, int nUploads) {
 		this.token = token;
 		this.title = title;
