@@ -16,6 +16,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
@@ -29,18 +30,21 @@ import com.google.appengine.api.datastore.TransactionOptions;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
+import com.google.appengine.api.datastore.QueryResultList;
 import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.ListOccurrenceData;
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceData;
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceDeleteData;
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceEditData;
+import pt.unl.fct.di.apdc.firstwebapp.util.CursorList;
 import pt.unl.fct.di.apdc.firstwebapp.util.SecurityManager;
 
 @Path("/occurrence")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class OccurrenceResource {
 
+	private static final int QUERY_LIMIT = 100;
 	private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
 	private final Gson g = new Gson();
 	private static final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -86,7 +90,7 @@ public class OccurrenceResource {
 					occurrenceMediaEntity = new Entity("UserOccurrenceMedia", occurrenceEntity.getKey());
 					mediaEntities.add(occurrenceMediaEntity);
 					Entity fileUpload = UploadResource.newUploadFileEntity(
-							"user/" + data.token.username + "/" + occurrenceID + "/", 
+							"user/" + data.token.username + "/occurrence/" + occurrenceID + "/", 
 							String.valueOf(occurrenceMediaEntity.getKey().getId()), 
 							"IMAGE&VIDEO",
 							data.visibility,
@@ -178,16 +182,31 @@ public class OccurrenceResource {
 			return Response.status(Status.FORBIDDEN).build();
 		}
 		Map<String, Object> occurrenceMap;
-		List<Entity> results = datastore.prepare(ctrQuery).asList(FetchOptions.Builder.withDefaults());
+		FetchOptions fetchOptions = FetchOptions.Builder.withLimit(QUERY_LIMIT);
+		if(data.cursor != null) {
+			fetchOptions.startCursor(Cursor.fromWebSafeString(data.cursor));
+		}
+		QueryResultList<Entity> results = datastore.prepare(ctrQuery).asQueryResultList(fetchOptions);
+		Query ctrQueryMedia;
+		List<Entity> mediaResults;
+		List<Long> mediaIDs;
 		for(Entity occurrenceEntity: results) {
 			occurrenceMap = new HashMap<String, Object>();
 			occurrenceMap.putAll(occurrenceEntity.getProperties());
 			occurrenceMap.put("username", occurrenceEntity.getParent().getName());
 			occurrenceMap.put("occurrenceID", occurrenceEntity.getKey().getId());
+			ctrQueryMedia = new Query("UserOccurrenceMedia").setAncestor(occurrenceEntity.getKey());
+			mediaResults = datastore.prepare(ctrQueryMedia).asList(FetchOptions.Builder.withDefaults());
+			mediaIDs = new LinkedList<Long>();
+			for(Entity occurrenceMediaEntity: mediaResults) {
+				mediaIDs.add(occurrenceMediaEntity.getKey().getId());
+			}
+			occurrenceMap.put("mediaIDs", mediaIDs);
 			occurrences.add(occurrenceMap);
 		}
+		CursorList cursorList = new CursorList(results.getCursor().toWebSafeString(), occurrences);
 		LOG.info("List of occurrences sent");
-		return Response.ok(g.toJson(occurrences)).build();
+		return Response.ok(g.toJson(cursorList)).build();
 	}
 	
 	@GET
