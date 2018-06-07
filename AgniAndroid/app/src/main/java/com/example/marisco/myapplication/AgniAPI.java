@@ -24,6 +24,8 @@ public interface AgniAPI {
     Call<ResponseBody> registerOccurrence(@Body OccurrenceData data);
 
     @GET("occurrence/list")
-    Call<List<Map<String, Object>> > getOccurrences();
+    Call<CursorList > getOccurrences();
 
+    @GET("occurrence/list")
+    Call<CursorList > getMoreOccurrences(@Body ListOccurrenceData data);
 }
