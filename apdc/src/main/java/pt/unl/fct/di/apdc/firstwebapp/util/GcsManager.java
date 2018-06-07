@@ -74,9 +74,12 @@ public class GcsManager {
 				builder.acl("public-read");
 			}
 			GcsFileOptions instance = builder.build();
-			GcsFilename fileName = temporary?
+			/**GcsFilename fileName = temporary?
 					new GcsFilename("staging.liquid-layout-196103.appspot.com", filename)
-					:new GcsFilename("liquid-layout-196103.appspot.com", filename);
+					:new GcsFilename("liquid-layout-196103.appspot.com", filename);**/
+			GcsFilename fileName = temporary?
+					new GcsFilename("staging.custom-tine-204615.appspot.com", filename)
+					:new GcsFilename("custom-tine-204615.appspot.com", filename);
 			GcsOutputChannel outputChannel;
 			outputChannel = gcsService.createOrReplace(fileName, instance);
 			copy(inputStream, Channels.newOutputStream(outputChannel));

@@ -1,13 +1,33 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table';
+import Table, { TableBody, TableCell, TablePagination, TableHead, TableRow } from 'material-ui/Table';
 import Async from 'react-promise';
 import operationsData from './operationsData';
 import Radio, { RadioGroup } from 'material-ui/Radio';
 import InfoIcon from '@material-ui/icons/EventNote';
 import IconButton from 'material-ui/IconButton';
+import UpdateListIcon from '@material-ui/icons/Cached';
+import Toolbar from 'material-ui/Toolbar';
+import Tooltip from 'material-ui/Tooltip';
+import Typography from 'material-ui/Typography';
+import blue from 'material-ui/colors/blue';
+import grey from 'material-ui/colors/grey';
+import green from 'material-ui/colors/lightGreen';
+import red from 'material-ui/colors/red';
+import amber from 'material-ui/colors/amber';
 import {withStyles} from "material-ui/styles/index";
 import {Link} from "react-router-dom";
+
+const CustomTableCell = withStyles(theme => ({
+    head: {
+        backgroundColor: blue[200],
+        color: grey[50],
+        //color: theme.palette.common.white,
+    },
+    body: {
+        fontSize: 14,
+    },
+}))(TableCell);
 
 const styles = theme => ({
     title:{
@@ -21,6 +41,26 @@ const styles = theme => ({
     table: {
         minWidth: 700,
     },
+    spacer: {
+        flex: '1 1 100%',
+    },
+    toolbarroot: {
+        paddingRight: theme.spacing.unit,
+    },
+    toolbartitle: {
+        flex: '0 0 auto',
+    },
+    severe: {
+        color: red[500],
+    },
+    lessSerious:{
+        color: green[400],
+    },
+    serious: {
+        color: amber[400],
+    },
+
+
 });
 
 // function makeAJAXCall(){
@@ -74,6 +114,40 @@ const styles = theme => ({
 //
 // }
 
+let EnhancedTableToolbar = props => {
+    const { classes } = props;
+
+    return (
+        <Toolbar
+            className={classes.toolbarroot}
+        >
+            <div className={classes.toolbartitle}>
+                {(
+                    <Typography variant="title" id="tableTitle">
+                        Tabela de Ocorrências
+                    </Typography>
+                )}
+            </div>
+            <div className={classes.spacer} />
+            <div className={classes.actions}>
+                {(
+                    <Tooltip title="Update list">
+                        <IconButton aria-label="Update list">
+                            <UpdateListIcon />
+                        </IconButton>
+                    </Tooltip>
+                )}
+            </div>
+        </Toolbar>
+    );
+};
+
+EnhancedTableToolbar.propTypes = {
+    classes: PropTypes.object.isRequired,
+};
+
+EnhancedTableToolbar = withStyles(styles)(EnhancedTableToolbar);
+
 let prom = new Promise(function(resolve, reject) {
     setTimeout(function() {
         resolve('a value')
@@ -120,7 +194,7 @@ let xmlRequest = new Promise(function(resolve, reject) {
                     // var array = Object.values(map);
                     // console.log(array);
                     // console.log(operationsData);
-                    resolve(obj);
+                    resolve(obj.mapList);
                     // resolve('xml value')
                 }
                 else {
@@ -152,7 +226,9 @@ const obj = [
 class TestOperations extends React.Component {
     state={
         object: [
-            {user_occurrence_title: 'titulo1'}]
+            {user_occurrence_title: ''}],
+        page: 0,
+        rowsPerPage: 10,
     };
 
     componentDidMount () {
@@ -164,24 +240,36 @@ class TestOperations extends React.Component {
         );
     }
 
+    handleChangePage = (event, page) => {
+        this.setState({ page });
+    };
+
+    handleChangeRowsPerPage = event => {
+        this.setState({ rowsPerPage: event.target.value });
+    };
+
     render () {
+        const {classes} = this.props;
+        const { object, rowsPerPage, page } = this.state;
+
         return (
             <div>
+                <EnhancedTableToolbar></EnhancedTableToolbar>
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>Informações</TableCell>
-                            <TableCell>Nome</TableCell>
-                            <TableCell>Tipo</TableCell>
-                            <TableCell>Data</TableCell>
-                            <TableCell>Estado</TableCell>
-                            <TableCell numeric>Grau de urgência</TableCell>
-                            <TableCell>Visibilidade</TableCell>
+                            <CustomTableCell>Informações</CustomTableCell>
+                            <CustomTableCell>Nome</CustomTableCell>
+                            <CustomTableCell>Tipo</CustomTableCell>
+                            <CustomTableCell>Data</CustomTableCell>
+                            <CustomTableCell>Estado</CustomTableCell>
+                            <CustomTableCell numeric>Grau de urgência</CustomTableCell>
+                            <CustomTableCell>Visibilidade</CustomTableCell>
                         </TableRow>
                     </TableHead>
 
                     <TableBody>
-                        {this.state.object.map(n => {
+                        {object.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(n => {
                             return (
                                 <TableRow key={n.user_occurrence_data}>
                                     <TableCell> <IconButton component={Link}
@@ -190,13 +278,29 @@ class TestOperations extends React.Component {
                                     <TableCell>{n.user_occurrence_type}</TableCell>
                                     <TableCell>{n.user_occurrence_data}</TableCell>
                                     <TableCell>{'nao tratado'}</TableCell>
-                                    <TableCell numeric> {n.user_occurrence_level}</TableCell>
+                                    <TableCell numeric
+                                               className={classes.severe}>
+                                        {n.user_occurrence_level}</TableCell>
                                     <TableCell>{n.user_occurrence_visibility ? 'publico' : 'privado'}</TableCell>
                                 </TableRow>
                             );
                         })}
                     </TableBody>
                 </Table>
+                <TablePagination
+                    component="div"
+                    count={object.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    backIconButtonProps={{
+                        'aria-label': 'Previous Page',
+                    }}
+                    nextIconButtonProps={{
+                        'aria-label': 'Next Page',
+                    }}
+                    onChangePage={this.handleChangePage}
+                    onChangeRowsPerPage={this.handleChangeRowsPerPage}
+                />
             </div>
         )
     }

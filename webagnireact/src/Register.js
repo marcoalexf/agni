@@ -73,6 +73,10 @@ const styles = theme => ({
         //fontFamily: 'Roboto Mono',
         fontSize: 12,
     },
+    accountPhoto:{
+        borderRadius: 20,
+        marginBottom: 20
+    },
 });
 
 //TODO
@@ -111,7 +115,8 @@ class Register extends Component {
             startedPassword: true,
             startedConfPass: true,
             file: '',
-            imagePreviewUrl: ''
+            imagePreviewUrl: '',
+            wantUploadPhoto: false,
         };
 
         this.handleCreateAccount = this.handleCreateAccount.bind(this);
@@ -254,17 +259,24 @@ class Register extends Component {
         console.log(this.state.validName);
         console.log(this.state.validEmail);
 
+        // if(this.state.file != '') {
+        //     this.setState({uploadPhoto: !this.state.uploadPhoto});
+        //     console.log("uploadPhoto1 " + this.state.uploadPhoto);
+        // }
+
         if(this.state.validUsername && this.state.validName && this.state.validEmail
             && this.state.validPassword && this.state.validConfPass){
             console.log("valid informations");
+            console.log("uploadPhoto1 " + this.state.uploadPhoto);
 
             var user = {
                 "username": this.state.username,
                 "name": this.state.name,
                 "email": this.state.email,
                 "role": this.state.value,
-                "password": this.state.password
-            }
+                "password": this.state.password,
+                "uploadPhoto": this.state.wantUploadPhoto,
+            };
 
             console.log(user);
             var xmlHttp = new XMLHttpRequest();
@@ -279,14 +291,19 @@ class Register extends Component {
                         console.log("Sucesso");
                         var response = xmlHttp.response;
                         console.log("XML response: " + response);
-                        var obj = JSON.parse(response);
-                        console.log("obj");
-                        console.log(obj);
+                        var id = JSON.parse(response);
+                        console.log("id");
+                        console.log(id);
                         document.getElementById("errorMessage").innerHTML = "";
-                        document.getElementById("tologin").click();
+
+                        if(this.state.file != '')
+                            this.uploadPhoto(id);
+
+                        else
+                            document.getElementById("tologin").click();
 
                         //TODO
-                        // uploadFile(obj);
+                        // uploadPhoto(obj);
                     }
 
                     else{
@@ -298,6 +315,31 @@ class Register extends Component {
         else{
             document.getElementById("errorMessage").innerHTML = "Parâmetros incorretos";
         }
+    };
+
+    uploadPhoto = id => {
+        console.log("uploadPhoto");
+        var file = this.state.file;
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open( "POST", 'https://custom-tine-204615.appspot.com/rest/upload/' + id);
+        xmlHttp.setRequestHeader("Content-Type", file.type);
+        // xmlHttp.setRequestHeader("Access-Control-Request-Headers", file.type);
+        // var myJSON = JSON.stringify(file);
+        xmlHttp.send(file);
+
+        xmlHttp.onreadystatechange = function() {//Call a function when the state changes.
+            if(xmlHttp.readyState === XMLHttpRequest.DONE) {
+                if(xmlHttp.status === 200){
+                    console.log("uploadPhoto sucessfully!");
+                    document.getElementById("tologin").click();
+                }
+
+                else{
+                    document.getElementById("errorMessage").innerHTML = "Ocorreu um erro ao carregar a sua foto";
+                }
+            }
+        }.bind(this)
+
     };
 
     savePhoto = id => {
@@ -358,14 +400,17 @@ class Register extends Component {
         let reader = new FileReader();
         let file = e.target.files[0];
 
-        reader.onloadend = () => {
-            this.setState({
-                file: file,
-                imagePreviewUrl: reader.result
-            });
-        };
+        if(file){
+            reader.onloadend = () => {
+                this.setState({
+                    file: file,
+                    imagePreviewUrl: reader.result,
+                    wantUploadPhoto: true,
+                });
+            };
 
-        reader.readAsDataURL(file)
+            reader.readAsDataURL(file)
+        }
     }
 
 
@@ -376,9 +421,9 @@ class Register extends Component {
         validConfPass} = this.state;
         const { classes } = this.props;
         let {imagePreviewUrl} = this.state;
-        let $imagePreview = null;
+        let $imagePreview = (<img src={require('./img/registUser2.png')} alt="Avatar2" width={100} style={{marginBottom: '20'}} />);
         if (imagePreviewUrl) {
-            $imagePreview = (<img src={imagePreviewUrl} />);
+            $imagePreview = (<img src={imagePreviewUrl} width={200} className={classes.accountPhoto} />);
         }
 
         return (
@@ -387,7 +432,7 @@ class Register extends Component {
                 <h4>Criar Conta</h4>
 
                 <div className="imgcontainer">
-                    <img src={require('./img/registUser2.png')} alt="Avatar2" width={100} heigth={100} />
+                    {/*<img src={require('./img/registUser2.png')} alt="Avatar2" width={100} heigth={100} />*/}
                     <div>
                         {/*<form encType="text/plain" method="get" name="putFile" id="putFile">*/}
                             {/*<div>*/}
@@ -422,11 +467,11 @@ class Register extends Component {
                             {/*<br />*/}
                             {/*<button type="submit">Submit</button>*/}
                         {/*</form>*/}
+                        {$imagePreview}
                         <form onSubmit={this._handleSubmit}>
                             <input type="file" onChange={this._handleImageChange} />
-                            <button type="submit" onClick={this._handleSubmit}>Upload Image</button>
+                            {/*<button type="submit" onClick={this._handleSubmit}>Upload Image</button>*/}
                         </form>
-                        {$imagePreview}
                     </div>
                 </div>
 
@@ -525,7 +570,7 @@ class Register extends Component {
                 </Paper>
 
                 <Button id={"tologin"} component={Link} to='/login' className={classes.input} color={"primary"}>
-                    Sem sessao iniciada
+                    IniciarSessao
                 </Button>
             </div>
         );

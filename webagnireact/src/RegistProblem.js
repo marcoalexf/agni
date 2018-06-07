@@ -151,8 +151,8 @@ class RegistProblem extends React.Component {
             "type": this.state.problem,
             "level": this.state.urgency,
             "visibility": !this.state.private,
-            "lat": 59.95,
-            "lon": 30.33,
+            "lat": 38.661453,
+            "lon": -9.206618,
             "notificationOnResolve": this.state.open,
         };
 
@@ -195,8 +195,8 @@ class RegistProblem extends React.Component {
 
     static defaultProps = {
         center: {
-            lat: 59.95,
-            lng: 30.33
+            lat: 38.661453,
+            lng: -9.206618
         },
         zoom: 11
     };
@@ -249,9 +249,8 @@ class RegistProblem extends React.Component {
                                 defaultZoom={this.props.zoom}
                             >
                                 <AnyReactComponent
-                                    lat={59.955413}
-                                    lng={30.337844}
-                                    text={'Kreyser Avrora'}
+                                    lat={38.661453}
+                                    lng={-9.206618}
                                 />
                             </GoogleMapReact>
                         </div>
