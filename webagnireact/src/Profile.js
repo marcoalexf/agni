@@ -158,7 +158,7 @@ let xmlRequest = new Promise(function(resolve, reject) {
                     // var array = Object.values(map);
                     // console.log(array);
                     // console.log(operationsData);
-                    resolve(obj);
+                    resolve(obj.mapList);
                     // resolve('xml value')
                 }
                 else {

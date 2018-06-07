@@ -105,13 +105,14 @@ let xmlRequest = new Promise(function(resolve, reject) {
                     var obj = JSON.parse(response);
                     console.log("obj:");
                     console.log(obj);
-                    map = obj[0];
+                    var mapList = obj.mapList;
+                    map = mapList[0];
                     console.log("map:");
                     console.log(map);
                     // var array = Object.values(map);
                     // console.log(array);
                     // console.log(operationsData);
-                    resolve(obj);
+                    resolve(obj.mapList);
                     // resolve('xml value')
                 }
                 else {
