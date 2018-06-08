@@ -154,7 +154,7 @@ class AboutUs extends React.Component {
                                 Androide
                             </div>
                             <Typography component="p">
-                                Especialista em androide, e engatar chicas
+                                Especialista em androide
                             </Typography>
                         </CardContent>
                         <CardActions>

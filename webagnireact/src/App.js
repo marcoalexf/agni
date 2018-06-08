@@ -24,7 +24,7 @@ import HomePage from './HomePage';
 import News from './News';
 import NewsTwo from './NewsTwo';
 import Profile from './Profile';
-import RegistProblem from './RegistProblem';
+import RegistProblem from './NewRegistProblem';
 import ThankYou from './ThankYou';
 import Operations from './Operations';
 import TestOperations from './TestOperations';
@@ -136,7 +136,7 @@ const styles = theme => ({
 
 class MiniDrawer extends React.Component {
     state = {
-        open: false,
+        open: true,
         accountOpen: false,
     };
 
