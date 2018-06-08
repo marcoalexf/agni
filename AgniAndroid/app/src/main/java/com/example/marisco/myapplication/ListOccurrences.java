@@ -7,8 +7,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.NumberPicker;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -26,7 +28,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ListOccurrences extends Fragment {
+public class ListOccurrences extends Fragment implements AbsListView.OnScrollListener {
 
     public static final String ENDPOINT = "https://custom-tine-204615.appspot.com/rest/";
     private static final String TITLE = "title";
@@ -36,11 +38,14 @@ public class ListOccurrences extends Fragment {
     private static final String VISIBILITY = "visibility";
     private static final String LEVEL = "level";
 
+    private int preLast;
+
     private Retrofit retrofit;
 
     @BindView(R.id.list_occurrences) ListView lv;
 
-    private ArrayList<Map<String, Object>> map_list;
+    private List<Map<String, Object>> map_list;
+    private String cursor;
 
     public ListOccurrences() { }
 
@@ -63,7 +68,9 @@ public class ListOccurrences extends Fragment {
             }
         });
 
+
         getOccurrences();
+        lv.setOnScrollListener(this);
         return v;
     }
 
@@ -93,13 +100,50 @@ public class ListOccurrences extends Fragment {
 
         AgniAPI agniAPI = retrofit.create(AgniAPI.class);
 
-        Call<List<Map<String, Object>>> call = agniAPI.getOccurrences();
+        Call<CursorList> call = agniAPI.getOccurrences();
 
-        call.enqueue(new Callback<List<Map<String, Object>>>() {
-            public void onResponse(Call<List<Map<String, Object>>> call, Response<List<Map<String, Object>>> response) {
+        call.enqueue(new Callback<CursorList>() {
+            public void onResponse(Call<CursorList> call, Response<CursorList> response) {
                 if (response.code() == 200) {
                     Log.d("GET_PUBLIC_OCCURRENCES", response.toString());
-                    map_list = new ArrayList<>(response.body());
+                    CursorList c = response.body();
+                    map_list = c.getMapList();
+                    cursor = c.getCursor();
+                    ListAdapterOccurrence adapter = new ListAdapterOccurrence(getContext(), map_list);
+                    lv.setAdapter(adapter);
+                    Toast toast = Toast.makeText(getActivity(), "Número de ocorrências" + map_list.size(), Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+                else {
+                    Toast toast = Toast.makeText(getActivity(), "Failed to get public occurrences" + response.code(), Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+            }
+            public void onFailure(Call<CursorList> call, Throwable t) {
+                Log.e("ERROR", t.toString());
+            }
+        });
+    }
+
+    private void getMoreOccurrences(){
+        if (retrofit == null) {
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(ENDPOINT)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+        }
+
+        AgniAPI agniAPI = retrofit.create(AgniAPI.class);
+
+        Call<CursorList> call = agniAPI.getMoreOccurrences(new ListOccurrenceData(null, false, null, cursor));
+
+        call.enqueue(new Callback<CursorList>() {
+            public void onResponse(Call<CursorList> call, Response<CursorList> response) {
+                if (response.code() == 200) {
+                    Log.d("GET_PUBLIC_OCCURRENCES", response.toString());
+                    CursorList c = response.body();
+                    map_list = c.getMapList();
+                    cursor = c.getCursor();
                     ListAdapterOccurrence adapter = new ListAdapterOccurrence(getContext(), map_list);
                     lv.setAdapter(adapter);
                 }
@@ -108,10 +152,62 @@ public class ListOccurrences extends Fragment {
                     toast.show();
                 }
             }
-
-            public void onFailure(Call<List<Map<String, Object>>> call, Throwable t) {
+            public void onFailure(Call<CursorList> call, Throwable t) {
                 Log.e("ERROR", t.toString());
             }
         });
     }
+
+    @Override
+    public void onScrollStateChanged (AbsListView view,
+                                      int scrollState)
+    {
+        if(lv != null && lv.getAdapter() != null) {
+            if (lv.getLastVisiblePosition() == lv.getAdapter().getCount() - 1)
+            //lv.getChildAt(lv.getChildCount() - 1).getBottom() <= lv.getHeight())
+            {
+                Toast toast = Toast.makeText(getActivity(), "Fim da list view", Toast.LENGTH_SHORT);
+                toast.show();
+
+            }
+        }
+        /*switch(lw.getId())
+        {
+            case lv.getId():
+
+                // Make your calculation stuff here. You have all your
+                // needed info from the parameters of this function.
+
+                // Sample calculation to determine if the last
+                // item is fully visible.
+                final int lastItem = firstVisibleItem + visibleItemCount;
+
+                if(lastItem == totalItemCount)
+                {
+                    if(preLast!=lastItem)
+                    {
+                        //to avoid multiple calls for last item
+                        Log.d("Last", "Last");
+                        preLast = lastItem;
+                    }
+                }
+        }*/
+    }
+
+    @Override
+    public void onScroll (AbsListView view, int firstVisibleItem, int visibleItemCount,
+                                   int totalItemCount){
+
+        if(lv != null && lv.getAdapter() != null)
+        {
+            if (lv.getLastVisiblePosition() == lv.getAdapter().getCount() -1)
+            //lv.getChildAt(lv.getChildCount() - 1).getBottom() <= lv.getHeight())
+            {
+                Toast toast = Toast.makeText(getActivity(), "Fim da list view", Toast.LENGTH_SHORT);
+                toast.show();
+
+            }
+        }
+    }
+
 }

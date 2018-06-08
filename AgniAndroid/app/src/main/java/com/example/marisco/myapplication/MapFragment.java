@@ -48,7 +48,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
     private GoogleMap map;
     @BindView(R.id.mapView) MapView mapView;
 
-    private ArrayList<Map<String, Object>> map_list;
+    private List<Map<String, Object>> map_list;
     private Retrofit retrofit;
 
     private Map<Marker, Map<String, Object>> marker_list;
@@ -98,12 +98,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
 
         AgniAPI agniAPI = retrofit.create(AgniAPI.class);
 
-        Call<List<Map<String, Object>>> call = agniAPI.getOccurrences();
+        Call<CursorList> call = agniAPI.getOccurrences();
 
-        call.enqueue(new Callback<List<Map<String, Object>>>() {
-            public void onResponse(Call<List<Map<String, Object>>> call, Response<List<Map<String, Object>>> response) {
+        call.enqueue(new Callback<CursorList>() {
+            public void onResponse(Call<CursorList> call, Response<CursorList> response) {
                 if (response.code() == 200) {
-                    map_list = new ArrayList<>(response.body());
+                    CursorList c = response.body();
+                    map_list = c.getMapList();
                     putAllMarkers();
                 }
                 else {
@@ -111,7 +112,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
                     toast.show();
                 }
             }
-            public void onFailure(Call<List<Map<String, Object>>> call, Throwable t) {
+            public void onFailure(Call<CursorList> call, Throwable t) {
                 Log.e("ERROR", t.toString());
             }
         });
