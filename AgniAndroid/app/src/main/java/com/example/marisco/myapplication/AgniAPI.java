@@ -26,6 +26,6 @@ public interface AgniAPI {
     @GET("occurrence/list")
     Call<CursorList > getOccurrences();
 
-    @GET("occurrence/list")
+    @POST("occurrence/list")
     Call<CursorList > getMoreOccurrences(@Body ListOccurrenceData data);
 }
