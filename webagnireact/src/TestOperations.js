@@ -131,8 +131,8 @@ let EnhancedTableToolbar = props => {
             <div className={classes.spacer} />
             <div className={classes.actions}>
                 {(
-                    <Tooltip title="Update list">
-                        <IconButton aria-label="Update list">
+                    <Tooltip title="Atualizar lista">
+                        <IconButton aria-label="Atualizar lista">
                             <UpdateListIcon />
                         </IconButton>
                     </Tooltip>
