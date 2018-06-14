@@ -1,17 +1,65 @@
 import {Map, InfoWindow, Marker, GoogleApiWrapper, Listing} from 'google-maps-react';
 import React, {Component} from 'react';
+import ReactDOM from 'react-dom';
+import PropTypes from 'prop-types';
 
 const style = {
     width: '50%',
     height: '50%'
 };
 
+const LoadingContainer = (props) => (
+    <div>A carregar mapa...</div>
+);
+
+
+let xmlRequest = new Promise(function(resolve, reject) {
+    console.log("xmlRequest");
+    var map;
+    console.log("pedido");
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open("GET", "https://custom-tine-204615.appspot.com/rest/occurrence/list", true);
+    xmlHttp.send();
+
+    console.log("esperar pelo estado");
+    xmlHttp.onreadystatechange = function () {
+        console.log("1");
+        if (xmlHttp.readyState === 4) {
+            console.log("2");
+            if (xmlHttp.status === 200) {
+                console.log("3");
+                var response = xmlHttp.response;
+                var obj = JSON.parse(response);
+                console.log("obj:");
+                console.log(obj);
+                map = obj[0];
+                console.log("map:");
+                console.log(obj.mapList);
+                resolve(obj.mapList);
+            }
+            else {
+                console.log("tempo expirado");
+            }
+        }
+    }
+
+});
+
+
 export class MapContainer extends Component {
-    state = {
-        showingInfoWindow: false,
-        activeMarker: {},
-        selectedPlace: {},
-    };
+    constructor(props){
+        super(props);
+
+        this.onMarkerClick = this.onMarkerClick.bind(this);
+
+        this.state = {
+            showingInfoWindow: false,
+            activeMarker: {},
+            selectedPlace: {},
+            object: [
+                {user_occurrence_title: ''}],
+        };
+    }
 
     fetchPlaces(mapProps, map) {
         const {google} = mapProps;
@@ -39,16 +87,34 @@ export class MapContainer extends Component {
         }
     };
 
+    componentDidMount() {
+        xmlRequest.then((value) =>{
+                this.setState({object: value});
+                console.log("state object");
+                console.log(this.state.object);
+            }
+        );
+    }
+
     render() {
         const {google} = window.google;
+        const {object} = this.state;
         
         return (
-            <Map google={this.props.google} style={style} zoom={14}
-            onReady={this.fetchPlaces} onClick={this.onMapClicked} className={'map'}>
+            <Map google={this.props.google}
+                 style={style}
+                 initialCenter={{
+                     lat: 38.66,
+                     lng: -9.20
+                 }}
+                 zoom={14}
+                 onReady={this.fetchPlaces}
+                 onClick={this.onMapClicked}
+                 className={'map'}>
                 <Marker onClick={this.onMarkerClick}
                     title={'Clica para mais detalhes'}
-                    name={'Zona de reporte'} />
-                    {/*position={{lat: 37.778519, lng: -122.405640}} />*/}
+                    name={'Zona de reporte'}
+                    position={{lat: 38.661453, lng: -9.206618}} />
                 {/*<Marker onMouseOver={this.onMouseOverMarker}*/}
                     {/*name={'Dolores park'}*/}
                     {/*position={{lat: 37.759703, lng: -122.428093}} />*/}
@@ -60,6 +126,25 @@ export class MapContainer extends Component {
                         <h1>{this.state.selectedPlace.name}</h1>
                     </div>
                 </InfoWindow>
+
+                {object.map(n => {
+                    return (
+                            <Marker onClick={this.onMarkerClick}
+                                    title={n.user_occurrence_title}
+                                    name={n.user_occurrence_title}
+                                    position={{lat: n.user_occurrence_lat, lng: n.user_occurrence_lon}}/>
+
+                    );})
+                }
+
+                <InfoWindow
+                    marker={this.state.activeMarker}
+                    visible={this.state.showingInfoWindow}>
+                    <div>
+                        <h1>{this.state.selectedPlace.name}</h1>
+                    </div>
+                </InfoWindow>
+
                 {/*<Marker*/}
                     {/*name={'Your position'}*/}
                     {/*position={{lat: 37.762391, lng: -122.439192}}*/}
@@ -88,6 +173,24 @@ export class MapContainer extends Component {
 //     initialCenter: React.PropTypes.object
 // }
 
+// MapContainer.propTypes = {
+//     google: PropTypes.object,
+//     zoom: PropTypes.number,
+//     initialCenter: PropTypes.object,
+//     centerAroundCurrentLocation: PropTypes.bool
+// };
+//
+// MapContainer.defaultProps = {
+//     zoom: 13,
+//     // San Francisco, by default
+//     initialCenter: {
+//         lat: 37.774929,
+//         lng: -122.419416
+//     },
+//     centerAroundCurrentLocation: false
+// };
+
 export default GoogleApiWrapper({
-    apiKey: 'AIzaSyAM-jV8q7-FWs7RdP0G4cH938jWgQwlGVo'
+    apiKey: 'AIzaSyAM-jV8q7-FWs7RdP0G4cH938jWgQwlGVo',
+    LoadingContainer: LoadingContainer
 })(MapContainer)

@@ -381,34 +381,6 @@ class Profile extends React.Component {
             this.setState({username: uname});
             this.setState({firstLetter: uname.charAt(0)});
 
-            var url = 'https://storage.googleapis.com/custom-tine-204615.appspot.com/user/' + uname + '/photo' ;
-
-            var image = new Image();
-
-            image.onload = function () {
-              this.setState({hasPhoto: true});
-              this.setState({photo: url});
-            }.bind(this);
-
-            image.onerror = function () {
-                this.setState({hasPhoto: false});
-            }.bind(this);
-
-            image.src = url;
-
-            console.log("hasphoto:");
-            console.log(this.state.hasPhoto);
-
-            // var http = new XMLHttpRequest();
-            //
-            // http.open('HEAD', url, false);
-            // http.send();
-            //
-            // if(http.status != 404){
-            //     this.setState({hasPhoto: true});
-            //     this.setState({photo: url});
-            // }
-
 
             informations.then((obj) => {
                 this.setState({email: obj.user_email});
@@ -432,6 +404,24 @@ class Profile extends React.Component {
                 console.log("state object");
                 console.log(this.state.reports);
             });
+
+            var url = 'https://storage.googleapis.com/custom-tine-204615.appspot.com/user/' + uname + '/photo' ;
+
+            var image = new Image();
+
+            image.onload = function () {
+                this.setState({hasPhoto: true});
+                this.setState({photo: url});
+            }.bind(this);
+
+            image.onerror = function () {
+                this.setState({hasPhoto: false});
+            }.bind(this);
+
+            image.src = url;
+
+            console.log("hasphoto:");
+            console.log(this.state.hasPhoto);
         }
         else{
             document.getElementById("tologin").click();
