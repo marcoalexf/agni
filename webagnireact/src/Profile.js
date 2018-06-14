@@ -119,6 +119,61 @@ const styles =  theme => ({
     },
 });
 
+let informations = new Promise(function(resolve, reject) {
+    var obj;
+    var token = window.localStorage.getItem('token');
+    var d = new Date();
+    var t = d.getTime();
+    // var expirationData = JSON.parse(token).expirationData;
+    // console.log(token);
+    // console.log(t);
+    // console.log(expirationData);
+
+    if(token != null){
+        var uname = JSON.parse(token).username;
+        var tokenObj = JSON.parse(token);
+
+        var user = {
+            "username": uname,
+            "token": tokenObj
+        }
+
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open( "POST", "https://custom-tine-204615.appspot.com/rest/profile/", true);
+        xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        var myJSON = JSON.stringify(user);
+        xmlHttp.send(myJSON);
+
+        xmlHttp.onreadystatechange = function() {
+            if (xmlHttp.readyState === XMLHttpRequest.DONE){
+                if(xmlHttp.status === 200){
+                    var response = xmlHttp.response;
+                    console.log("XML response: " + response);
+                    obj = JSON.parse(response);
+                    console.log(obj);
+
+                    var username = document.getElementById("showusername");
+                    username.innerHTML = uname;
+                    console.log(uname.charAt(0));
+
+                    resolve(obj);
+                }
+
+                else{
+                    console.log("tempo expirado");
+                    window.localStorage.removeItem('token');
+                    // document.getElementById("tologin").click();
+                }
+            }
+        }.bind(this)
+    }
+    else{
+        console.log("Sem sessao iniciada");
+        // document.getElementById("tologin").click();
+
+    }
+}.bind(this));
+
 let xmlRequest = new Promise(function(resolve, reject) {
     console.log("xmlRequest");
     // var t = true;
@@ -155,23 +210,18 @@ let xmlRequest = new Promise(function(resolve, reject) {
                     map = obj[0];
                     console.log("map:");
                     console.log(map);
-                    // var array = Object.values(map);
-                    // console.log(array);
-                    // console.log(operationsData);
+
                     resolve(obj.mapList);
-                    // resolve('xml value')
                 }
                 else {
                     console.log("tempo expirado");
                     window.localStorage.removeItem('token');
-                    // document.getElementById("tologin").click();
                 }
             }
         }.bind(this)
     }
     else{
         console.log("Sem sessao iniciada");
-        // document.getElementById("tologin").click();
     }
 }.bind(this));
 
@@ -188,8 +238,14 @@ class Profile extends React.Component {
         editProfile: false,
         editPass: false,
         isLoggedIn: true,
+        username: '',
+        email: '',
+        name: '',
+        role: '',
+        hasReports: false,
         reports: [
-            {user_occurrence_title: 'titulo1'}]
+            {user_occurrence_title: ''}],
+        hasPhoto: true,
     };
 
     loadInformations = () =>{
@@ -227,20 +283,20 @@ class Profile extends React.Component {
                         var username = document.getElementById("showusername");
                         username.innerHTML = uname;
                         console.log(uname.charAt(0));
-                        this.setState({username: uname});
-                        this.setState({firstLetter: uname.charAt(0)});
+                        // this.setState({username: uname});
+                        // this.setState({firstLetter: uname.charAt(0)});
 
-                        var name = document.getElementById("showname");
-                        name.innerHTML = obj.user_name;
-                        this.setState({name: obj.user_name});
-
-                        var email = document.getElementById("showemail");
-                        email.innerHTML = obj.user_email;
-                        this.setState({email: obj.user_email});
-
-                        var role = document.getElementById("showrole");
-                        role.innerHTML = obj.user_role;
-                        this.setState({role: obj.user_role});
+                        // var name = document.getElementById("showname");
+                        // name.innerHTML = obj.user_name;
+                        // this.setState({name: obj.user_name});
+                        //
+                        // var email = document.getElementById("showemail");
+                        // email.innerHTML = obj.user_email;
+                        // this.setState({email: obj.user_email});
+                        //
+                        // var role = document.getElementById("showrole");
+                        // role.innerHTML = obj.user_role;
+                        // this.setState({role: obj.user_role});
 
                         // var img = document.getElementById("profileimg");
                         // img.innerHTML = obj.user_name.charAt(0);
@@ -319,34 +375,82 @@ class Profile extends React.Component {
         return event.target.value == this.state.newpass;
     };
 
-    componentWillMount () {
-        xmlRequest.then((value) =>{
-            if(value != undefined){
-                this.setState({reports: value});
-                // if(this.isMounted())
-                //     this.setState({loggedIn: true});
-                console.log("loggedIn");
-                console.log(this.state.isLoggedIn);
-                console.log(value);
-            }
-            else{
-                console.log("not loggedIn");
-            }
-            console.log("state object");
-            console.log(this.state.reports);
-        });
+    componentDidMount () {
+        var token = window.localStorage.getItem('token');
+
+        if(token != null){
+            var uname = JSON.parse(token).username;
+            this.setState({username: uname});
+            this.setState({firstLetter: uname.charAt(0)});
+
+            var url = 'https://storage.googleapis.com/custom-tine-204615.appspot.com/user/' + uname + '/photo' ;
+
+            var image = new Image();
+
+            image.onload = function () {
+              this.setState({hasPhoto: true});
+              this.setState({photo: url});
+            }.bind(this);
+
+            image.onerror = function () {
+                this.setState({hasPhoto: false});
+            }.bind(this);
+
+            image.src = url;
+
+            console.log("hasphoto:");
+            console.log(this.state.hasPhoto);
+
+            // var http = new XMLHttpRequest();
+            //
+            // http.open('HEAD', url, false);
+            // http.send();
+            //
+            // if(http.status != 404){
+            //     this.setState({hasPhoto: true});
+            //     this.setState({photo: url});
+            // }
+
+
+            informations.then((obj) => {
+                this.setState({email: obj.user_email});
+                this.setState({name: obj.user_name});
+                this.setState({role: obj.user_role});
+            });
+            xmlRequest.then((value) =>{
+                if(value != undefined && value.length != 0){
+                    this.setState({reports: value});
+                    // if(this.isMounted())
+                    //     this.setState({loggedIn: true});
+                    console.log(this.state.reports);
+                    console.log("loggedIn");
+                    console.log(this.state.isLoggedIn);
+                    console.log(value);
+                    this.setState({hasReports: true});
+                }
+                else{
+                    console.log("not loggedIn");
+                }
+                console.log("state object");
+                console.log(this.state.reports);
+            });
+        }
+        else{
+            document.getElementById("tologin").click();
+        }
+
     }
 
     render() {
         const { classes } = this.props;
-        const { accountOpen, value, isLoggedIn, reports } = this.state;
+        const { accountOpen, value, isLoggedIn, reports, name, email, role, username, firstLetter, hasReports } = this.state;
 
         if(!isLoggedIn){
             return <Redirect to={"/login"}>Link</Redirect>;
         }
 
         return (
-            <div onLoad={this.loadInformations}>
+            <div>
                 {/*{isLoggedIn ? <div/> : <Link to={"/login"}>Link</Link>}*/}
 
                 {/*<Typography variant="display1" className={classes.title}>Perfil</Typography>*/}
@@ -367,7 +471,7 @@ class Profile extends React.Component {
                         <DialogContent>
                             {/*<img src={require('./img/user.png')} alt="Avatar" className={classes.media} width="100"/>*/}
                             <div className={classes.row}>
-                                <Avatar className={classes.bigAvatar}>{this.state.firstLetter}</Avatar>
+                                <Avatar className={classes.bigAvatar}>{firstLetter}</Avatar>
                             </div>
                             <div className="imgcontainer">
                                 <input
@@ -461,19 +565,22 @@ class Profile extends React.Component {
                     <div className={"w3-row-padding"}>
                     <div className={"w3-third"} style={{margin: '50'}}>
                         {/*<img src={require('./img/user.png')} alt="Avatar" className={classes.media} width="200"/>*/}
-                        <Avatar className={classes.biggerAvatar} style={{margin: '0 auto'}}>
-                            {/*<div className={classes.textAvatar}>*/}
+                        {this.state.hasPhoto ?
+                            <img src={this.state.photo} alt='Foto'
+                            width={"200"}/> :
+
+                            <Avatar className={classes.biggerAvatar} style={{margin: '0 auto'}}>
                                 {this.state.firstLetter}
-                                {/*</div>*/}
                             </Avatar>
-                        {/*<div><Avatar id={"profileimg"} className={classes.avatar}></Avatar></div>*/}
+                        }
+
                     </div>
 
                     <div className={"w3-twothird"}>
-                        <div id="showusername" className={classes.username}></div>
-                        <Typography id="showemail" component="p"></Typography>
+                        <div id="showusername" className={classes.username}>{username}</div>
+                        <Typography id="showemail" component="p">{email}</Typography>
                         <div className={classes.basicInfo}>
-                            <b id="reports">0</b> Reportes de Problemas
+                            {hasReports ? <b id="reports">{reports.length}</b> : <b id="reports">0</b>} Reportes de Problemas
                         </div>
                         <div className={classes.basicInfo}>
                             <b id="supports">0</b> A apoiar
@@ -482,8 +589,8 @@ class Profile extends React.Component {
                             <b id="supports">0</b> Comentarios
                         </div>
 
-                        <Typography id="showname" component="p"></Typography>
-                        <p id="showrole" className={classes.role}></p>
+                        <Typography id="showname" component="p">{name}</Typography>
+                        <p id="showrole" className={classes.role}>{role}</p>
 
                     </div>
                     </div>
@@ -503,8 +610,8 @@ class Profile extends React.Component {
                         <Tab icon={<PersonPinIcon />} label="AMIGOS" />
                     </Tabs>
 
-                    {value === 0 && <TabContainer>
-                        {/*{hasReports ? }*/}
+                    {value === 0 && hasReports &&
+                        <TabContainer>
                         {reports.map(n => {
                             return(
                                 <div style={{marginBottom: '50px'}}>
@@ -519,6 +626,7 @@ class Profile extends React.Component {
                             )
                         })}
                     </TabContainer>}
+                    {value === 0 && !hasReports && <TabContainer>Sem registos de momento</TabContainer>}
                     {value === 1 && <TabContainer>Sem apoios de momento</TabContainer>}
                     {value === 2 && <TabContainer>Sem amigos de momento</TabContainer>}
                 </Paper>

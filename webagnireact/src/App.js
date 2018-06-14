@@ -138,6 +138,7 @@ class MiniDrawer extends React.Component {
     state = {
         open: true,
         accountOpen: false,
+        changeRouter: false,
     };
 
     handleDrawerOpen = () => {
