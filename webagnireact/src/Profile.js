@@ -152,8 +152,6 @@ let informations = new Promise(function(resolve, reject) {
                     obj = JSON.parse(response);
                     console.log(obj);
 
-                    var username = document.getElementById("showusername");
-                    username.innerHTML = uname;
                     console.log(uname.charAt(0));
 
                     resolve(obj);

@@ -46,8 +46,8 @@ export class MapContainer extends Component {
             <Map google={this.props.google} style={style} zoom={14}
             onReady={this.fetchPlaces} onClick={this.onMapClicked} className={'map'}>
                 <Marker onClick={this.onMarkerClick}
-                    title={'The marker`s title will appear as a tooltip.'}
-                    name={'SOMA'} />
+                    title={'Clica para mais detalhes'}
+                    name={'Zona de reporte'} />
                     {/*position={{lat: 37.778519, lng: -122.405640}} />*/}
                 {/*<Marker onMouseOver={this.onMouseOverMarker}*/}
                     {/*name={'Dolores park'}*/}
