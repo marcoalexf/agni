@@ -2,6 +2,8 @@ package com.example.marisco.myapplication;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -9,17 +11,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +37,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class MapFragment extends Fragment implements OnMapReadyCallback{
+public class MapFragment extends Fragment implements OnMapReadyCallback, LocationListener {
 
     public static final String ENDPOINT = "https://custom-tine-204615.appspot.com/rest/";
     private static final String TITLE = "title";
@@ -52,6 +54,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
     private Retrofit retrofit;
 
     private Map<Marker, Map<String, Object>> marker_list;
+
+    private Location initialLoc;
 
     public MapFragment() {
         marker_list = new HashMap<>();
@@ -80,6 +84,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     map.setMyLocationEnabled(true);
 
+                    map.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
+                        public void onMyLocationChange(Location location) {
+                            if (initialLoc == null) {
+                                map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(),
+                                        location.getLongitude()), 14));
+                                initialLoc = location;
+                            }
+                        }
+                    });
                 } else {
                     //meter mapa em local standard
                 }
@@ -141,6 +154,30 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
         mp.position(new LatLng((double)entry.get("user_occurrence_lat"), (double)entry.get("user_occurrence_lon")));
         mp.title((String) entry.get("user_occurrence_title"));
         Marker m = map.addMarker(mp);
+
+
+        switch ((int) Math.round((double)entry.get("user_occurrence_level"))){
+            case 1:
+                m.setIcon(BitmapDescriptorFactory
+                        .defaultMarker(130.0f));
+                break;
+            case 2:
+                m.setIcon(BitmapDescriptorFactory
+                        .defaultMarker(80.0f));
+                break;
+            case 3:
+                m.setIcon(BitmapDescriptorFactory
+                        .defaultMarker(50.0f));
+                break;
+            case 4:
+                m.setIcon(BitmapDescriptorFactory
+                        .defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+                break;
+            case 5:
+                m.setIcon(BitmapDescriptorFactory
+                        .defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                break;
+        }
         marker_list.put(m, entry);
         if(entry == null ){
             Toast toast = Toast.makeText(getActivity(), "entry é nula" , Toast.LENGTH_SHORT);
@@ -167,6 +204,25 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
             od.setArguments(args);
             fman.beginTransaction().replace(R.id.fragment, od).commit();
         }
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location){
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
 
     }
 }
