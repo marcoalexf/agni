@@ -108,6 +108,7 @@ class Register extends Component {
             password: '',
             confirmPass: '',
             value: 'User',
+            locality: '',
             submitted: false,
             startedUsername: true,
             startedEmail: true,
@@ -209,6 +210,21 @@ class Register extends Component {
         console.log(event.target.value);
     };
 
+    handleLocalityChange = locality => event => {
+        var specialChars = /[!#$%^&*()+\-=\[\]{};':"\\|,<>\/?]+/;
+        this.setState({ [locality]: event.target.value });
+        console.log(this.state.locality);
+
+        // if(event.target.value.indexOf('@') <= -1 || event.target.value.length < 9 || event.target.value.length > 30
+        //     || specialChars.test(event.target.value)){
+        //     this.setState({validEmail: false});
+        // }
+        // else{
+        //     this.setState({validEmail: true});
+        // }
+        // this.setState({startedEmail: false});
+    };
+
     handleConfirmPassChange = confirmPass => event => {
         this.setState({ [confirmPass]: event.target.value });
 
@@ -274,6 +290,7 @@ class Register extends Component {
                 "name": this.state.name,
                 "email": this.state.email,
                 "role": this.state.value,
+                "locality": this.state.locality,
                 "password": this.state.password,
                 "uploadPhoto": this.state.wantUploadPhoto,
             };
@@ -291,19 +308,21 @@ class Register extends Component {
                         console.log("Sucesso");
                         var response = xmlHttp.response;
                         console.log("XML response: " + response);
-                        var id = JSON.parse(response);
-                        console.log("id");
-                        console.log(id);
-                        document.getElementById("errorMessage").innerHTML = "";
 
-                        if(this.state.file != '')
-                            this.uploadPhoto(id);
+                        if(this.state.wantUploadPhoto){
+                            var id = JSON.parse(response);
+                            console.log("id");
+                            console.log(id);
+                            document.getElementById("errorMessage").innerHTML = "";
 
-                        else
-                            document.getElementById("tologin").click();
+                            if(this.state.file != '')
+                                this.uploadPhoto(id);
 
-                        //TODO
-                        // uploadPhoto(obj);
+                            else
+                                document.getElementById("tologin").click();
+                        }
+
+                        document.getElementById("tologin").click();
                     }
 
                     else{
@@ -416,7 +435,7 @@ class Register extends Component {
 
     render() {
         const { loggingIn } = this.props;
-        const { username, email, password, confirmPass, submitted, validUsername, startedUsername,
+        const { username, email, password, locality, confirmPass, submitted, validUsername, startedUsername,
             startedEmail, startedName, startedPassword, startedConfPass, validEmail, validName, validPassword,
         validConfPass} = this.state;
         const { classes } = this.props;
@@ -524,6 +543,18 @@ class Register extends Component {
                             <MenuItem value={'GS'}>GS</MenuItem>
                             <MenuItem value={'OBE'}>OBE</MenuItem>
                         </SelectField>
+                    </div>
+
+                    <div className="input-group">
+                        <div className={'form-group' + (submitted && !locality ? ' has-error' : '')}>
+                            <TextField required id="locality" label="Localidade" className={classes.textField} value={this.state.locality}
+                                       onChange={this.handleLocalityChange('locality')}/>
+                            {/*{!startedEmail &&*/}
+                            {/*(validEmail ? <CheckIcon className={classes.validIcon}/> : <CloseIcon className={classes.nonValidIcon}/> )}*/}
+                            {/*{submitted && !locality &&*/}
+                            {/*<div className="help-block">Localidade is required</div>*/}
+                            {/*}*/}
+                        </div>
                     </div>
 
                     <div className="input-group">
