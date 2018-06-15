@@ -3,21 +3,37 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".MapFragment">
-
 
 
     <com.google.android.gms.maps.MapView
         android:id="@+id/mapView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true" />
 
-    <!--
-    <com.google.android.gms.maps.MapView
-        android:id="@+id/mapView"
-        android:layout_width="379dp"
-        android:layout_height="508dp"
-        android:layout_centerInParent="true"
-        android:visibility="visible" />-->
+
+    <LinearLayout
+        android:id="@+id/container"
+        android:layout_width="47dp"
+        android:layout_height="47dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="69dp">
+
+        <ImageButton
+            android:id="@+id/filters_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/filter_button"
+            android:padding="35dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/filter_icon"
+            android:alpha="0.85"
+            android:scaleY="-1"/>
+    </LinearLayout>
 
 </RelativeLayout>

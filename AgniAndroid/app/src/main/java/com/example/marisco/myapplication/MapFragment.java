@@ -1,16 +1,22 @@
 package com.example.marisco.myapplication;
 
-import android.Manifest;
+import  android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationListener;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.ImageButton;
+import android.widget.PopupWindow;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -37,7 +43,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class MapFragment extends Fragment implements OnMapReadyCallback, LocationListener {
+public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     public static final String ENDPOINT = "https://custom-tine-204615.appspot.com/rest/";
     private static final String TITLE = "title";
@@ -49,6 +55,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Locatio
 
     private GoogleMap map;
     @BindView(R.id.mapView) MapView mapView;
+    @BindView(R.id.filters_button) ImageButton filter_button;
 
     private List<Map<String, Object>> map_list;
     private Retrofit retrofit;
@@ -56,14 +63,26 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Locatio
     private Map<Marker, Map<String, Object>> marker_list;
 
     private Location initialLoc;
+    private int minDifficulty;
+    private boolean cleanIsChecked, zoneIsChecked, otherIsChecked;
+
+    private LayoutInflater inflater;
+    private ViewGroup container;
 
     public MapFragment() {
+        minDifficulty = 1;
+        cleanIsChecked = true;
+        zoneIsChecked = true;
+        otherIsChecked = true;
         marker_list = new HashMap<>();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        this.inflater = inflater;
+        this.container = container;
 
         View v = inflater.inflate(R.layout.fragment_map, container, false);
         ButterKnife.bind(this, v);
@@ -73,6 +92,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Locatio
         mapView.getMapAsync(this);
         requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
 
+        filter_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popupWindow();
+            }
+        });
         return v;
     }
 
@@ -134,10 +159,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Locatio
     @Override
     public void onMapReady(GoogleMap map) {
         this.map = map;
+        //map.getUiSettings().setMyLocationButtonEnabled(false);
         getOccurrences();
     }
 
     private void putAllMarkers(){
+        map.clear();
         map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
@@ -145,8 +172,20 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Locatio
             }
         });
         for(Map<String, Object> entry: map_list){
-            putMarker(entry);
+            if(isNotFiltered(entry))
+                putMarker(entry);
         }
+    }
+
+    private boolean isNotFiltered(Map<String, Object> entry){
+        if((int) Math.round((double)entry.get("user_occurrence_level")) >= minDifficulty){
+            if( (cleanIsChecked && entry.get("user_occurrence_type").equals(getResources().getString(R.string.occurrence_type_clean))) ||
+                    (zoneIsChecked && entry.get("user_occurrence_type").equals(getResources().getString(R.string.occurrence_type_zone))) ||
+                    (otherIsChecked && entry.get("user_occurrence_type").equals(getResources().getString(R.string.occurrence_type_other)))){
+                return true;
+            }
+        }
+        return false;
     }
 
     private void putMarker(Map<String, Object> entry) {
@@ -185,10 +224,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Locatio
         }
     }
 
-
-
     private void listOccurrenceDetails( Map<String, Object> entry){
-
         OccurrenceDetails od = new OccurrenceDetails();
         FragmentManager fman = getFragmentManager();
         Bundle args = new Bundle();
@@ -204,25 +240,56 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Locatio
             od.setArguments(args);
             fman.beginTransaction().replace(R.id.fragment, od).commit();
         }
-
     }
 
-    @Override
-    public void onLocationChanged(Location location){
+    private void popupWindow() {
+        View popupView = inflater.inflate(R.layout.filter_menu, container, false);
+        setRadioIds(popupView);
+        final RadioGroup level_rb = popupView.findViewById(R.id.minimum_level_rb);
+
+        final CheckBox cb_clean = popupView.findViewById(R.id.cb_clean);
+        final CheckBox cb_zone = popupView.findViewById(R.id.cb_zone);
+        final CheckBox cb_other = popupView.findViewById(R.id.cb_other);
+
+        cb_clean.setChecked(cleanIsChecked);
+        cb_zone.setChecked(zoneIsChecked);
+        cb_other.setChecked(otherIsChecked);
+        level_rb.check(minDifficulty);
+
+        popupView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        final PopupWindow popupWindow = new PopupWindow(popupView, popupView.getMeasuredWidth(), popupView.getMeasuredHeight(), true);
+        popupWindow.showAtLocation(popupView, Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL, 0, 0);
+        popupWindow.setOutsideTouchable(true);
+        popupWindow.setIgnoreCheekPress();
+
+        Button btnOk = (Button) popupView.findViewById(R.id.btnApply);
+        Button btnCancel = (Button) popupView.findViewById(R.id.btnCancel);
+
+        btnOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                minDifficulty = level_rb.getCheckedRadioButtonId();
+                cleanIsChecked = cb_clean.isChecked();
+                zoneIsChecked = cb_zone.isChecked();
+                otherIsChecked = cb_other.isChecked();
+                putAllMarkers();
+                popupWindow.dismiss();
+            }
+        });
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popupWindow.dismiss();
+            }
+        });
     }
 
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
+    @SuppressLint("ResourceType")
+    private void setRadioIds(View popupView) {
+        popupView.findViewById(R.id.radio1).setId(1);
+        popupView.findViewById(R.id.radio2).setId(2);
+        popupView.findViewById(R.id.radio3).setId(3);
+        popupView.findViewById(R.id.radio4).setId(4);
+        popupView.findViewById(R.id.radio5).setId(5);
     }
 }
