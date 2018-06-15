@@ -76,4 +76,9 @@
 
     <string name="statistics">Statistics</string>
 
+    <!--Filter menu-->
+    <string name="minimum_level">Minimum severity:</string>
+    <string name="apply">Apply</string>
+    <string name="cancel">Cancel</string>
+
 </resources>

@@ -64,4 +64,8 @@
 
     <string name="statistics">Estatísticas</string>
 
+    <!--Filter menu-->
+    <string name="minimum_level">Gravidade mínima:</string>
+    <string name="apply">Aplicar</string>
+    <string name="cancel">Cancelar</string>
 </resources>
