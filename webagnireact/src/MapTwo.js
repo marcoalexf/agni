@@ -1,17 +1,20 @@
 import {Map, InfoWindow, Marker, GoogleApiWrapper, Listing} from 'google-maps-react';
 import React, {Component} from 'react';
+// import { Popup } from 'react-leaflet';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 
 const style = {
-    width: '50%',
-    height: '50%'
+    width: '80%',
+    height: '70%'
 };
 
 const LoadingContainer = (props) => (
     <div>A carregar mapa...</div>
 );
 
+// const { Map: LeafletMap, Popup } = window.ReactLeaflet;
+// const { Map: LeafletMap, TileLayer, Marker, Popup } = ReactLeaflet;
 
 let xmlRequest = new Promise(function(resolve, reject) {
     console.log("xmlRequest");
@@ -44,6 +47,7 @@ let xmlRequest = new Promise(function(resolve, reject) {
     }
 
 });
+
 
 
 export class MapContainer extends Component {
@@ -99,6 +103,7 @@ export class MapContainer extends Component {
     render() {
         const {google} = window.google;
         const {object} = this.state;
+        const position = [38.66, -9.20];
         
         return (
             <Map google={this.props.google}
@@ -111,21 +116,25 @@ export class MapContainer extends Component {
                  onReady={this.fetchPlaces}
                  onClick={this.onMapClicked}
                  className={'map'}>
+                {/*<Marker position={position}>*/}
+                    {/*<Popup>*/}
+                        {/*It works!!!*/}
+                    {/*</Popup>*/}
+                {/*</Marker>*/}
                 <Marker onClick={this.onMarkerClick}
-                    title={'Clica para mais detalhes'}
-                    name={'Zona de reporte'}
-                    position={{lat: 38.661453, lng: -9.206618}} />
+                    title={'Clica para mais detalhes'} position={{lat: 38.661453, lng: -9.206618}} />
+                    {/*position={{lat: 38.661453, lng: -9.206618}} />*/}
                 {/*<Marker onMouseOver={this.onMouseOverMarker}*/}
                     {/*name={'Dolores park'}*/}
                     {/*position={{lat: 37.759703, lng: -122.428093}} />*/}
                 {/*<Marker />*/}
-                <InfoWindow
-                    marker={this.state.activeMarker}
-                    visible={this.state.showingInfoWindow}>
-                    <div>
-                        <h1>{this.state.selectedPlace.name}</h1>
-                    </div>
-                </InfoWindow>
+                {/*<InfoWindow*/}
+                    {/*marker={this.state.activeMarker}*/}
+                    {/*visible={this.state.showingInfoWindow}>*/}
+                    {/*<div>*/}
+                        {/*<h1>{this.state.selectedPlace.name}</h1>*/}
+                    {/*</div>*/}
+                {/*</InfoWindow>*/}
 
                 {object.map(n => {
                     return (

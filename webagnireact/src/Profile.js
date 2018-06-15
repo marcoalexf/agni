@@ -120,6 +120,7 @@ const styles =  theme => ({
 });
 
 let informations = new Promise(function(resolve, reject) {
+    console.log("informations1");
     var obj;
     var token = window.localStorage.getItem('token');
     var d = new Date();
@@ -147,6 +148,7 @@ let informations = new Promise(function(resolve, reject) {
         xmlHttp.onreadystatechange = function() {
             if (xmlHttp.readyState === XMLHttpRequest.DONE){
                 if(xmlHttp.status === 200){
+                    console.log("informations2");
                     var response = xmlHttp.response;
                     console.log("XML response: " + response);
                     obj = JSON.parse(response);
@@ -244,6 +246,7 @@ class Profile extends React.Component {
         reports: [
             {user_occurrence_title: ''}],
         hasPhoto: true,
+        s: true,
     };
 
     loadInformations = () =>{
@@ -373,21 +376,95 @@ class Profile extends React.Component {
         return event.target.value == this.state.newpass;
     };
 
+    // componentDidUpdate () {
+    //     console.log("update");
+    //     if(this.state.s){
+    //         this.setState({s: false});
+    //         this.setState({email: 'ana'});
+    //     }
+    //     else{
+    //         this.setState({s: true});
+    //         this.setState({email: 'outro'});
+    //     }
+    //
+    // }
+
     componentDidMount () {
+        console.log("componentdidmount");
+        this.setState({s: !this.state.s});
         var token = window.localStorage.getItem('token');
 
         if(token != null){
+            console.log("cdm2");
             var uname = JSON.parse(token).username;
             this.setState({username: uname});
             this.setState({firstLetter: uname.charAt(0)});
 
+            console.log("cdm3");
 
-            informations.then((obj) => {
+            console.log("informations1");
+            var obj;
+            var token = window.localStorage.getItem('token');
+            var d = new Date();
+            var t = d.getTime();
+            // var expirationData = JSON.parse(token).expirationData;
+            // console.log(token);
+            // console.log(t);
+            // console.log(expirationData);
+
+            if(token != null){
+                var uname = JSON.parse(token).username;
+                var tokenObj = JSON.parse(token);
+
+                var user = {
+                    "username": uname,
+                    "token": tokenObj
+                }
+
+                var xmlHttp = new XMLHttpRequest();
+                xmlHttp.open( "POST", "https://custom-tine-204615.appspot.com/rest/profile/", true);
+                xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+                var myJSON = JSON.stringify(user);
+                xmlHttp.send(myJSON);
+
+                xmlHttp.onreadystatechange = function() {
+                    if (xmlHttp.readyState === XMLHttpRequest.DONE){
+                        if(xmlHttp.status === 200){
+                            console.log("informations2");
+                            var response = xmlHttp.response;
+                            console.log("XML response: " + response);
+                            obj = JSON.parse(response);
+                            console.log(obj);
+
+                            console.log(uname.charAt(0));
+
+                            // resolve(obj);
+                        }
+
+                        else{
+                            console.log("tempo expirado");
+                            window.localStorage.removeItem('token');
+                            // document.getElementById("tologin").click();
+                        }
+                    }
+                }.bind(this)
+            }
+            else {
+                console.log("Sem sessao iniciada");
+                // document.getElementById("tologin").click();
+            }
+
+
+                // informations.then((obj) => {
+                console.log("cdm4");
                 this.setState({email: obj.user_email});
                 this.setState({name: obj.user_name});
                 this.setState({role: obj.user_role});
-            });
+                console.log(this.state.name + " " + this.state.email + " " + this.state.role);
+                console.log(obj);
+            // });
             xmlRequest.then((value) =>{
+                console.log("cdm5");
                 if(value != undefined && value.length != 0){
                     this.setState({reports: value});
                     // if(this.isMounted())
@@ -405,23 +482,23 @@ class Profile extends React.Component {
                 console.log(this.state.reports);
             });
 
-            var url = 'https://storage.googleapis.com/custom-tine-204615.appspot.com/user/' + uname + '/photo' ;
-
-            var image = new Image();
-
-            image.onload = function () {
-                this.setState({hasPhoto: true});
-                this.setState({photo: url});
-            }.bind(this);
-
-            image.onerror = function () {
-                this.setState({hasPhoto: false});
-            }.bind(this);
-
-            image.src = url;
-
-            console.log("hasphoto:");
-            console.log(this.state.hasPhoto);
+            // var url = 'https://storage.googleapis.com/custom-tine-204615.appspot.com/user/' + uname + '/photo' ;
+            //
+            // var image = new Image();
+            //
+            // image.onload = function () {
+            //     this.setState({hasPhoto: true});
+            //     this.setState({photo: url});
+            // }.bind(this);
+            //
+            // image.onerror = function () {
+            //     this.setState({hasPhoto: false});
+            // }.bind(this);
+            //
+            // image.src = url;
+            //
+            // console.log("hasphoto:");
+            // console.log(this.state.hasPhoto);
         }
         else{
             document.getElementById("tologin").click();

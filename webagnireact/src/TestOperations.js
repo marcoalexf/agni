@@ -5,6 +5,7 @@ import Async from 'react-promise';
 import operationsData from './operationsData';
 import Radio, { RadioGroup } from 'material-ui/Radio';
 import InfoIcon from '@material-ui/icons/EventNote';
+import WarningIcon from '@material-ui/icons/Error';
 import IconButton from 'material-ui/IconButton';
 import UpdateListIcon from '@material-ui/icons/Cached';
 import Toolbar from 'material-ui/Toolbar';
@@ -15,6 +16,7 @@ import grey from 'material-ui/colors/grey';
 import green from 'material-ui/colors/lightGreen';
 import red from 'material-ui/colors/red';
 import amber from 'material-ui/colors/amber';
+import yellow from 'material-ui/colors/yellow';
 import {withStyles} from "material-ui/styles/index";
 import {Link} from "react-router-dom";
 
@@ -228,7 +230,7 @@ class TestOperations extends React.Component {
         object: [
             {user_occurrence_title: ''}],
         page: 0,
-        rowsPerPage: 10,
+        rowsPerPage: 5,
     };
 
     componentDidMount () {
@@ -246,6 +248,19 @@ class TestOperations extends React.Component {
 
     handleChangeRowsPerPage = event => {
         this.setState({ rowsPerPage: event.target.value });
+    };
+
+    colorByLevel = (level) => {
+        if(level==1)
+            return green[700];
+        else if(level==2)
+            return green[500];
+        else if(level==3)
+            return yellow[600];
+        else if(level ==4)
+            return amber[700];
+        else
+            return red[600];
     };
 
     render () {
@@ -277,9 +292,10 @@ class TestOperations extends React.Component {
                                     <TableCell>{n.user_occurrence_title}</TableCell>
                                     <TableCell>{n.user_occurrence_type}</TableCell>
                                     <TableCell>{n.user_occurrence_data}</TableCell>
-                                    <TableCell>{'nao tratado'}</TableCell>
+                                    <TableCell>nao tratado</TableCell>
                                     <TableCell numeric
-                                               className={classes.severe}>
+                                               style={{color: this.colorByLevel(n.user_occurrence_level)}}>
+                                        <WarningIcon color={this.colorByLevel(n.user_occurrence_level)}/>
                                         {n.user_occurrence_level}</TableCell>
                                     <TableCell>{n.user_occurrence_visibility ? 'publico' : 'privado'}</TableCell>
                                 </TableRow>

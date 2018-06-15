@@ -29,7 +29,7 @@ import ThankYou from './ThankYou';
 import Operations from './Operations';
 import TestOperations from './TestOperations';
 import Map from './Map';
-import MapTwo from './MapTwo';
+import MapTwo from './MapFour';
 import Statistics from './Statistics';
 import Operation from './InfoOperationTwo';
 import AboutUs from './AboutUs';
