@@ -132,6 +132,9 @@ const styles = theme => ({
     popperClose: {
         pointerEvents: 'none',
     },
+    input: {
+        display: 'none',
+    },
 });
 
 class MiniDrawer extends React.Component {
@@ -196,6 +199,7 @@ class MiniDrawer extends React.Component {
                         console.log("XML response: " + response);
                         //window.localStorage.removeItem('token');
                         console.log("sucesso");
+                        document.getElementById("tologin").click();
                         // document.location.href = '/login';
                     }
                     else{
@@ -295,6 +299,10 @@ class MiniDrawer extends React.Component {
                     <List>{mainMenuListItems}</List>
                     <Divider />
                     <List>{logoutItem}</List>
+
+                    <Button id={"tologin"} component={Link} to='/login' className={classes.input} color={"primary"}>
+                        Sem sessao iniciada
+                    </Button>
                 </Drawer>
                 <main className={classes.content}>
                     <div className={classes.toolbar} />
