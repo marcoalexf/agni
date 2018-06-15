@@ -27,7 +27,8 @@ import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Transaction;
 import com.google.appengine.api.datastore.TransactionOptions;
-import com.google.appengine.api.datastore.Query.Filter;
+import com.google.appengine.api.datastore.Query.CompositeFilter;
+import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.QueryResultList;
@@ -39,6 +40,10 @@ import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceDeleteDat
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceEditData;
 import pt.unl.fct.di.apdc.firstwebapp.util.CursorList;
 import pt.unl.fct.di.apdc.firstwebapp.util.SecurityManager;
+import pt.unl.fct.di.apdc.firstwebapp.util.geocalc.BoundingArea;
+import pt.unl.fct.di.apdc.firstwebapp.util.geocalc.Coordinate;
+import pt.unl.fct.di.apdc.firstwebapp.util.geocalc.EarthCalc;
+import pt.unl.fct.di.apdc.firstwebapp.util.geocalc.Point;
 
 @Path("/occurrence")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -83,6 +88,7 @@ public class OccurrenceResource {
 			// Create occurrence media entities
 			if(data.uploadMedia) {
 				List<Entity> mediaEntities = new LinkedList<Entity>();
+				List<Entity> uploadEntities = new LinkedList<Entity>();
 				List<Long> uploadMediaIDs = new LinkedList<Long>();
 				Entity occurrenceMediaEntity;
 				long occurrenceID = occurrenceEntity.getKey().getId();
@@ -96,11 +102,14 @@ public class OccurrenceResource {
 							data.visibility,
 							false
 							);
-					uploadMediaIDs.add(fileUpload.getKey().getId());
-					mediaEntities.add(fileUpload);
+					uploadEntities.add(fileUpload);
 				}
 				datastore.put(txn, mediaEntities);
+				datastore.put(txn, uploadEntities);
 				txn.commit();
+				for(Entity uploadEntity: uploadEntities) {
+					uploadMediaIDs.add(uploadEntity.getKey().getId());
+				}
 				LOG.info("User " + data.token.username + " registered occurrence " + data.title);
 				return Response.ok(g.toJson(uploadMediaIDs)).build();
 			}
@@ -115,46 +124,6 @@ public class OccurrenceResource {
 			}
 		}
 	}
-	
-
-	/**@POST
-	@Path("/register")
-	@Consumes(MediaType.MULTIPART_FORM_DATA + ";charset=utf-8")
-	public Response registerOccurrence(@FormDataParam("data") FormDataBodyPart rawData, @FormDataParam("file") FormDataBodyPart file) {
-		rawData.setMediaType(MediaType.APPLICATION_JSON_TYPE);
-		OccurrenceData data = rawData.getValueAs(OccurrenceData.class);
-		LOG.fine("Attempt to register ocurrence: " + data.title + " by user: " + data.token.username);
-		if(!data.token.isTokenValid()) {
-			LOG.warning("Failed to register occurrence, token for user: " + data.token.username + "is invalid");
-			return Response.status(Status.FORBIDDEN).build();
-		}
-		String fileContentType = file.getMediaType().toString();
-		if(fileContentType != "image/png" && fileContentType != "image/jpeg" && fileContentType != "image/svg+xml" && fileContentType != "video/x-flv" && fileContentType != "video/mp4" && fileContentType != "video/3gpp" && fileContentType != "video/quicktime" && fileContentType != "video/x-msvideo" && fileContentType != "video/x-ms-wmv" && fileContentType != "video/webm") {
-			return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
-		}
-		Transaction txn = datastore.beginTransaction();
-		try {
-			Key userKey = KeyFactory.createKey("User", data.token.username);
-			
-			// Save occurrence
-			Entity occurrenceEntity = new Entity("UserOccurrence", userKey);
-			occurrenceEntity.setProperty("user_occurrence_title", data.title);
-			occurrenceEntity.setProperty("user_occurrence_data", new Date());
-			occurrenceEntity.setProperty("user_occurrence_type", data.type);
-			occurrenceEntity.setProperty("user_occurrence_level", data.level);
-			occurrenceEntity.setProperty("user_occurrence_visibility", data.visibility);
-			// TODO occurrenceEntity.setProperty("user_occurrence_media", ????);
-			datastore.put(occurrenceEntity);
-			
-			txn.commit();
-			LOG.info("User " + data.token.username + " registered occurrence " + data.title);
-			return Response.ok().build();
-		} finally {
-			if (txn.isActive() ) {
-				txn.rollback();
-			}
-		}
-	}**/
 	
 	@POST
 	@Path("/list")
@@ -174,12 +143,31 @@ public class OccurrenceResource {
 			Key userKey = KeyFactory.createKey("User", data.username);
 			ctrQuery.setAncestor(userKey);
 		}
+		FilterPredicate visibilityFilter = null;
 		if(!data.showPrivate) {
-			Filter propertyFilter = new FilterPredicate("user_occurrence_visibility", FilterOperator.EQUAL, true);
-			ctrQuery.setFilter(propertyFilter);
+			visibilityFilter = new FilterPredicate("user_occurrence_visibility", FilterOperator.EQUAL, true);
+			ctrQuery.setFilter(visibilityFilter);
 		}
 		else if(!data.token.username.equals(data.username) && !SecurityManager.userHasAccess("see_private_occurrences", data.token.username)) {
 			return Response.status(Status.FORBIDDEN).build();
+		}
+		if(data.lat != null && data.lon != null) {
+			Point geoPoint = Point.at(Coordinate.fromDegrees(data.lat), Coordinate.fromDegrees(data.lon));
+			BoundingArea area = EarthCalc.around(geoPoint, data.radius);
+			Point nw = area.northWest;
+			Point se = area.southEast;
+			FilterPredicate geoFilterUpperLat = new FilterPredicate("user_occurrence_lat", FilterOperator.LESS_THAN_OR_EQUAL, nw.latitude);
+			FilterPredicate geoFilterLowerLat = new FilterPredicate("user_occurrence_lat", FilterOperator.GREATER_THAN_OR_EQUAL, se.latitude);
+			FilterPredicate geoFilterLeftmostLon = new FilterPredicate("user_occurrence_lon", FilterOperator.GREATER_THAN_OR_EQUAL, nw.longitude);
+			FilterPredicate geoFilterRightmostLon = new FilterPredicate("user_occurrence_lon", FilterOperator.LESS_THAN_OR_EQUAL, se.longitude);
+			CompositeFilter compositeFilter;
+			if(visibilityFilter != null) {
+				compositeFilter = CompositeFilterOperator.and(visibilityFilter, geoFilterUpperLat, geoFilterLowerLat, geoFilterLeftmostLon, geoFilterRightmostLon);
+			}
+			else {
+				compositeFilter = CompositeFilterOperator.and(geoFilterUpperLat, geoFilterLowerLat, geoFilterLeftmostLon, geoFilterRightmostLon);
+			}
+			ctrQuery.setFilter(compositeFilter);
 		}
 		Map<String, Object> occurrenceMap;
 		FetchOptions fetchOptions = FetchOptions.Builder.withLimit(QUERY_LIMIT);
