@@ -13,14 +13,19 @@ import {withStyles} from "material-ui/styles/index";
 import newsData from './newsData';
 
 const styles = theme => ({
-    paper:theme.mixins.gutters({
-        width: 600,
-        padding: 40,
-        margin: 20,
-        display: 'inline-block',
-    }),
-    table: {
-
+    root: {
+        display: 'flex',
+        flexWrap: 'wrap',
+        justifyContent: 'space-around',
+        overflow: 'hidden',
+        backgroundColor: theme.palette.background.paper,
+    },
+    gridList: {
+        width: 500,
+        height: 450,
+    },
+    icon: {
+        color: 'rgba(255, 255, 255, 0.54)',
     },
 });
 
@@ -32,9 +37,10 @@ class NewsTwo extends Component {
         const { classes } = this.props;
 
         return (
-            <div className="Home">
-                <Paper className={classes.paper} style={{backgroundColor: '#f2f2f2'}} >
-                    <Typography variant="display1">Noticias</Typography>
+            <div>
+                <Typography variant="display1">Noticias</Typography>
+            <div className={classes.root}>
+                {/*<Paper className={classes.paper} style={{backgroundColor: '#f2f2f2'}} >*/}
                     <GridList cellHeight={180} className={classes.gridList}>
                         <GridListTile key="Subheader" cols={2} style={{ height: 'auto' }}>
                             <Subheader component="div">Abril</Subheader>
@@ -65,8 +71,32 @@ class NewsTwo extends Component {
                             </GridListTile>
                         ))}
                     </GridList>
-                </Paper>
+                {/*</Paper>*/}
 
+            </div>
+
+                <div className={classes.root}>
+                    <GridList cellHeight={180} className={classes.gridList}>
+                        <GridListTile key="Subheader" cols={2} style={{ height: 'auto' }}>
+                            <Subheader component="div">Maio</Subheader>
+                        </GridListTile>
+                        {newsData.map(news => (
+                            <GridListTile key={news.img}>
+                                <img src={news.img} alt={news.title} />
+                                <GridListTileBar
+                                    title={news.title}
+                                    subtitle={<span>by: {news.author}</span>}
+                                    actionIcon={
+                                        <IconButton className={classes.icon}>
+                                            <StarBorderIcon />
+                                        </IconButton>
+                                    }
+                                />
+                            </GridListTile>
+                        ))}
+                    </GridList>
+
+                </div>
             </div>
 
         );

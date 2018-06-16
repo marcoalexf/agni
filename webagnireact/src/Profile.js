@@ -455,14 +455,14 @@ class Profile extends React.Component {
             }
 
 
-                // informations.then((obj) => {
+            informations.then((obj) => {
                 console.log("cdm4");
                 this.setState({email: obj.user_email});
                 this.setState({name: obj.user_name});
                 this.setState({role: obj.user_role});
                 console.log(this.state.name + " " + this.state.email + " " + this.state.role);
                 console.log(obj);
-            // });
+            });
             xmlRequest.then((value) =>{
                 console.log("cdm5");
                 if(value != undefined && value.length != 0){
@@ -482,23 +482,23 @@ class Profile extends React.Component {
                 console.log(this.state.reports);
             });
 
-            // var url = 'https://storage.googleapis.com/custom-tine-204615.appspot.com/user/' + uname + '/photo' ;
-            //
-            // var image = new Image();
-            //
-            // image.onload = function () {
-            //     this.setState({hasPhoto: true});
-            //     this.setState({photo: url});
-            // }.bind(this);
-            //
-            // image.onerror = function () {
-            //     this.setState({hasPhoto: false});
-            // }.bind(this);
-            //
-            // image.src = url;
-            //
-            // console.log("hasphoto:");
-            // console.log(this.state.hasPhoto);
+            var url = 'https://storage.googleapis.com/custom-tine-204615.appspot.com/user/' + uname + '/photo' ;
+
+            var image = new Image();
+
+            image.onload = function () {
+                this.setState({hasPhoto: true});
+                this.setState({photo: url});
+            }.bind(this);
+
+            image.onerror = function () {
+                this.setState({hasPhoto: false});
+            }.bind(this);
+
+            image.src = url;
+
+            console.log("hasphoto:");
+            console.log(this.state.hasPhoto);
         }
         else{
             document.getElementById("tologin").click();
