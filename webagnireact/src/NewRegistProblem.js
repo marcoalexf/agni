@@ -122,6 +122,7 @@ class NewRegistProblem extends React.Component {
     constructor(){
         super();
         this.handleSeeIfLoggedIn = this.handleSeeIfLoggedIn.bind(this);
+        this.getLocation = this.getLocation.bind(this);
     }
     state = {
         name: 'Nome do Registo do Problema',
@@ -135,7 +136,38 @@ class NewRegistProblem extends React.Component {
         location: '',
         open: false,
         privateSpace: false,
+        myLatLng: {
+            lat: 49.2827,
+            lng: -123.1207
+        },
     };
+
+    componentDidMount(){
+        this.getLocation();
+    }
+
+    getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((position) => {
+                this.setState({
+                        myLatLng: {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        }
+                    }
+                );
+            })
+        } else {
+            //browser doesn't support geolocation, set as vancouver
+            this.setState({
+                    myLatLng: {
+                        lat: 49.8527,
+                        lng: -123.1207
+                    }
+                }
+            );
+        }
+    }
 
     handleChange = name => event => {
         this.setState({
@@ -289,19 +321,19 @@ class NewRegistProblem extends React.Component {
                                         onChange={this.handleChange('location')}
                                         className={classes.textField}
                                     />
-                                    <Button variant="fab" mini className={classes.searchButton}> <SearchIcon/> </Button>
+                                    <Button variant="fab" mini className={classes.searchButton} onClick={this.getLocation()}> <SearchIcon/> </Button>
                                 </div>
 
                                 <div className={classes.map} style={{ height: '50vh', width: '100%' }}>
                                     <GoogleMapReact
                                         bootstrapURLKeys={{ key: 'AIzaSyAM-jV8q7-FWs7RdP0G4cH938jWgQwlGVo' }}
-                                        defaultCenter={this.props.center}
+                                        center={this.state.myLatLng}
                                         defaultZoom={this.props.zoom}
                                     >
-                                        <AnyReactComponent
-                                            lat={38.661453}
-                                            lng={-9.206618}
-                                        />
+                                        {/*<AnyReactComponent*/}
+                                            {/*lat={38.661453}*/}
+                                            {/*lng={-9.206618}*/}
+                                        {/*/>*/}
                                     </GoogleMapReact>
                                 </div>
                             </TableCell>

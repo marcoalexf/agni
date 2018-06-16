@@ -84,7 +84,15 @@ class RegistProblem extends React.Component {
         location: '',
         open: false,
         privateSpace: false,
+        myLatLng: {
+            lat: 49.2827,
+            lng: -123.1207
+        }
     };
+
+    componentDidMount(){
+        this.getLocation();
+    }
 
     handleChange = name => event => {
         this.setState({
@@ -193,6 +201,29 @@ class RegistProblem extends React.Component {
 
     };
 
+    getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((position) => {
+                this.setState({
+                        myLatLng: {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        }
+                    }
+                );
+            })
+        } else {
+            //browser doesn't support geolocation, set as vancouver
+            this.setState({
+                    myLatLng: {
+                        lat: 49.8527,
+                        lng: -123.1207
+                    }
+                }
+            );
+        }
+    }
+
     static defaultProps = {
         center: {
             lat: 38.661453,
@@ -245,7 +276,7 @@ class RegistProblem extends React.Component {
                         <div className={classes.map} style={{ height: '30vh', width: '100%' }}>
                             <GoogleMapReact
                                 bootstrapURLKeys={{ key: 'AIzaSyAM-jV8q7-FWs7RdP0G4cH938jWgQwlGVo' }}
-                                defaultCenter={this.props.center}
+                                defaultCenter={this.state.myLatLng}
                                 defaultZoom={this.props.zoom}
                             >
                                 <AnyReactComponent

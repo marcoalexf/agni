@@ -16,6 +16,7 @@ import {
     Rectangle,
 } from 'react-leaflet';
 import PropTypes from 'prop-types';
+import GpsIcon from '@material-ui/icons/LocationSearching';
 
 const { BaseLayer, Overlay } = LayersControl;
 
@@ -154,6 +155,28 @@ export default class SimpleExample extends Component {
                 console.log(this.state.object);
             }
         );
+
+        this.getLocation();
+    }
+
+    getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((position) => {
+                this.setState({
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                    }
+                );
+            })
+        } else {
+            //browser doesn't support geolocation, set as vancouver
+            this.setState({
+                        lat: 38.66,
+                        lng: -9.20
+
+                }
+            );
+        }
     }
 
     iconWithLevel = (level) => {
@@ -212,6 +235,7 @@ export default class SimpleExample extends Component {
         return (
             <div>
                 <EnhancedTableToolbar></EnhancedTableToolbar>
+
                 <Map center={position} zoom={this.state.zoom}>
                     <LayersControl position="topright">
                         <BaseLayer checked name="Cores">
@@ -309,6 +333,8 @@ export default class SimpleExample extends Component {
                         </Overlay>
                     </LayersControl>
                 </Map>
+
+                <IconButton onClick={this.getLocation()}><GpsIcon/></IconButton> Ir para localização atual
             </div>
         )
     }
