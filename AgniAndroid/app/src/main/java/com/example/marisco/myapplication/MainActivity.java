@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements Serializable{
     @BindView(R.id.login_button) Button login_button;
     @BindView(R.id.register_button) Button register_button;
     @BindView(R.id.save_credentials) CheckBox save_credentials;
+    @BindView(R.id.forgot_password) TextView forgot_password;
 
     RelativeLayout rellay1;
     Handler handler = new Handler();
@@ -93,6 +94,14 @@ public class MainActivity extends AppCompatActivity implements Serializable{
                     editor.apply();
                 }
                 loginUser(username_input.getText().toString(), password_input.getText().toString());
+            }
+        });
+
+        this.forgot_password.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                Toast toast = Toast.makeText(getApplicationContext(), "Estudasses :|", Toast.LENGTH_LONG);
+                toast.show();
             }
         });
 
