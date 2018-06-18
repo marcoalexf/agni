@@ -13,7 +13,7 @@
     <TextView
         android:layout_width="220dp"
         android:text="@string/minimum_level"
-        android:textSize="25dp"
+        android:textSize="25sp"
         android:textStyle="bold"
         android:textColor="@android:color/black"
         android:layout_marginBottom="15dp"
@@ -60,7 +60,7 @@
     <TextView
         android:layout_width="match_parent"
         android:text="@string/occurrence_type"
-        android:textSize="25dp"
+        android:textSize="25sp"
         android:textStyle="bold"
         android:textColor="@android:color/black"
         android:layout_marginBottom="15dp"
@@ -91,15 +91,15 @@
     <LinearLayout
         android:id="@+id/LinearLayout02"
         android:layout_height="wrap_content"
-        android:layout_width="fill_parent"
-        android:layout_alignParentBottom="true">
+        android:layout_width="fill_parent">
 
         <Button
             android:id="@+id/btnApply"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/apply">
+            android:text="@string/apply"
+            style="?android:attr/borderlessButtonStyle">
         </Button>
 
         <Button
@@ -107,7 +107,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/cancel">
+            android:text="@string/cancel"
+            style="?android:attr/borderlessButtonStyle">
         </Button>
     </LinearLayout>
 </LinearLayout>

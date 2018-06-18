@@ -71,6 +71,10 @@
     <string name="occurrence_type_other">Other</string>
 
     <string name="map">Map</string>
+    <string name="new_saved_location">Save location</string>
+    <string name="save">Save</string>
+    <string name="nameOfLocation">Name of the location to save</string>
+    <string name="currentLocation">Current location</string>
 
     <string name="list_occurrences">List occurrences</string>
 

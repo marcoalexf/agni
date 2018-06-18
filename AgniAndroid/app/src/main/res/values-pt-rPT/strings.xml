@@ -59,6 +59,11 @@
 
 
     <string name="map">Mapa</string>
+    <string name="new_saved_location">Guardar localização</string>
+    <string name="save">Guardar</string>
+    <string name="nameOfLocation">Nome da localização a guardar</string>
+    <string name="currentLocation">Localização atual</string>
+
 
     <string name="list_occurrences">Listar ocorrências</string>
 
