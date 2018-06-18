@@ -8,6 +8,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,17 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import org.json.JSONObject;
+
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -50,6 +62,7 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback, 
 
     private Retrofit retrofit;
     private LoginResponse token;
+    private File photoFile;
 
     @BindView(R.id.occurence_title)
     EditText title;
@@ -101,6 +114,7 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback, 
         Bundle b = this.getArguments();
         if (b != null) {
             this.token = (LoginResponse) b.getSerializable(TOKEN);
+            this.photoFile = (File) b.getSerializable("PHOTO");
         }
 
         map.onCreate(savedInstanceState);
@@ -201,8 +215,14 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback, 
 
         double lat = mp.getPosition().latitude, lon = mp.getPosition().longitude;
 
-        OccurrenceData data = new OccurrenceData(token, occ_title, occ_description, occ_type, level,
-                visibility, lat, lon, notificationOn);
+        OccurrenceData data = null;
+        if(this.photoFile != null){
+            data = new OccurrenceData(token, occ_title, occ_description, occ_type, level,
+                    visibility, lat, lon, notificationOn, true, 1);
+        }else{
+            data = new OccurrenceData(token, occ_title, occ_description, occ_type, level,
+                    visibility, lat, lon, notificationOn, false, 0);
+        }
 
         if (retrofit == null) {
             retrofit = new Retrofit.Builder()
@@ -211,34 +231,113 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback, 
                     .build();
         }
 
-        AgniAPI agniAPI = retrofit.create(AgniAPI.class);
-        Call <ResponseBody> call = agniAPI.registerOccurrence(data);
+        final AgniAPI agniAPI = retrofit.create(AgniAPI.class);
+        final List<Long> list_of_ids_to_upload_to = new ArrayList<>();
 
-        call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if(response.code() == 200){
-                    Toast toast = Toast.makeText(getActivity(), "Nova ocorrência registada"
-                            , Toast.LENGTH_SHORT);
-                    toast.show();
-                }
-                else {
-                    try{
-                        Toast toast = Toast.makeText(getActivity(), "Código de erro: " + response.code(), Toast.LENGTH_SHORT);
+        if(data.getUploadMedia()){
+            Log.d("UPLOADING SHIT", "UPLOADING SHIT");
+            Call <MediaUploadResponse> call = agniAPI.registerOccurrencePhoto(data);
+
+            call.enqueue(new Callback<MediaUploadResponse>() {
+                @Override
+                public void onResponse(Call<MediaUploadResponse> call, Response<MediaUploadResponse> response) {
+                    if(response.code() == 200){
+                        Toast toast = Toast.makeText(getActivity(), "Nova ocorrência registada"
+                                , Toast.LENGTH_SHORT);
                         toast.show();
-                    } catch (Exception e){
-                        Toast toast = Toast.makeText(getActivity(), "excecao", Toast.LENGTH_SHORT);
-                        toast.show();
+
+                        list_of_ids_to_upload_to.addAll(response.body().getList());
+
+                        for(Long l : list_of_ids_to_upload_to){
+                            Log.d("ID: " , l.toString());
+                        }
+
+                        uploadPhoto(photoFile, agniAPI, list_of_ids_to_upload_to);
+                    }
+                    else {
+                        try{
+                            Toast toast = Toast.makeText(getActivity(), "Código de erro: " + response.code(), Toast.LENGTH_SHORT);
+                            toast.show();
+                        } catch (Exception e){
+                            Toast toast = Toast.makeText(getActivity(), "excecao", Toast.LENGTH_SHORT);
+                            toast.show();
+                        }
                     }
                 }
+
+                @Override
+                public void onFailure(Call<MediaUploadResponse> call, Throwable t) {
+                    Toast toast = Toast.makeText(getActivity(), "Failed", Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+            });
+        }else{
+            Call <ResponseBody> call = agniAPI.registerOccurrence(data);
+
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    if(response.code() == 200){
+                        Toast toast = Toast.makeText(getActivity(), "Nova ocorrência registada"
+                                , Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
+                    else {
+                        try{
+                            Toast toast = Toast.makeText(getActivity(), "Código de erro: " + response.code(), Toast.LENGTH_SHORT);
+                            toast.show();
+                        } catch (Exception e){
+                            Toast toast = Toast.makeText(getActivity(), "excecao", Toast.LENGTH_SHORT);
+                            toast.show();
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    Toast toast = Toast.makeText(getActivity(), "Failed", Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+            });
+        }
+    }
+
+    public void uploadPhoto(File photoFile, AgniAPI agniAPI, List<Long> list_of_ids_to_upload_to){
+        Long id = list_of_ids_to_upload_to.get(0);
+
+        /*
+        Now we need to do this:
+            - Make a call to the endpoint in the form /upload/{id}
+            - In this endpoint we just send a POST that it's payload is the bytes from the file
+
+           And that's it!
+         */
+
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                try {
+                    Call <ResponseBody> call = agniAPI.uploadPhoto(id, Files.readAllBytes(photoFile.toPath()));
+
+                    call.enqueue(new Callback<ResponseBody>() {
+                        @Override
+                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                            if(response.isSuccessful()){
+                                Toast toast = Toast.makeText(getActivity(), "Photo successfully uploaded", Toast.LENGTH_SHORT);
+                                toast.show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+                            Toast toast = Toast.makeText(getActivity(), "Failed to upload photo", Toast.LENGTH_SHORT);
+                            toast.show();
+                        }
+                    });
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
 
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Toast toast = Toast.makeText(getActivity(), "Failed", Toast.LENGTH_SHORT);
-                toast.show();
-            }
-        });
     }
 
     @Override

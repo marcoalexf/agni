@@ -21,9 +21,14 @@ public class OccurrenceData {
 	@SerializedName("lon") double lon;
 
 	@SerializedName("notificationOnResolve") boolean notificationOnResolve;
+
+	@SerializedName("uploadMedia") boolean uploadMedia;
+
+	@SerializedName("nUploads") int nUploads;
+
 	
 	public OccurrenceData(LoginResponse token, String title, String description, String type, int level,
-			boolean visibility, double lat, double lon, boolean notificationOnResolve) {
+			boolean visibility, double lat, double lon, boolean notificationOnResolve, boolean uploadMedia, int nUploads) {
 		this.token = token;
 		this.title = title;
 		this.description = description;
@@ -33,6 +38,8 @@ public class OccurrenceData {
 		this.lat = lat;
 		this.lon = lon;
 		this.notificationOnResolve = notificationOnResolve;
+		this.uploadMedia = uploadMedia;
+		this.nUploads = nUploads;
 	}
 
 	public LoginResponse getToken() {
@@ -105,5 +112,9 @@ public class OccurrenceData {
 
 	public void setNotificationOnResolve(boolean notificationOnResolve) {
 		this.notificationOnResolve = notificationOnResolve;
+	}
+
+	public boolean getUploadMedia(){
+		return this.uploadMedia;
 	}
 }
