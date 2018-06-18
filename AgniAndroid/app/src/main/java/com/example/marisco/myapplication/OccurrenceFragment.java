@@ -217,9 +217,11 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback, 
 
         OccurrenceData data = null;
         if(this.photoFile != null){
+            Log.d("PHOTO", "IS NOT NULL");
             data = new OccurrenceData(token, occ_title, occ_description, occ_type, level,
                     visibility, lat, lon, notificationOn, true, 1);
         }else{
+            Log.d("PHOTO", "IS NULL");
             data = new OccurrenceData(token, occ_title, occ_description, occ_type, level,
                     visibility, lat, lon, notificationOn, false, 0);
         }
@@ -235,24 +237,19 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback, 
         final List<Long> list_of_ids_to_upload_to = new ArrayList<>();
 
         if(data.getUploadMedia()){
-            Log.d("UPLOADING SHIT", "UPLOADING SHIT");
             Call <MediaUploadResponse> call = agniAPI.registerOccurrencePhoto(data);
-
+            Log.d("UPLOADING SHIT", "UPLOADING SHIT");
             call.enqueue(new Callback<MediaUploadResponse>() {
                 @Override
                 public void onResponse(Call<MediaUploadResponse> call, Response<MediaUploadResponse> response) {
                     if(response.code() == 200){
-                        Toast toast = Toast.makeText(getActivity(), "Nova ocorrência registada"
+                        Toast toast = Toast.makeText(getActivity(), "Nova ocorrência registada, como foto"
                                 , Toast.LENGTH_SHORT);
                         toast.show();
 
                         list_of_ids_to_upload_to.addAll(response.body().getList());
-
-                        for(Long l : list_of_ids_to_upload_to){
-                            Log.d("ID: " , l.toString());
-                        }
-
                         uploadPhoto(photoFile, agniAPI, list_of_ids_to_upload_to);
+
                     }
                     else {
                         try{
@@ -304,6 +301,7 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback, 
 
     public void uploadPhoto(File photoFile, AgniAPI agniAPI, List<Long> list_of_ids_to_upload_to){
         Long id = list_of_ids_to_upload_to.get(0);
+        Log.d("UPLOADING SHIT", "ENTERED THE UPLOAD PHOTO METHOD");
 
         /*
         Now we need to do this:
@@ -314,7 +312,7 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback, 
          */
 
 
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+
                 try {
                     Call <ResponseBody> call = agniAPI.uploadPhoto(id, Files.readAllBytes(photoFile.toPath()));
 
@@ -336,7 +334,7 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback, 
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            }
+
 
     }
 

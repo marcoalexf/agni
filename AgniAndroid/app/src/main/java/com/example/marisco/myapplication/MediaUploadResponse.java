@@ -6,7 +6,7 @@ import java.util.List;
 
 public class MediaUploadResponse {
 
-    @SerializedName("") List<Long> response;
+    @SerializedName("uploadMediaIDs") List<Long> response;
 
     public MediaUploadResponse(){
 
