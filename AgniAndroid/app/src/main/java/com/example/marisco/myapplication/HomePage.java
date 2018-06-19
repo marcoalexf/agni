@@ -26,6 +26,7 @@ import android.widget.TextView;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -94,6 +95,20 @@ public class HomePage extends AppCompatActivity
                         photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takePictureIntent, 1);
+
+                //Redirect to register occurence fragment
+                //With file inside the bundle, as well as the token (duh)
+                //Screen changes to register occurence fragment and now it has the photo
+
+                OccurrenceFragment of = new OccurrenceFragment();
+                FragmentManager fman = getSupportFragmentManager();
+                Bundle args = new Bundle();
+                args.putSerializable(TOKEN, token);
+
+                args.putSerializable("PHOTO", photoFile);
+
+                of.setArguments(args);
+                fman.beginTransaction().replace(R.id.fragment, of).commit();
             }
         }
 
@@ -141,6 +156,15 @@ public class HomePage extends AppCompatActivity
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+
+        if(id == R.id.action_sign_out){
+            Intent intent = new Intent(this, LogoutActivity.class);
+            intent.putExtra(TOKEN, token);
+            startActivity(intent);
+
+
+            return true;
+        }
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {

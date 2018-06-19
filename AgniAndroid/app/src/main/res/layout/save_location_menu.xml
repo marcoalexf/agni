@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:paddingLeft="50dp"
+    android:paddingRight="50dp"
+    android:paddingTop="25dp"
+    android:paddingBottom="25dp"
+    android:orientation="vertical"
+    android:background="@android:color/darker_gray"
+    android:alpha="0.9">
+
+    <EditText
+        android:id="@+id/locationName"
+        android:layout_width="match_parent"
+        android:hint="@string/nameOfLocation"
+        android:textSize="18sp"
+        android:textColor="@android:color/black"
+        android:layout_marginBottom="15dp"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:id="@+id/LinearLayout02"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent">
+
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/save"
+            style="?android:attr/borderlessButtonStyle">
+        </Button>
+
+        <Button
+            android:id="@+id/btnCancelSave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/cancel"
+            style="?android:attr/borderlessButtonStyle">
+        </Button>
+    </LinearLayout>
+</LinearLayout>

@@ -95,16 +95,20 @@ public class OccurrenceResource {
 				for(int i = 0; i < data.nUploads; i++) {
 					occurrenceMediaEntity = new Entity("UserOccurrenceMedia", occurrenceEntity.getKey());
 					mediaEntities.add(occurrenceMediaEntity);
+				}
+				datastore.put(txn, mediaEntities);
+				txn.commit();
+				txn = datastore.beginTransaction(options);
+				for(Entity mediaEntity : mediaEntities) {
 					Entity fileUpload = UploadResource.newUploadFileEntity(
 							"user/" + data.token.username + "/occurrence/" + occurrenceID + "/", 
-							String.valueOf(occurrenceMediaEntity.getKey().getId()), 
+							String.valueOf(mediaEntity.getKey().getId()), 
 							"IMAGE&VIDEO",
 							data.visibility,
 							false
 							);
 					uploadEntities.add(fileUpload);
 				}
-				datastore.put(txn, mediaEntities);
 				datastore.put(txn, uploadEntities);
 				txn.commit();
 				for(Entity uploadEntity: uploadEntities) {

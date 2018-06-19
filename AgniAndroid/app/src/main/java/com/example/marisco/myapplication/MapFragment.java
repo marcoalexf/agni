@@ -2,6 +2,8 @@ package com.example.marisco.myapplication;
 
 import  android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -10,15 +12,19 @@ import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.PopupMenu;
 import android.widget.PopupWindow;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -27,7 +33,12 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,13 +63,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private static final String LONGITUDE = "longitude";
     private static final String VISIBILITY = "visibility";
     private static final String LEVEL = "level";
+    private static final String SAVED_LOCATIONS = "saved_locations";
 
     private GoogleMap map;
     @BindView(R.id.mapView) MapView mapView;
     @BindView(R.id.filters_button) ImageButton filter_button;
+    @BindView(R.id.location_button) ImageButton location_button;
 
     private List<Map<String, Object>> map_list;
     private Retrofit retrofit;
+
+    private Marker locationMarker;
+
+    private List<SavedLocation> savedLocations;
 
     private Map<Marker, Map<String, Object>> marker_list;
 
@@ -75,12 +92,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         zoneIsChecked = true;
         otherIsChecked = true;
         marker_list = new HashMap<>();
+        savedLocations = new ArrayList<>(10);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
+        savedLocations = new ArrayList<>(10);
         this.inflater = inflater;
         this.container = container;
 
@@ -92,13 +110,31 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mapView.getMapAsync(this);
         requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
 
+        getSavedLocations();
+
         filter_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                popupWindow();
+                filtersWindow();
+            }
+        });
+
+        location_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                locationMenu();
             }
         });
         return v;
+    }
+
+    private void getSavedLocations(){
+        // load tasks from preference
+        SharedPreferences prefs = this.getActivity().getSharedPreferences(SAVED_LOCATIONS, Context.MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = prefs.getString(SAVED_LOCATIONS, null);
+        Type type = new TypeToken<ArrayList<SavedLocation>>() {}.getType();
+        savedLocations =  gson.fromJson(json, type);
     }
 
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) throws SecurityException{
@@ -114,8 +150,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                             if (initialLoc == null) {
                                 map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(),
                                         location.getLongitude()), 14));
-                                initialLoc = location;
                             }
+                            initialLoc = location;
                         }
                     });
                 } else {
@@ -159,7 +195,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap map) {
         this.map = map;
-        //map.getUiSettings().setMyLocationButtonEnabled(false);
+        map.setOnMapLongClickListener(
+                new GoogleMap.OnMapLongClickListener() {
+                    @Override
+                    public void onMapLongClick (LatLng latLng){
+                        mapPress(latLng);
+                    }});
+        map.getUiSettings().setMyLocationButtonEnabled(false);
         getOccurrences();
     }
 
@@ -194,7 +236,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mp.title((String) entry.get("user_occurrence_title"));
         Marker m = map.addMarker(mp);
 
-
         switch ((int) Math.round((double)entry.get("user_occurrence_level"))){
             case 1:
                 m.setIcon(BitmapDescriptorFactory
@@ -218,10 +259,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 break;
         }
         marker_list.put(m, entry);
-        if(entry == null ){
-            Toast toast = Toast.makeText(getActivity(), "entry é nula" , Toast.LENGTH_SHORT);
-            toast.show();
-        }
     }
 
     private void listOccurrenceDetails( Map<String, Object> entry){
@@ -242,7 +279,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    private void popupWindow() {
+    private void filtersWindow() {
         View popupView = inflater.inflate(R.layout.filter_menu, container, false);
         setRadioIds(popupView);
         final RadioGroup level_rb = popupView.findViewById(R.id.minimum_level_rb);
@@ -291,5 +328,99 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         popupView.findViewById(R.id.radio3).setId(3);
         popupView.findViewById(R.id.radio4).setId(4);
         popupView.findViewById(R.id.radio5).setId(5);
+    }
+
+    private void locationMenu(){
+        //Creating the instance of PopupMenu
+        PopupMenu popup = new PopupMenu(getContext(), location_button);
+        //Inflating the Popup using xml file
+        popup.getMenu().add(getResources().getString(R.string.currentLocation));
+        if(savedLocations != null){
+            //for(SavedLocation s: savedLocations)
+              //  popup.getMenu().add(s.getTitle());
+            for(int i = 1; i < savedLocations.size() +1; i++){
+                popup.getMenu().add(i, i, i, savedLocations.get(i-1).getTitle());
+            }
+
+        }
+        //registering popup with OnMenuItemClickListener
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            public boolean onMenuItemClick(MenuItem item) {
+                if(item.getOrder() == 0){
+                    CameraUpdate location = CameraUpdateFactory.newLatLngZoom(new LatLng(initialLoc.getLatitude(),
+                            initialLoc.getLongitude()), 15);
+                    map.animateCamera(location);
+                }else{
+                    CameraUpdate location = CameraUpdateFactory.newLatLngZoom(
+                            savedLocations.get(item.getOrder() -1).getLocation(), 15);
+                    map.animateCamera(location);
+                }
+                return true;
+            }
+        });
+        popup.show();
+    }
+
+
+    private void saveNewLocation(String title, LatLng location){
+        if(savedLocations == null)
+            savedLocations = new ArrayList<>();
+
+        savedLocations.add(new SavedLocation(title, location));
+
+        SharedPreferences prefs = this.getActivity().getSharedPreferences(SAVED_LOCATIONS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(savedLocations);
+        editor.putString(SAVED_LOCATIONS, json);
+        editor.apply();
+    }
+
+    private void mapPress(final LatLng location){
+        MarkerOptions mp = new MarkerOptions();
+        mp.position(location);
+        mp.title(getResources().getString(R.string.new_saved_location));
+        final Marker m = map.addMarker(mp);
+        m.setIcon(BitmapDescriptorFactory
+                .defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+
+        if(locationMarker != null)
+            locationMarker.remove();
+        locationMarker = m;
+
+        map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                final View popupView = inflater.inflate(R.layout.save_location_menu, container, false);
+                Button btnOk = (Button) popupView.findViewById(R.id.btnSave);
+                Button btnCancel = (Button) popupView.findViewById(R.id.btnCancelSave);
+
+                popupView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+                final PopupWindow popupWindow = new PopupWindow(popupView, popupView.getMeasuredWidth(), popupView.getMeasuredHeight(), true);
+                popupWindow.showAtLocation(popupView, Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL, 0, 0);
+                popupWindow.setOutsideTouchable(false);
+                popupWindow.setIgnoreCheekPress();
+
+                btnOk.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        EditText locationName = (EditText) popupView.findViewById(R.id.locationName);
+                        String name = locationName.getText().toString();
+                        if(name != null && name.length() > 0){
+                            saveNewLocation(name, location);
+                            popupWindow.dismiss();
+                            m.remove();
+                        }
+                    }
+                });
+                btnCancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        m.remove();
+                        popupWindow.dismiss();
+                    }
+                });
+            }
+        });
     }
 }
