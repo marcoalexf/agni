@@ -157,6 +157,15 @@ public class HomePage extends AppCompatActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        if(id == R.id.action_sign_out){
+            Intent intent = new Intent(this, LogoutActivity.class);
+            intent.putExtra(TOKEN, token);
+            startActivity(intent);
+
+
+            return true;
+        }
+
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;

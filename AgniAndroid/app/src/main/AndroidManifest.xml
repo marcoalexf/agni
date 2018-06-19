@@ -38,6 +38,7 @@
             android:value="AIzaSyBp0bNOT2mZzgY3afDIYZ7FZpbRtWvm4u4" />
 
         <activity android:name=".RegisterActivity"/>
+        <activity android:name=".LogoutActivity"/>
 
         <provider
             android:name="android.support.v4.content.FileProvider"
