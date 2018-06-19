@@ -91,7 +91,14 @@ class RegistProblem extends React.Component {
     };
 
     componentDidMount(){
-        this.getLocation();
+        var token = window.localStorage.getItem('token');
+
+        if(token != null){
+            this.getLocation();
+        }
+        else{
+            document.getElementById("tologin").click();
+        }
     }
 
     handleChange = name => event => {

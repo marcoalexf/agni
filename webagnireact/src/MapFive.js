@@ -17,6 +17,7 @@ import {
 } from 'react-leaflet';
 import PropTypes from 'prop-types';
 import GpsIcon from '@material-ui/icons/LocationSearching';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const { BaseLayer, Overlay } = LayersControl;
 
@@ -29,6 +30,10 @@ const styles = theme => ({
     },
     toolbartitle: {
         flex: '0 0 auto',
+    },
+    opName:{
+        fontFamily: 'Montserrat',
+        // fontSize: 48,
     },
 });
 
@@ -47,6 +52,15 @@ let EnhancedTableToolbar = props => {
                 )}
             </div>
             <div className={classes.spacer} />
+            <div className={classes.actions}>
+                {(
+                    <Tooltip title="Localizar por GPS">
+                        <IconButton aria-label="Localizar por GPS">
+                            <GpsIcon />
+                        </IconButton>
+                    </Tooltip>
+                )}
+            </div>
             <div className={classes.actions}>
                 {(
                     <Tooltip title="Atualizar mapa">
@@ -146,6 +160,7 @@ export default class SimpleExample extends Component {
             {user_occurrence_title: '',
                 user_occurrence_lat: 38.66,
                 user_occurrence_lon: -9.20}],
+        loading: true,
     };
 
     componentDidMount() {
@@ -159,7 +174,7 @@ export default class SimpleExample extends Component {
         this.getLocation();
     }
 
-    getLocation() {
+    getLocation = () => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((position) => {
                 this.setState({
@@ -167,7 +182,17 @@ export default class SimpleExample extends Component {
                             lng: position.coords.longitude
                     }
                 );
-            })
+                // this.setState(() =>
+                // {
+                //     this.timer = setTimeout(() => {
+                //         this.setState({
+                //             loading: false,
+                //         });
+                //     }, 2000);
+                // });
+            });
+            this.setState({loading: false});
+            console.log("GPS");
         } else {
             //browser doesn't support geolocation, set as vancouver
             this.setState({
@@ -176,6 +201,8 @@ export default class SimpleExample extends Component {
 
                 }
             );
+            this.setState({loading: false});
+            console.log("browser does not support GPS");
         }
     }
 
@@ -206,6 +233,7 @@ export default class SimpleExample extends Component {
     };
 
     listObjects = (level) => {
+        const classes = this.props;
         var result = [];
         for(var i =0; i < this.state.object.length; i++) {
             var obj = this.state.object;
@@ -215,28 +243,34 @@ export default class SimpleExample extends Component {
                     <Marker position={[obj[i].user_occurrence_lat, obj[i].user_occurrence_lon]}
                             icon={this.iconWithLevel(obj[i].user_occurrence_level)}>
                         <Popup>
-                            {obj[i].user_occurrence_title} <br /> {obj[i].user_occurrence_data} <br />
-                            Grau de urgencia: {obj[i].user_occurrence_level} <br/>
-                            Tipo de problema: {obj[i].user_occurrence_type}
+                            <div className={classes.opName}>{obj[i].user_occurrence_title}</div>
+                            <b>Data de registo: </b>{obj[i].user_occurrence_data} <br />
+                            <b>Grau de urgencia:</b> {obj[i].user_occurrence_level} <br/>
+                            <b> Tipo de problema:</b> {obj[i].user_occurrence_type}
                         </Popup>
                     </Marker>
                 )}
             }
+
+            // if(level == 5)
+            //     this.setState({loading: false});
 
         return result;
     };
 
     render() {
         const position = [this.state.lat, this.state.lng];
-        const {object} = this.state;
-        const center = [51.505, -0.09]
-        const rectangle = [[51.49, -0.08], [51.5, -0.06]]
+        const {object, loading} = this.state;
+        const center = [51.505, -0.09];
+        const rectangle = [[51.49, -0.08], [51.5, -0.06]];
 
         return (
             <div>
                 <EnhancedTableToolbar></EnhancedTableToolbar>
 
-                <Map center={position} zoom={this.state.zoom}>
+                {loading && <CircularProgress/>}
+
+                {!loading && <Map center={position} zoom={this.state.zoom}>
                     <LayersControl position="topright">
                         <BaseLayer checked name="Cores">
                             <TileLayer
@@ -250,6 +284,7 @@ export default class SimpleExample extends Component {
                                 url="https://tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png"
                             />
                         </BaseLayer>
+
                         {/*<Overlay name="Marker with popup">*/}
                             {/*<Marker position={center}>*/}
                                 {/*<Popup>*/}
@@ -332,9 +367,9 @@ export default class SimpleExample extends Component {
                             </LayerGroup>
                         </Overlay>
                     </LayersControl>
-                </Map>
+                </Map>}
 
-                <IconButton onClick={this.getLocation()}><GpsIcon/></IconButton> Ir para localização atual
+                {/*<IconButton onClick={this.getLocation}><GpsIcon/></IconButton> Localizar por GPS*/}
             </div>
         )
     }

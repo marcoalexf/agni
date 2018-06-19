@@ -25,6 +25,7 @@ import TextField from 'material-ui/TextField';
 import SwipeableViews from 'react-swipeable-views';
 import img2 from './img/news2.jpg';
 import List from 'material-ui/List';
+import Functions from './Functions.js';
 
 function TabContainer(props) {
     return (
@@ -119,7 +120,75 @@ const styles =  theme => ({
     },
 });
 
-let informations = new Promise(function(resolve, reject) {
+// async function info(){
+//     console.log("info");
+//     var info = await informations();
+//     console.log("info!!!!!!!!");
+//     console.log(info);
+//     return info;
+//     // this.setState({email: info.user_email})
+//
+// }
+
+function informations2(){
+    return new Promise( resolve => {
+        console.log("informations1");
+        var obj;
+        var token = window.localStorage.getItem('token');
+        var d = new Date();
+        var t = d.getTime();
+        // var expirationData = JSON.parse(token).expirationData;
+        // console.log(token);
+        // console.log(t);
+        // console.log(expirationData);
+
+        if(token != null){
+            var uname = JSON.parse(token).username;
+            var tokenObj = JSON.parse(token);
+
+            var user = {
+                "username": uname,
+                "token": tokenObj
+            }
+
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.open( "POST", "https://custom-tine-204615.appspot.com/rest/profile/", true);
+            xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            var myJSON = JSON.stringify(user);
+            xmlHttp.send(myJSON);
+
+            xmlHttp.onreadystatechange = function() {
+                if (xmlHttp.readyState === XMLHttpRequest.DONE){
+                    if(xmlHttp.status === 200){
+                        console.log("informations2");
+                        var response = xmlHttp.response;
+                        console.log("XML response: " + response);
+                        obj = JSON.parse(response);
+                        console.log(obj);
+
+                        console.log(uname.charAt(0));
+
+                        resolve(obj);
+                    }
+
+                    else{
+                        console.log("tempo expirado");
+                        window.localStorage.removeItem('token');
+                        // document.getElementById("tologin").click();
+                    }
+                }
+            }.bind(this)
+        }
+        else{
+            console.log("Sem sessao iniciada");
+            // document.getElementById("tologin").click();
+
+        }
+    });
+
+}
+
+let informations = new Promise(function(resolve) {
     console.log("informations1");
     var obj;
     var token = window.localStorage.getItem('token');
@@ -229,7 +298,7 @@ class Profile extends React.Component {
     constructor(props){
         super(props);
 
-        this.loadInformations = this.loadInformations.bind(this);
+        // this.loadInformations = this.loadInformations.bind(this);
     }
 
     state = {
@@ -249,84 +318,84 @@ class Profile extends React.Component {
         s: true,
     };
 
-    loadInformations = () =>{
-        var obj;
-        var token = window.localStorage.getItem('token');
-        var d = new Date();
-        var t = d.getTime();
-        // var expirationData = JSON.parse(token).expirationData;
-        // console.log(token);
-        // console.log(t);
-        // console.log(expirationData);
-
-        if(token != null){
-            var uname = JSON.parse(token).username;
-            var tokenObj = JSON.parse(token);
-
-            var user = {
-                "username": uname,
-                "token": tokenObj
-            }
-
-            var xmlHttp = new XMLHttpRequest();
-            xmlHttp.open( "POST", "https://custom-tine-204615.appspot.com/rest/profile/", true);
-            xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            var myJSON = JSON.stringify(user);
-            xmlHttp.send(myJSON);
-
-            xmlHttp.onreadystatechange = function() {
-                if (xmlHttp.readyState === XMLHttpRequest.DONE){
-                    if(xmlHttp.status === 200){
-                        var response = xmlHttp.response;
-                        console.log("XML response: " + response);
-                        obj = JSON.parse(response);
-
-                        var username = document.getElementById("showusername");
-                        username.innerHTML = uname;
-                        console.log(uname.charAt(0));
-                        // this.setState({username: uname});
-                        // this.setState({firstLetter: uname.charAt(0)});
-
-                        // var name = document.getElementById("showname");
-                        // name.innerHTML = obj.user_name;
-                        // this.setState({name: obj.user_name});
-                        //
-                        // var email = document.getElementById("showemail");
-                        // email.innerHTML = obj.user_email;
-                        // this.setState({email: obj.user_email});
-                        //
-                        // var role = document.getElementById("showrole");
-                        // role.innerHTML = obj.user_role;
-                        // this.setState({role: obj.user_role});
-
-                        // var img = document.getElementById("profileimg");
-                        // img.innerHTML = obj.user_name.charAt(0);
-                    }
-
-                    else{
-                        console.log("tempo expirado");
-                        window.localStorage.removeItem('token');
-                        document.getElementById("tologin").click();
-                        {/*<Link to={'/login'}/>*/}
-                    }
-                }
-            }.bind(this)
-        }
-        else{
-            // if(token != null){
-            //     window.localStorage.removeItem('token');
-            //     console.log("Tempo expirado - faca login");
-            //     document.getElementById("tologin").click();
-            // }
-            // else{
-                console.log("Sem sessao iniciada");
-                document.getElementById("tologin").click();
-            // }
-
-            {/*<Link to={'/login'}/>*/}
-            //document.location.href = '/login';
-        }
-    };
+    // loadInformations = () =>{
+    //     var obj;
+    //     var token = window.localStorage.getItem('token');
+    //     var d = new Date();
+    //     var t = d.getTime();
+    //     // var expirationData = JSON.parse(token).expirationData;
+    //     // console.log(token);
+    //     // console.log(t);
+    //     // console.log(expirationData);
+    //
+    //     if(token != null){
+    //         var uname = JSON.parse(token).username;
+    //         var tokenObj = JSON.parse(token);
+    //
+    //         var user = {
+    //             "username": uname,
+    //             "token": tokenObj
+    //         }
+    //
+    //         var xmlHttp = new XMLHttpRequest();
+    //         xmlHttp.open( "POST", "https://custom-tine-204615.appspot.com/rest/profile/", true);
+    //         xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    //         var myJSON = JSON.stringify(user);
+    //         xmlHttp.send(myJSON);
+    //
+    //         xmlHttp.onreadystatechange = function() {
+    //             if (xmlHttp.readyState === XMLHttpRequest.DONE){
+    //                 if(xmlHttp.status === 200){
+    //                     var response = xmlHttp.response;
+    //                     console.log("XML response: " + response);
+    //                     obj = JSON.parse(response);
+    //
+    //                     var username = document.getElementById("showusername");
+    //                     username.innerHTML = uname;
+    //                     console.log(uname.charAt(0));
+    //                     // this.setState({username: uname});
+    //                     // this.setState({firstLetter: uname.charAt(0)});
+    //
+    //                     // var name = document.getElementById("showname");
+    //                     // name.innerHTML = obj.user_name;
+    //                     // this.setState({name: obj.user_name});
+    //                     //
+    //                     // var email = document.getElementById("showemail");
+    //                     // email.innerHTML = obj.user_email;
+    //                     // this.setState({email: obj.user_email});
+    //                     //
+    //                     // var role = document.getElementById("showrole");
+    //                     // role.innerHTML = obj.user_role;
+    //                     // this.setState({role: obj.user_role});
+    //
+    //                     // var img = document.getElementById("profileimg");
+    //                     // img.innerHTML = obj.user_name.charAt(0);
+    //                 }
+    //
+    //                 else{
+    //                     console.log("tempo expirado");
+    //                     window.localStorage.removeItem('token');
+    //                     document.getElementById("tologin").click();
+    //                     {/*<Link to={'/login'}/>*/}
+    //                 }
+    //             }
+    //         }.bind(this)
+    //     }
+    //     else{
+    //         // if(token != null){
+    //         //     window.localStorage.removeItem('token');
+    //         //     console.log("Tempo expirado - faca login");
+    //         //     document.getElementById("tologin").click();
+    //         // }
+    //         // else{
+    //             console.log("Sem sessao iniciada");
+    //             document.getElementById("tologin").click();
+    //         // }
+    //
+    //         {/*<Link to={'/login'}/>*/}
+    //         //document.location.href = '/login';
+    //     }
+    // };
 
     handleToggle = () => {
         this.setState({ accountOpen: !this.state.accountOpen });
@@ -389,6 +458,16 @@ class Profile extends React.Component {
     //
     // }
 
+    async info() {
+        console.log("info");
+        var info = await informations();
+        console.log("info!!!!!!!!");
+        console.log(info);
+        return info;
+        this.setState({email: info.user_email});
+        console.log(this.state.email);
+    }
+
     componentDidMount () {
         console.log("componentdidmount");
         this.setState({s: !this.state.s});
@@ -402,57 +481,12 @@ class Profile extends React.Component {
 
             console.log("cdm3");
 
-            console.log("informations1");
-            var obj;
-            var token = window.localStorage.getItem('token');
-            var d = new Date();
-            var t = d.getTime();
-            // var expirationData = JSON.parse(token).expirationData;
-            // console.log(token);
-            // console.log(t);
-            // console.log(expirationData);
-
-            if(token != null){
-                var uname = JSON.parse(token).username;
-                var tokenObj = JSON.parse(token);
-
-                var user = {
-                    "username": uname,
-                    "token": tokenObj
-                }
-
-                var xmlHttp = new XMLHttpRequest();
-                xmlHttp.open( "POST", "https://custom-tine-204615.appspot.com/rest/profile/", true);
-                xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-                var myJSON = JSON.stringify(user);
-                xmlHttp.send(myJSON);
-
-                xmlHttp.onreadystatechange = function() {
-                    if (xmlHttp.readyState === XMLHttpRequest.DONE){
-                        if(xmlHttp.status === 200){
-                            console.log("informations2");
-                            var response = xmlHttp.response;
-                            console.log("XML response: " + response);
-                            obj = JSON.parse(response);
-                            console.log(obj);
-
-                            console.log(uname.charAt(0));
-
-                            // resolve(obj);
-                        }
-
-                        else{
-                            console.log("tempo expirado");
-                            window.localStorage.removeItem('token');
-                            // document.getElementById("tologin").click();
-                        }
-                    }
-                }.bind(this)
-            }
-            else {
-                console.log("Sem sessao iniciada");
-                // document.getElementById("tologin").click();
-            }
+        // this.info();
+            // var obj = info();
+            // this.setState({email: obj.user_email});
+            // this.setState({name: obj.user_name});
+            // this.setState({role: obj.user_role});
+            // console.log(this.state.email);
 
 
             informations.then((obj) => {
@@ -463,6 +497,7 @@ class Profile extends React.Component {
                 console.log(this.state.name + " " + this.state.email + " " + this.state.role);
                 console.log(obj);
             });
+
             xmlRequest.then((value) =>{
                 console.log("cdm5");
                 if(value != undefined && value.length != 0){

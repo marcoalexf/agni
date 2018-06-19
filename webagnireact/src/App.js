@@ -138,6 +138,10 @@ const styles = theme => ({
 });
 
 class MiniDrawer extends React.Component {
+    constructor(){
+        super();
+        this.handleLogout = this.handleLogout.bind(this);
+    }
     state = {
         open: true,
         accountOpen: false,
@@ -168,11 +172,11 @@ class MiniDrawer extends React.Component {
         if (this.target1.contains(event.target)) {
             return;
         }
-
+        console.log("handleClose");
         this.setState({ accountOpen: false });
     };
 
-    handleLogout = () => {
+    handleLogout = event => {
         var token = window.localStorage.getItem('token');
 
         if(token != null){
@@ -194,20 +198,30 @@ class MiniDrawer extends React.Component {
                 xmlHttp.send(myJSON);
 
                 xmlHttp.onreadystatechange = function() {
-                    if(xmlHttp.readyState == XMLHttpRequest.DONE && xmlHttp.status == 200) {
-                        var response = xmlHttp.responseText;
-                        console.log("XML response: " + response);
-                        //window.localStorage.removeItem('token');
-                        console.log("sucesso");
-                        document.getElementById("tologin").click();
-                        // document.location.href = '/login';
-                    }
-                    else{
-                        //TO DO- ver se o tempo ja expirou antes de "chatear" o server
-                        console.log("tempo expirado");
+                    if(xmlHttp.readyState == XMLHttpRequest.DONE) {
+                        if (xmlHttp.status == 200) {
+                            var response = xmlHttp.responseText;
+                            console.log("XML response: " + response);
+                            //window.localStorage.removeItem('token');
+                            console.log("sucesso");
+
+                            // if (this.target1.contains(event.target)) {
+                            //     return;
+                            // }
+                            console.log("handleClose2");
+
+                            this.setState({ accountOpen: false });
+
+                            document.getElementById("tologin").click();
+                            // document.location.href = '/login';
+                        }
+
+                        else {
+                            console.log("tempo expirado");
+                        }
                     }
                     window.localStorage.removeItem('token');
-                }
+                }.bind(this)
             }
         }
 
@@ -216,6 +230,17 @@ class MiniDrawer extends React.Component {
         }
     }
 
+    isLogin = () => {
+        var token = window.localStorage.getItem('token');
+
+        if(token == null){
+            return false;
+        }
+        else{
+            return true;
+        }
+
+    }
 
     render() {
         const { classes, theme } = this.props;
@@ -251,7 +276,8 @@ class MiniDrawer extends React.Component {
                                         aria-owns={accountOpen ? 'menu-list-grow' : null}
                                         aria-haspopup="true"
                                         color="inherit"
-                                        onClick={this.handleToggle}>
+                                        onClick={this.handleToggle}
+                                        className={this.isLogin() ? null: classes.input}>
                                         <AccountIcon/>
                                     </IconButton>
                                 </div>
@@ -266,7 +292,9 @@ class MiniDrawer extends React.Component {
                                         <Paper>
                                             <MenuList role="menu">
                                                 <MenuItem component={Link} to={'/perfil'}>Perfil</MenuItem>
-                                                <MenuItem onClick={this.handleLogout}><LogoutIcon/>Terminar Sessao</MenuItem>
+                                                <MenuItem onClick={this.handleLogout}>
+                                                    <LogoutIcon/> Terminar Sessao
+                                                </MenuItem>
                                             </MenuList>
                                         </Paper>
                                     </Grow>
@@ -274,10 +302,10 @@ class MiniDrawer extends React.Component {
                             </Popper>
                         </Manager>
 
-                        <Button component={Link} to="/login" color="inherit">
+                        <Button component={Link} to="/login" color="inherit" className={this.isLogin() ? classes.input : null}>
                             Entrar
                         </Button>
-                        <Button component={Link} to="/register" color="inherit">
+                        <Button component={Link} to="/register" color="inherit" className={this.isLogin() ? classes.input : null}>
                             Criar Conta
                         </Button>
                     </Toolbar>

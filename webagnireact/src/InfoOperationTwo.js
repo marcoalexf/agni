@@ -14,6 +14,7 @@ import SwipeableViews from 'react-swipeable-views';
 import img2 from './img/news2.jpg';
 import {Map, InfoWindow, Marker, GoogleApiWrapper, Listing} from 'google-maps-react';
 import GoogleMapReact from 'google-map-react';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const AnyReactComponent = ({ text }) => <div>{text}</div>;
 
@@ -163,6 +164,7 @@ class SwipeableTextMobileStepper extends React.Component {
         showingInfoWindow: false,
         activeMarker: {},
         selectedPlace: {},
+        loading: true,
     };
 
     componentDidMount () {
@@ -170,6 +172,7 @@ class SwipeableTextMobileStepper extends React.Component {
                 this.setState({object: value});
                 this.setState({lat: value.user_occurrence_lat});
                 this.setState({lng: value.user_occurrence_lon});
+                this.setState({loading: false});
                 // this.setState({center: {'lat': value.user_occurrence_lat, 'lng': value.user_occurrence_lon}});
                 console.log("state object");
                 console.log(this.state.object);
@@ -239,13 +242,16 @@ class SwipeableTextMobileStepper extends React.Component {
 
     render() {
         const { classes, theme } = this.props;
-        const { activeStep, object, activeStepTwo, center, zoom } = this.state;
+        const { activeStep, object, activeStepTwo, center, zoom, loading } = this.state;
         const steps = getSteps();
 
         const maxSteps = object.length;
 
         return (
-            <div className={classes.root} style={{margin: '0 auto'}}>
+            <div>
+                {loading && <CircularProgress className={"img-container"} />}
+
+                {!loading && <div className={classes.root} style={{margin: '0 auto'}}>
                 <Paper square elevation={0} className={classes.header}>
                     <div className={classes.opName}>{object[activeStep].user_occurrence_title}</div>
                 </Paper>
@@ -296,15 +302,16 @@ class SwipeableTextMobileStepper extends React.Component {
                 {/*</div>*/}
 
                 <div className={classes.rootTwo}>
-                    <Stepper activeStep={activeStepTwo} alternativeLabel>
-                        {steps.map(label => {
-                            return (
-                                <Step key={label}>
-                                    <StepLabel>{label}</StepLabel>
-                                </Step>
-                            );
-                        })}
-                    </Stepper>
+                    {/*//NAO APAGAR*/}
+                    {/*<Stepper activeStep={activeStepTwo} alternativeLabel>*/}
+                        {/*{steps.map(label => {*/}
+                            {/*return (*/}
+                                {/*<Step key={label}>*/}
+                                    {/*<StepLabel>{label}</StepLabel>*/}
+                                {/*</Step>*/}
+                            {/*);*/}
+                        {/*})}*/}
+                    {/*</Stepper>*/}
                     {/*NAO APAGAR ISTO PODE SER NECESSARIO PARA DEPOIS*/}
                     {/*<div>*/}
                         {/*{this.state.activeStepTwo === steps.length ? (*/}
@@ -354,6 +361,7 @@ class SwipeableTextMobileStepper extends React.Component {
                         </Button>
                     }
                 />
+            </div>}
             </div>
         );
     }

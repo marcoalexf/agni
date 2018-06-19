@@ -29,6 +29,7 @@ import UpdateListIcon from '@material-ui/icons/Save';
 import Tooltip from 'material-ui/Tooltip';
 import PropTypes from 'prop-types';
 import IconButton from 'material-ui/IconButton';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const AnyReactComponent = ({ text }) => <div>{text}</div>;
 
@@ -140,10 +141,19 @@ class NewRegistProblem extends React.Component {
             lat: 49.2827,
             lng: -123.1207
         },
+        loading: true,
     };
 
     componentDidMount(){
-        this.getLocation();
+        var token = window.localStorage.getItem('token');
+
+        if(token != null){
+            this.getLocation();
+        }
+
+        else{
+            document.getElementById("tologin").click();
+        }
     }
 
     getLocation() {
@@ -156,6 +166,7 @@ class NewRegistProblem extends React.Component {
                         }
                     }
                 );
+                this.setState({loading: false});
             })
         } else {
             //browser doesn't support geolocation, set as vancouver
@@ -166,6 +177,10 @@ class NewRegistProblem extends React.Component {
                     }
                 }
             );
+
+            this.setState({loading: false});
+
+            console.log("Browser does not support geolocation");
         }
     }
 
@@ -288,6 +303,7 @@ class NewRegistProblem extends React.Component {
 
     render(){
         const { classes } = this.props;
+        const {loading} = this.state;
         return(
             <div onLoad={this.handleSeeIfLoggedIn()}>
                 <EnhancedTableToolbar></EnhancedTableToolbar>
@@ -314,17 +330,20 @@ class NewRegistProblem extends React.Component {
                         </TableRow>
                         <TableRow>
                             <TableCell>
-                                <div>
+                                {loading && <CircularProgress/>}
+                                {!loading && <div>
                                     <TextField
                                         id="location"
                                         label="Localizacao"
                                         onChange={this.handleChange('location')}
                                         className={classes.textField}
                                     />
-                                    <Button variant="fab" mini className={classes.searchButton} onClick={this.getLocation()}> <SearchIcon/> </Button>
+                                    <Button variant="fab" mini className={classes.searchButton}
+                                            onClick={this.getLocation}> <SearchIcon/> </Button>
                                 </div>
+                                }
 
-                                <div className={classes.map} style={{ height: '50vh', width: '100%' }}>
+                                {!loading && <div className={classes.map} style={{ height: '50vh', width: '100%' }}>
                                     <GoogleMapReact
                                         bootstrapURLKeys={{ key: 'AIzaSyAM-jV8q7-FWs7RdP0G4cH938jWgQwlGVo' }}
                                         center={this.state.myLatLng}
@@ -335,7 +354,7 @@ class NewRegistProblem extends React.Component {
                                             {/*lng={-9.206618}*/}
                                         {/*/>*/}
                                     </GoogleMapReact>
-                                </div>
+                                </div>}
                             </TableCell>
                         </TableRow>
                         <TableRow>
