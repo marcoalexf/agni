@@ -27,6 +27,9 @@ public interface AgniAPI {
     @POST("profile")
     Call<ProfileResponse> getProfile(@Body ProfileRequest request);
 
+    @POST("profile/edit")
+    Call<ResponseBody> changeProfile(@Body EditProfileData request);
+
     @POST("occurrence/register")
     Call<ResponseBody> registerOccurrence(@Body OccurrenceData data);
 

@@ -13,6 +13,7 @@
     <string name="permission_rationale">É necessário acesso aos contactos para completar sugestões
         de e-mail</string>
 
+    <string name="action_edit_profile">Editar perfil</string>
 
     <string name="action_sign_in">Entrar</string>
     <string name="action_sign_out">Terminar sessão</string>

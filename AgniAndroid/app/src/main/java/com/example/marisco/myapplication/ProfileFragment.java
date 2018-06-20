@@ -1,7 +1,6 @@
 package com.example.marisco.myapplication;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.text.InputType;
 import android.util.Log;
@@ -10,11 +9,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -29,7 +28,7 @@ public class ProfileFragment extends Fragment {
     private static final String TOKEN = "token";
     public static final String RESPONSE = "com.example.marisco.myapplication.RESPONSE";
     public static final String ENDPOINT = "https://custom-tine-204615.appspot.com/rest/";
-    private String username, email, type, name;
+    private String username, email, name, locality, county, district;
     private Retrofit retrofit;
     private LoginResponse token;
 
@@ -42,6 +41,10 @@ public class ProfileFragment extends Fragment {
     @BindView(R.id.profile_locality) EditText profile_locality;
     @BindView(R.id.profile_county) EditText profile_county;
     @BindView(R.id.profile_district) EditText profile_district;
+    @BindView(R.id.edit_button) Button edit_button;
+    @BindView(R.id.btnSave) Button save_button;
+    @BindView(R.id.btnCancelSave) Button cancel_button;
+
 
     public ProfileFragment() {
 
@@ -57,11 +60,48 @@ public class ProfileFragment extends Fragment {
         if(b != null){
             this.token = (LoginResponse) b.getSerializable(TOKEN);
         }
-        this.username = token.getUsername();
+
         getProfile();
         fieldsSetup();
 
+        edit_button.setOnClickListener( new View.OnClickListener(){
+            public void onClick(View v) {
+                saveInitialValues();
+                editProfile();
+            }
+        });
+        save_button.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v) {
+                changeProfile();
+                fieldsSetup();
+            }
+        });
+
+        cancel_button.setOnClickListener( new View.OnClickListener(){
+            public void onClick(View v) {
+                fieldsSetup();
+                restoreInitialValues();
+            }
+        });
         return v;
+    }
+
+    private void saveInitialValues(){
+        username = profile_username.getText().toString();
+        name = profile_name.getText().toString();
+        email = profile_email.getText().toString();
+        locality = profile_locality.getText().toString();
+        county = profile_county.getText().toString();
+        district = profile_district.getText().toString();
+    }
+
+    private void restoreInitialValues(){
+        profile_username.setText(username);
+        profile_name.setText(name);
+        profile_email.setText(email);
+        profile_locality.setText(locality);
+        profile_county.setText(county);
+        profile_district.setText(district);
     }
 
     //Sets up all the EditText fields in this fragment to be un-editable.
@@ -69,6 +109,10 @@ public class ProfileFragment extends Fragment {
         profile_username.setInputType(InputType.TYPE_NULL);
         profile_username.setEnabled(false);
         profile_username.setTextIsSelectable(false);
+
+        profile_type.setInputType(InputType.TYPE_NULL);
+        profile_type.setEnabled(false);
+        profile_type.setTextIsSelectable(false);
 
         profile_name.setInputType(InputType.TYPE_NULL);
         profile_name.setEnabled(false);
@@ -89,6 +133,9 @@ public class ProfileFragment extends Fragment {
         profile_locality.setInputType(InputType.TYPE_NULL);
         profile_locality.setEnabled(false);
         profile_locality.setTextIsSelectable(false);
+
+        save_button.setVisibility(View.GONE);
+        cancel_button.setVisibility(View.GONE);
     }
 
     public void editProfile(){
@@ -115,6 +162,9 @@ public class ProfileFragment extends Fragment {
         profile_locality.setInputType(InputType.TYPE_CLASS_TEXT);
         profile_locality.setEnabled(true);
         profile_locality.setTextIsSelectable(true);
+
+        save_button.setVisibility(View.VISIBLE);
+        cancel_button.setVisibility(View.VISIBLE);
     }
 
     public void getProfile() {
@@ -148,15 +198,44 @@ public class ProfileFragment extends Fragment {
         });
     }
 
-    /*public void launchActivity(ProfileResponse response){
-        Intent intent = new Intent(this, HomePage.class);
-        intent.putExtra(RESPONSE, response);
-        startActivity(intent);
-    }*/
+    private void changeProfile(){
+        if (retrofit == null) {
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(ENDPOINT)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+        }
+
+        AgniAPI agniAPI = retrofit.create(AgniAPI.class);
+
+        EditProfileData request = new EditProfileData(token, profile_username.getText().toString(),
+                profile_email.getText().toString(), profile_district.getText().toString(), profile_county.getText().toString(),
+                profile_locality.getText().toString(), false);
+        Call<ResponseBody> call = agniAPI.changeProfile(request);
+
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.code() == 200){
+                    Toast toast = Toast.makeText(getActivity(), "Perfil alterado", Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+                else {
+                    Toast toast = Toast.makeText(getActivity(), "Failed to change profile" + response.code(), Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+            }
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.e("ERROR", t.toString());
+            }
+        });
+    }
+
     private void fillInfo(ProfileResponse response){
         profile_type.setText(response.getRole());
-        profile_username.setText(username);
 
+        profile_username.setText(response.getUsername());
         profile_name.setText(response.getName());
         profile_email.setText(response.getEmail());
         profile_locality.setText(response.getLocality());
