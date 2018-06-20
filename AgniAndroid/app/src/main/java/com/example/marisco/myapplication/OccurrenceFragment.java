@@ -39,6 +39,8 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -248,7 +250,7 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback, 
                         toast.show();
 
                         list_of_ids_to_upload_to.addAll(response.body().getList());
-                        uploadPhoto(photoFile, agniAPI, list_of_ids_to_upload_to);
+                        uploadPhoto(photoFile, list_of_ids_to_upload_to);
 
                     }
                     else {
@@ -299,9 +301,11 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback, 
         }
     }
 
-    public void uploadPhoto(File photoFile, AgniAPI agniAPI, List<Long> list_of_ids_to_upload_to){
+    public void uploadPhoto(File photoFile, List<Long> list_of_ids_to_upload_to){
+        AgniAPI agniAPI = retrofit.create(AgniAPI.class);
         Long id = list_of_ids_to_upload_to.get(0);
         Log.d("UPLOADING SHIT", "ENTERED THE UPLOAD PHOTO METHOD");
+        Log.d("ID IS -> ", String.valueOf(id));
 
         /*
         Now we need to do this:
@@ -314,7 +318,11 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback, 
 
 
                 try {
-                    Call <ResponseBody> call = agniAPI.uploadPhoto(id, Files.readAllBytes(photoFile.toPath()));
+                    byte [] data = Files.readAllBytes(photoFile.toPath());
+                    Log.d("SIZE OF DATA: ", String.valueOf(data.length));
+                    RequestBody body = RequestBody.create(MediaType.parse("image/jpeg"), data);
+                    String contentType = "image/jpeg";
+                    Call <ResponseBody> call = agniAPI.uploadPhoto(id, contentType, body);
 
                     call.enqueue(new Callback<ResponseBody>() {
                         @Override
@@ -331,7 +339,7 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback, 
                             toast.show();
                         }
                     });
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
