@@ -249,20 +249,20 @@ class SwipeableTextMobileStepper extends React.Component {
 
         return (
             <div>
-                {loading && <CircularProgress className={"img-container"} />}
+                {loading && <div className={"imgcontainer"}><CircularProgress /></div>}
 
                 {!loading && <div className={classes.root} style={{margin: '0 auto'}}>
                 <Paper square elevation={0} className={classes.header}>
                     <div className={classes.opName}>{object[activeStep].user_occurrence_title}</div>
                 </Paper>
                 <Paper square elevation={0} className={classes.headerTwo}>
-                    <Typography>Tipo: {object[activeStep].user_occurrence_type}</Typography>
+                    <p>Tipo:</p> <Typography>{object[activeStep].user_occurrence_type}</Typography>
                 </Paper>
                 <Paper square elevation={0} className={classes.headerTwo}>
-                    <Typography>Grau de urgencia: {object[activeStep].user_occurrence_level}</Typography>
+                    <p>Grau de urgencia: </p><Typography> {object[activeStep].user_occurrence_level}</Typography>
                 </Paper>
                 <Paper square elevation={0} className={classes.headerTwo}>
-                    <Typography>Data: {object[activeStep].user_occurrence_data}</Typography>
+                    <p>Data: </p><Typography> {object[activeStep].user_occurrence_data}</Typography>
                 </Paper>
                 <SwipeableViews
                     axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
@@ -301,7 +301,7 @@ class SwipeableTextMobileStepper extends React.Component {
                     {/*</GoogleMapReact>*/}
                 {/*</div>*/}
 
-                <div className={classes.rootTwo}>
+                {/*<div className={classes.rootTwo}>*/}
                     {/*//NAO APAGAR*/}
                     {/*<Stepper activeStep={activeStepTwo} alternativeLabel>*/}
                         {/*{steps.map(label => {*/}
@@ -339,7 +339,7 @@ class SwipeableTextMobileStepper extends React.Component {
                             {/*</div>*/}
                         {/*)}*/}
                     {/*</div>*/}
-                </div>
+                {/*</div>*/}
 
 
                 <MobileStepper

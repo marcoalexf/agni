@@ -161,6 +161,11 @@ export default class SimpleExample extends Component {
                 user_occurrence_lat: 38.66,
                 user_occurrence_lon: -9.20}],
         loading: true,
+        level1: true,
+        level2: true,
+        level3: true,
+        level4: true,
+        level5: true,
     };
 
     componentDidMount() {
@@ -244,7 +249,7 @@ export default class SimpleExample extends Component {
                             icon={this.iconWithLevel(obj[i].user_occurrence_level)}>
                         <Popup>
                             <div className={classes.opName}>{obj[i].user_occurrence_title}</div>
-                            <b>Data de registo: </b>{obj[i].user_occurrence_data} <br />
+                            <b>Data de registo:</b> {obj[i].user_occurrence_data} <br />
                             <b>Grau de urgencia:</b> {obj[i].user_occurrence_level} <br/>
                             <b> Tipo de problema:</b> {obj[i].user_occurrence_type}
                         </Popup>
@@ -257,6 +262,18 @@ export default class SimpleExample extends Component {
 
         return result;
     };
+
+    listTypeProblem = (type) =>{
+        var result = [];
+
+
+
+        return result;
+    }
+
+    changeLevel = (level) => {
+
+    }
 
     render() {
         const position = [this.state.lat, this.state.lng];
@@ -284,6 +301,13 @@ export default class SimpleExample extends Component {
                                 url="https://tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png"
                             />
                         </BaseLayer>
+                        {/*<BaseLayer checked name="Espaco publico">*/}
+                            {/*{}*/}
+                        {/*</BaseLayer>*/}
+
+                        {/*<BaseLayer name="Espaco privado">*/}
+                            {/*{}*/}
+                        {/*</BaseLayer>*/}
 
                         {/*<Overlay name="Marker with popup">*/}
                             {/*<Marker position={center}>*/}
@@ -366,6 +390,25 @@ export default class SimpleExample extends Component {
                                 {this.listObjects(5)}
                             </LayerGroup>
                         </Overlay>
+
+                        {/*<Overlay checked name="Limpeza de mato">*/}
+                            {/*<LayerGroup>*/}
+                                {/*{}*/}
+                            {/*</LayerGroup>*/}
+                        {/*</Overlay>*/}
+
+                        {/*<Overlay checked name="Zona de mau acesso">*/}
+                            {/*<LayerGroup>*/}
+                                {/*{}*/}
+                            {/*</LayerGroup>*/}
+                        {/*</Overlay>*/}
+
+                        {/*<Overlay checked name="Outro">*/}
+                            {/*<LayerGroup>*/}
+                                {/*{}*/}
+                            {/*</LayerGroup>*/}
+                        {/*</Overlay>*/}
+
                     </LayersControl>
                 </Map>}
 

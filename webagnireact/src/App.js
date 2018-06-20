@@ -38,6 +38,8 @@ import Grow from 'material-ui/transitions/Grow';
 import Paper from 'material-ui/Paper';
 import { MenuItem, MenuList } from 'material-ui/Menu';
 import { createMuiTheme } from 'material-ui/styles';
+import Avatar from 'material-ui/Avatar';
+import Typography from 'material-ui/Typography';
 
 const drawerWidth = 240;
 
@@ -135,6 +137,22 @@ const styles = theme => ({
     input: {
         display: 'none',
     },
+    row: {
+        display: 'flex',
+        justifyContent: 'center',
+    },
+    avatars:{
+        margin: 10,
+        width: 60,
+        height: 60,
+    },
+    username:{
+        margin: 30,
+        fontFamily: 'Montserrat',
+    },
+    logout:{
+        marginLeft: 20,
+    }
 });
 
 class MiniDrawer extends React.Component {
@@ -158,10 +176,6 @@ class MiniDrawer extends React.Component {
 
     handleOpenAccount = event => {
         this.setState({ anchorEl: event.currentTarget });
-    };
-
-    handleProfileOption = () => {
-        // document.location.href = '/perfil';
     };
 
     handleToggle = () => {
@@ -240,7 +254,18 @@ class MiniDrawer extends React.Component {
             return true;
         }
 
-    }
+    };
+
+    username = () => {
+        var token = window.localStorage.getItem('token');
+
+        if(token != null){
+            var uname = JSON.parse(token).username;
+            // this.setState({username: uname});
+            // this.setState({firstLetter: uname.charAt(0)});
+            return uname;
+        }
+    };
 
     render() {
         const { classes, theme } = this.props;
@@ -290,12 +315,20 @@ class MiniDrawer extends React.Component {
                                 <ClickAwayListener onClickAway={this.handleClose}>
                                     <Grow in={accountOpen} id="menu-list-grow" style={{ transformOrigin: '0 0 0' }}>
                                         <Paper>
-                                            <MenuList role="menu">
-                                                <MenuItem component={Link} to={'/perfil'}>Perfil</MenuItem>
-                                                <MenuItem onClick={this.handleLogout}>
-                                                    <LogoutIcon/> Terminar Sessao
-                                                </MenuItem>
-                                            </MenuList>
+                                            <div className={classes.row}>
+                                                <Avatar className={classes.avatars}>{this.username().charAt(0)}</Avatar>
+                                                <b className={classes.username}>{this.username()}</b><br/>
+                                            </div>
+                                            <div>
+                                                <Button component={Link} to={'/perfil'}>Perfil</Button>
+                                                <Button className={classes.logout} onClick={this.handleLogout}>Terminar Sessão</Button>
+                                            </div>
+                                            {/*<MenuList role="menu">*/}
+                                                {/*<MenuItem component={Link} to={'/perfil'}>Perfil</MenuItem>*/}
+                                                {/*<MenuItem onClick={this.handleLogout}>*/}
+                                                    {/*<LogoutIcon/> Terminar Sessao*/}
+                                                {/*</MenuItem>*/}
+                                            {/*</MenuList>*/}
                                         </Paper>
                                     </Grow>
                                 </ClickAwayListener>
