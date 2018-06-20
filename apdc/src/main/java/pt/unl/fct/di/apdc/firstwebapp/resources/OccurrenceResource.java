@@ -39,6 +39,7 @@ import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceData;
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceDeleteData;
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceEditData;
 import pt.unl.fct.di.apdc.firstwebapp.util.CursorList;
+import pt.unl.fct.di.apdc.firstwebapp.util.ListIds;
 import pt.unl.fct.di.apdc.firstwebapp.util.SecurityManager;
 import pt.unl.fct.di.apdc.firstwebapp.util.geocalc.BoundingArea;
 import pt.unl.fct.di.apdc.firstwebapp.util.geocalc.Coordinate;
@@ -71,7 +72,7 @@ public class OccurrenceResource {
 		TransactionOptions options = TransactionOptions.Builder.withXG(true);
 		Transaction txn = datastore.beginTransaction(options);
 		try {
-			Key userKey = KeyFactory.createKey("User", data.token.username);
+			Key userKey = KeyFactory.createKey("User", data.token.userID);
 			
 			// Save occurrence
 			Entity occurrenceEntity = new Entity("UserOccurrence", userKey);
@@ -101,7 +102,7 @@ public class OccurrenceResource {
 				txn = datastore.beginTransaction(options);
 				for(Entity mediaEntity : mediaEntities) {
 					Entity fileUpload = UploadResource.newUploadFileEntity(
-							"user/" + data.token.username + "/occurrence/" + occurrenceID + "/", 
+							"user/" + data.token.tokenID + "/occurrence/" + occurrenceID + "/", 
 							String.valueOf(mediaEntity.getKey().getId()), 
 							"IMAGE&VIDEO",
 							data.visibility,
@@ -115,7 +116,7 @@ public class OccurrenceResource {
 					uploadMediaIDs.add(uploadEntity.getKey().getId());
 				}
 				LOG.info("User " + data.token.username + " registered occurrence " + data.title);
-				return Response.ok(g.toJson(uploadMediaIDs)).build();
+				return Response.ok(g.toJson(new ListIds(uploadMediaIDs))).build();
 			}
 			else {
 				txn.commit();
@@ -144,7 +145,16 @@ public class OccurrenceResource {
 		List<Map<String, Object>> occurrences = new LinkedList<Map<String, Object>>();
 		Query ctrQuery = new Query("UserOccurrence");
 		if(data.username != null) {
-			Key userKey = KeyFactory.createKey("User", data.username);
+			FilterPredicate filter = new FilterPredicate("user_username", FilterOperator.EQUAL, data.username);
+			Query userQuery = new Query("User").setFilter(filter);
+			List<Entity> results = datastore.prepare(userQuery).asList(FetchOptions.Builder.withDefaults());
+			if(results.isEmpty()) {
+				// Username does not exist
+				LOG.warning("Searched username does not exist: " + data.username);
+				return Response.status(Status.BAD_REQUEST).build();
+			}
+			Entity user = results.get(0);
+			Key userKey = user.getKey();
 			ctrQuery.setAncestor(userKey);
 		}
 		FilterPredicate visibilityFilter = null;
@@ -152,7 +162,7 @@ public class OccurrenceResource {
 			visibilityFilter = new FilterPredicate("user_occurrence_visibility", FilterOperator.EQUAL, true);
 			ctrQuery.setFilter(visibilityFilter);
 		}
-		else if(!data.token.username.equals(data.username) && !SecurityManager.userHasAccess("see_private_occurrences", data.token.username)) {
+		else if(!data.token.username.equals(data.username) && !SecurityManager.userHasAccess("see_private_occurrences", data.token.userID)) {
 			return Response.status(Status.FORBIDDEN).build();
 		}
 		if(data.lat != null && data.lon != null) {
@@ -221,12 +231,12 @@ public class OccurrenceResource {
 				LOG.warning("Failed to edit occurrence, token for user: " + data.token.username + "is invalid");
 				return Response.status(Status.FORBIDDEN).build();
 			}
-			if(!data.token.username.equals(data.username) && !SecurityManager.userHasAccess("edit_user_occurrence", data.token.username)) {
+			if(!data.token.username.equals(data.username) && !SecurityManager.userHasAccess("edit_user_occurrence", data.token.userID)) {
 				LOG.warning("Failed to edit occurrence, user: " + data.token.username + " does not have the rights to do it");
 				return Response.status(Status.FORBIDDEN).build();
 			}
 		
-			Key userKey = KeyFactory.createKey("User", data.token.username);
+			Key userKey = KeyFactory.createKey("User", data.token.userID);
 			Key occurrenceKey = KeyFactory.createKey(userKey, "UserOccurrence", data.id);
 			
 			// Save occurrence
@@ -269,12 +279,12 @@ public class OccurrenceResource {
 				LOG.warning("Failed to delete occurrence, token for user: " + data.token.username + "is invalid");
 				return Response.status(Status.FORBIDDEN).build();
 			}
-			if(!data.token.username.equals(data.username) && !SecurityManager.userHasAccess("delete_user_occurrence", data.token.username)) {
+			if(!data.token.username.equals(data.username) && !SecurityManager.userHasAccess("delete_user_occurrence", data.token.userID)) {
 				LOG.warning("Failed to delete occurrence, user: " + data.token.username + " does not have the rights to do it");
 				return Response.status(Status.FORBIDDEN).build();
 			}
 		
-			Key userKey = KeyFactory.createKey("User", data.token.username);
+			Key userKey = KeyFactory.createKey("User", data.token.userID);
 			Key occurrenceKey = KeyFactory.createKey(userKey, "UserOccurrence", data.id);
 			
 			// Delete occurrence

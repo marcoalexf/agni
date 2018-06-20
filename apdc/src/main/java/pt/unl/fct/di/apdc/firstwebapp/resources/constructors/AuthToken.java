@@ -18,6 +18,7 @@ public class AuthToken {
 
 	public static final long EXPIRATION_TIME = 1000*60*60*2; //2h
 
+	public long userID;
 	public String username;
 	public String tokenID;
 	public long creationData;
@@ -29,14 +30,16 @@ public class AuthToken {
 
 	}
 
-	public AuthToken(String username) {
+	public AuthToken(long userID, String username) {
+		this.userID = userID;
 		this.username = username;
 		this.tokenID = UUID.randomUUID().toString();
 		this.creationData = System.currentTimeMillis();
 		this.expirationData = this.creationData + AuthToken.EXPIRATION_TIME;
 	}
 
-	public AuthToken(String username, String tokenID, long creationData, long expirationData) {
+	public AuthToken(long userID, String username, String tokenID, long creationData, long expirationData) {
+		this.userID = userID;
 		this.username = username;
 		this.tokenID = tokenID;
 		this.creationData = creationData;
@@ -44,12 +47,12 @@ public class AuthToken {
 	}
 
 	public boolean isTokenValid() {
-		Key userKey = KeyFactory.createKey("User", username);
+		Key userKey = KeyFactory.createKey("User", userID);
 		Filter propertyFilter = new FilterPredicate("user_token_id", FilterOperator.EQUAL, tokenID);
 		Query ctrQuery = new Query("UserToken").setAncestor(userKey).setFilter(propertyFilter);
 		List<Entity> results = datastore.prepare(ctrQuery).asList(FetchOptions.Builder.withDefaults());
 		for(Entity tokenEntity: results) {
-			if((long)tokenEntity.getProperty("user_token_creation_data")  == creationData && (long)tokenEntity.getProperty("user_token_expiration_data") == expirationData) {
+			if((String)tokenEntity.getProperty("user_token_username")  == username && (long)tokenEntity.getProperty("user_token_creation_data")  == creationData && (long)tokenEntity.getProperty("user_token_expiration_data") == expirationData) {
 				if(System.currentTimeMillis() >= expirationData) {
 					datastore.delete(tokenEntity.getKey());
 					return false;

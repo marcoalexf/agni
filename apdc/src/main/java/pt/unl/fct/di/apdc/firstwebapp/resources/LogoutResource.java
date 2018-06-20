@@ -42,7 +42,7 @@ public class LogoutResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response doLogout(AuthToken data) {
 		LOG.info("Attempt to logout user: " + data.username);
-		Key userKey = KeyFactory.createKey("User", data.username);
+		Key userKey = KeyFactory.createKey("User", data.userID);
 		Transaction txn = datastore.beginTransaction();
 		try {
 			@SuppressWarnings("unused")
@@ -55,7 +55,7 @@ public class LogoutResource {
 			Query ctrQuery = new Query("UserToken").setAncestor(userKey).setFilter(propertyFilter);
 			List<Entity> results = datastore.prepare(ctrQuery).asList(FetchOptions.Builder.withDefaults());
 			for(Entity tokenEntity: results) {
-				if((long)tokenEntity.getProperty("user_token_creation_data")  == data.creationData && (long)tokenEntity.getProperty("user_token_expiration_data") == data.expirationData) {
+				if((String)tokenEntity.getProperty("user_token_username")  == data.username && (long)tokenEntity.getProperty("user_token_creation_data")  == data.creationData && (long)tokenEntity.getProperty("user_token_expiration_data") == data.expirationData) {
 					datastore.delete(txn, tokenEntity.getKey());
 				}
 			}

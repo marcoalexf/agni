@@ -20,17 +20,13 @@ import javax.ws.rs.core.Response.Status;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
-//import com.google.appengine.api.datastore.PropertyProjection;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Transaction;
-//import com.google.appengine.api.datastore.Query.Filter;
-//import com.google.appengine.api.datastore.Query.FilterOperator;
-//import com.google.appengine.api.datastore.Query.FilterPredicate;
-//import com.google.appengine.api.datastore.Query.SortDirection;
+import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Query.FilterPredicate;
+
 import org.apache.commons.codec.digest.DigestUtils;
 import com.google.gson.Gson;
 
@@ -51,6 +47,90 @@ public class LoginResource {
 	public LoginResource() { } //Nothing to be done here...
 	
 	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response doLogin(LoginData data, 
+			                  @Context HttpServletRequest request,
+			                  @Context HttpHeaders headers) {
+		LOG.info("Attempt to login user: " + data.username);
+
+		Transaction txn = datastore.beginTransaction();
+		try {
+			FilterPredicate filter = new FilterPredicate("user_username", FilterOperator.EQUAL, data.username);
+			Query ctrQuery = new Query("User").setFilter(filter);
+			List<Entity> results = datastore.prepare(ctrQuery).asList(FetchOptions.Builder.withDefaults());
+			if(results.isEmpty()) {
+				// Username does not exist
+				txn.rollback();
+				LOG.warning("Failed login attempt for username: " + data.username);
+				return Response.status(Status.FORBIDDEN).build();
+			}
+			Entity user = results.get(0);
+			Key userKey = user.getKey();
+			
+			// Obtain the user login statistics
+			ctrQuery = new Query("UserStats").setAncestor(userKey);
+			results = datastore.prepare(ctrQuery).asList(FetchOptions.Builder.withDefaults());
+			Entity ustats = null;
+			if (results.isEmpty()) {
+				ustats = new Entity("UserStats", userKey );
+				ustats.setProperty("user_stats_logins", 0L);
+				ustats.setProperty("user_stats_failed", 0L);
+			} else {
+				ustats = results.get(0);
+			}
+
+			String hashedPWD = (String) user.getProperty("user_pwd");
+			if (hashedPWD.equals(DigestUtils.shaHex(data.password))) {
+				// Password correct
+				
+				// Construct the logs
+				Entity log = new Entity("UserLog", userKey);
+				log.setProperty("user_login_ip", request.getRemoteAddr());
+				log.setProperty("user_login_host", request.getRemoteHost());
+				log.setProperty("user_login_latlon", headers.getHeaderString("X-AppEngine-CityLatLong"));
+				log.setProperty("user_login_city", headers.getHeaderString("X-AppEngine-City"));
+				log.setProperty("user_login_country", headers.getHeaderString("X-AppEngine-Country"));
+				log.setProperty("user_login_time", new Date());
+				// Get the user statistics and updates it
+				ustats.setProperty("user_stats_logins", 1L + (long) ustats.getProperty("user_stats_logins"));
+				ustats.setProperty("user_stats_failed", 0L );
+				ustats.setProperty("user_stats_last", new Date());
+				
+				// Save token
+				AuthToken token = new AuthToken(userKey.getId(), data.username);
+				Entity tokenEntity = new Entity("UserToken", userKey);
+				tokenEntity.setProperty("user_token_username", token.username);
+				tokenEntity.setProperty("user_token_id", token.tokenID);
+				tokenEntity.setProperty("user_token_creation_data", token.creationData);
+				tokenEntity.setProperty("user_token_expiration_data", token.expirationData);
+				
+				// Batch operation
+				List<Entity> logs = Arrays.asList(log,ustats,tokenEntity);
+				datastore.put(txn,logs);
+				txn.commit();
+				
+				// Return token
+				LOG.info("User '" + data.username + "' logged in sucessfully.");
+				return Response.ok(g.toJson(token)).build();				
+			} else {
+				// Incorrect password
+				ustats.setProperty("user_stats_failed", 1L + (long) ustats.getProperty("user_stats_failed"));
+				datastore.put(txn,ustats);				
+				txn.commit();
+
+				LOG.warning("Wrong password for username: " + data.username);
+				return Response.status(Status.FORBIDDEN).build();				
+			}
+		} finally {
+			if (txn.isActive()) {
+				txn.rollback();
+				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+			}
+		}
+		
+	}
+	
+	/**@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response doLogin(LoginData data, 
 			                  @Context HttpServletRequest request,
@@ -129,7 +209,7 @@ public class LoginResource {
 			}
 		}
 		
-	}
+	}**/
 	
 	/**@POST
 	@Path("/user")
