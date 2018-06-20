@@ -9,6 +9,9 @@ public class LoginResponse implements Serializable {
     @SerializedName("username")
     String username;
 
+    @SerializedName("userID")
+    String userID;
+
     @SerializedName("tokenID")
     String tokenID;
 
@@ -48,5 +51,13 @@ public class LoginResponse implements Serializable {
 
     public void setCreationDate(long creationDate) {
         this.creationDate = creationDate;
+    }
+
+    public void setUserid(String userid){
+        this.userID = userid;
+    }
+
+    public String getUserid(){
+        return this.userID;
     }
 }
