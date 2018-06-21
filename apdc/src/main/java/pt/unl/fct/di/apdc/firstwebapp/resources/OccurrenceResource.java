@@ -223,7 +223,8 @@ public class OccurrenceResource {
 	@Path("/edit")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response editOccurrence(OccurrenceEditData data) {
-		Transaction txn = datastore.beginTransaction();
+		TransactionOptions options = TransactionOptions.Builder.withXG(true);
+		Transaction txn = datastore.beginTransaction(options);
 		try {
 			LOG.fine("Attempt to edit ocurrence with id: " + data.occurrenceID + " by user: " + data.token.username);
 			if(!data.valid()) {
@@ -257,9 +258,43 @@ public class OccurrenceResource {
 			}
 			datastore.put(txn, occurrenceEntity);
 			
-			txn.commit();
-			LOG.info("User " + data.token.username + " edited occurrence with id: " + data.occurrenceID);
-			return Response.ok().build();
+			// Create occurrence media entities
+			if(data.uploadMedia) {
+				List<Entity> mediaEntities = new LinkedList<Entity>();
+				List<Entity> uploadEntities = new LinkedList<Entity>();
+				List<Long> uploadMediaIDs = new LinkedList<Long>();
+				Entity occurrenceMediaEntity;
+				long occurrenceID = occurrenceEntity.getKey().getId();
+				for(int i = 0; i < data.nUploads; i++) {
+					occurrenceMediaEntity = new Entity("UserOccurrenceMedia", occurrenceEntity.getKey());
+					mediaEntities.add(occurrenceMediaEntity);
+				}
+				datastore.put(txn, mediaEntities);
+				txn.commit();
+				txn = datastore.beginTransaction(options);
+				for(Entity mediaEntity : mediaEntities) {
+					Entity fileUpload = UploadResource.newUploadFileEntity(
+							"user/" + data.token.userID + "/occurrence/" + occurrenceID + "/", 
+							String.valueOf(mediaEntity.getKey().getId()), 
+							"IMAGE&VIDEO",
+							data.visibility,
+							false
+							);
+					uploadEntities.add(fileUpload);
+				}
+				datastore.put(txn, uploadEntities);
+				txn.commit();
+				for(Entity uploadEntity: uploadEntities) {
+					uploadMediaIDs.add(uploadEntity.getKey().getId());
+				}
+				LOG.info("User " + data.token.username + " edited occurrence with id: " + data.occurrenceID);
+				return Response.ok(g.toJson(new ListIds(uploadMediaIDs))).build();
+			}
+			else {
+				txn.commit();
+				LOG.info("User " + data.token.username + " edited occurrence with id: " + data.occurrenceID);
+				return Response.ok().build();
+			}
 		} catch (EntityNotFoundException e) {
 			return Response.status(Status.BAD_REQUEST).entity("Occurrence not found.").build();
 		} finally {
@@ -275,7 +310,7 @@ public class OccurrenceResource {
 	public Response deleteOccurrence(OccurrenceDeleteData data) {
 		Transaction txn = datastore.beginTransaction();
 		try {
-			LOG.fine("Attempt to delete ocurrence with id: " + data.id + " by user: " + data.token.username);
+			LOG.fine("Attempt to delete ocurrence with id: " + data.occurrenceID + " by user: " + data.token.username);
 			if(!data.valid()) {
 				return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
 			}
@@ -283,19 +318,19 @@ public class OccurrenceResource {
 				LOG.warning("Failed to delete occurrence, token for user: " + data.token.username + "is invalid");
 				return Response.status(Status.FORBIDDEN).build();
 			}
-			if(!data.token.username.equals(data.username) && !SecurityManager.userHasAccess("delete_user_occurrence", data.token.userID)) {
+			if(!(data.token.userID == data.userID) && !SecurityManager.userHasAccess("delete_user_occurrence", data.token.userID)) {
 				LOG.warning("Failed to delete occurrence, user: " + data.token.username + " does not have the rights to do it");
 				return Response.status(Status.FORBIDDEN).build();
 			}
 		
-			Key userKey = KeyFactory.createKey("User", data.token.userID);
-			Key occurrenceKey = KeyFactory.createKey(userKey, "UserOccurrence", data.id);
+			Key userKey = KeyFactory.createKey("User", data.userID);
+			Key occurrenceKey = KeyFactory.createKey(userKey, "UserOccurrence", data.occurrenceID);
 			
 			// Delete occurrence
 			datastore.delete(txn, occurrenceKey);
 			
 			txn.commit();
-			LOG.info("User " + data.token.username + " deleted occurrence with id: " + data.id);
+			LOG.info("User " + data.token.username + " deleted occurrence with id: " + data.occurrenceID);
 			return Response.ok().build();
 		} finally {
 			if (txn.isActive() ) {
