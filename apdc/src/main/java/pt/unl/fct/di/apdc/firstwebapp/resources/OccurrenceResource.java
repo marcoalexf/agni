@@ -7,11 +7,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -38,7 +41,9 @@ import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.ListOccurrenceData;
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceData;
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceDeleteData;
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceEditData;
+import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceMediaData;
 import pt.unl.fct.di.apdc.firstwebapp.util.CursorList;
+import pt.unl.fct.di.apdc.firstwebapp.util.GcsManager;
 import pt.unl.fct.di.apdc.firstwebapp.util.ListIds;
 import pt.unl.fct.di.apdc.firstwebapp.util.SecurityManager;
 import pt.unl.fct.di.apdc.firstwebapp.util.geocalc.BoundingArea;
@@ -336,6 +341,44 @@ public class OccurrenceResource {
 			if (txn.isActive() ) {
 				txn.rollback();
 			}
+		}
+	}
+	
+	@POST
+	@Path("/media")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response occurrenceMedia(@Context HttpServletRequest req, @Context HttpServletResponse resp, OccurrenceMediaData data) {
+		try {
+			LOG.fine("Attempt to get media with id " + data.mediaID + " for ocurrence with id " + data.occurrenceID + " by user: " + data.token.username);
+			if(!data.valid()) {
+				return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
+			}
+			if(!data.token.isTokenValid()) {
+				LOG.warning("Failed to get occurrence media, token for user: " + data.token.username + "is invalid");
+				return Response.status(Status.FORBIDDEN).build();
+			}
+			if(!(data.token.userID == data.userID) && !SecurityManager.userHasAccess("see_private_occurrences", data.token.userID)) {
+				LOG.warning("Failed to get occurrence media, user: " + data.token.username + " does not have the rights to do it");
+				return Response.status(Status.FORBIDDEN).build();
+			}
+		
+			Key userKey = KeyFactory.createKey("User", data.userID);
+			Key occurrenceKey = KeyFactory.createKey(userKey, "UserOccurrence", data.occurrenceID);
+			Key mediaKey = KeyFactory.createKey(occurrenceKey, "UserOccurrenceMedia", data.mediaID);
+			
+			// Check media existence
+			datastore.get(mediaKey);
+			
+			if(GcsManager.gcsGet(resp, "user/" + data.userID + "/occurrence/" + data.occurrenceID + "/" + data.mediaID)) {
+				LOG.info("User " + data.token.username + " got media with id " + data.mediaID + " for occurrence with id " + data.occurrenceID);
+				return Response.created(null).status(HttpServletResponse.SC_OK).build();
+			}
+			else {
+				LOG.warning("Failed to get occurrence media, couldn't retrieve media from storage");
+				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+			}
+		} catch (EntityNotFoundException e) {
+			return Response.status(Status.BAD_REQUEST).entity("Media not found.").build();
 		}
 	}
 
