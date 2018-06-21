@@ -6,10 +6,10 @@ public class OccurrenceData {
 	public String title;
 	public String description;
 	public String type;
-	public int level;
+	public Integer level;
 	public boolean visibility;
-	public float lat;
-	public float lon;
+	public Float lat;
+	public Float lon;
 	public boolean notificationOnResolve;
 	public boolean uploadMedia;
 	public int nUploads;
@@ -19,8 +19,8 @@ public class OccurrenceData {
 		
 	}
 	
-	public OccurrenceData(AuthToken token, String title, String description, String type, int level, 
-			boolean visibility, float lat, float lon, boolean notificationOnResolve, 
+	public OccurrenceData(AuthToken token, String title, String description, String type, Integer level, 
+			boolean visibility, Float lat, Float lon, boolean notificationOnResolve, 
 			boolean uploadMedia, int nUploads) {
 		this.token = token;
 		this.title = title;
@@ -40,7 +40,8 @@ public class OccurrenceData {
 	}
 	
 	public boolean valid() {
-		return nonEmptyField(title) && nonEmptyField(description) && nonEmptyField(type) && level != 0;
+		return nonEmptyField(title) && nonEmptyField(description) && nonEmptyField(type) 
+				&& level != null && lat != null && lon != null;
 	}
 	
 }

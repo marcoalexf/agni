@@ -78,12 +78,13 @@ public class OccurrenceResource {
 			Entity occurrenceEntity = new Entity("UserOccurrence", userKey);
 			occurrenceEntity.setProperty("user_occurrence_title", data.title);
 			occurrenceEntity.setProperty("user_occurrence_description", data.description);
-			occurrenceEntity.setProperty("user_occurrence_data", new Date());
+			occurrenceEntity.setProperty("user_occurrence_date", new Date());
 			occurrenceEntity.setProperty("user_occurrence_type", data.type);
 			occurrenceEntity.setProperty("user_occurrence_level", data.level);
 			occurrenceEntity.setProperty("user_occurrence_visibility", data.visibility);
 			occurrenceEntity.setProperty("user_occurrence_lat", data.lat);
 			occurrenceEntity.setProperty("user_occurrence_lon", data.lon);
+			occurrenceEntity.setProperty("user_occurrence_notification_on_resolve", data.notificationOnResolve);
 			datastore.put(txn, occurrenceEntity);
 			
 			// Create occurrence media entities
@@ -102,7 +103,7 @@ public class OccurrenceResource {
 				txn = datastore.beginTransaction(options);
 				for(Entity mediaEntity : mediaEntities) {
 					Entity fileUpload = UploadResource.newUploadFileEntity(
-							"user/" + data.token.tokenID + "/occurrence/" + occurrenceID + "/", 
+							"user/" + data.token.userID + "/occurrence/" + occurrenceID + "/", 
 							String.valueOf(mediaEntity.getKey().getId()), 
 							"IMAGE&VIDEO",
 							data.visibility,
@@ -197,6 +198,7 @@ public class OccurrenceResource {
 			occurrenceMap.putAll(occurrenceEntity.getProperties());
 			occurrenceMap.put("username", occurrenceEntity.getParent().getName());
 			occurrenceMap.put("occurrenceID", occurrenceEntity.getKey().getId());
+			occurrenceMap.put("userID", occurrenceEntity.getParent().getId());
 			ctrQueryMedia = new Query("UserOccurrenceMedia").setAncestor(occurrenceEntity.getKey());
 			mediaResults = datastore.prepare(ctrQueryMedia).asList(FetchOptions.Builder.withDefaults());
 			mediaIDs = new LinkedList<Long>();
@@ -223,7 +225,7 @@ public class OccurrenceResource {
 	public Response editOccurrence(OccurrenceEditData data) {
 		Transaction txn = datastore.beginTransaction();
 		try {
-			LOG.fine("Attempt to edit ocurrence with id: " + data.id + " by user: " + data.token.username);
+			LOG.fine("Attempt to edit ocurrence with id: " + data.occurrenceID + " by user: " + data.token.username);
 			if(!data.valid()) {
 				return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
 			}
@@ -231,13 +233,13 @@ public class OccurrenceResource {
 				LOG.warning("Failed to edit occurrence, token for user: " + data.token.username + "is invalid");
 				return Response.status(Status.FORBIDDEN).build();
 			}
-			if(!data.token.username.equals(data.username) && !SecurityManager.userHasAccess("edit_user_occurrence", data.token.userID)) {
+			if(!(data.token.userID == data.userID) && !SecurityManager.userHasAccess("edit_user_occurrence", data.token.userID)) {
 				LOG.warning("Failed to edit occurrence, user: " + data.token.username + " does not have the rights to do it");
 				return Response.status(Status.FORBIDDEN).build();
 			}
 		
-			Key userKey = KeyFactory.createKey("User", data.token.userID);
-			Key occurrenceKey = KeyFactory.createKey(userKey, "UserOccurrence", data.id);
+			Key userKey = KeyFactory.createKey("User", data.userID);
+			Key occurrenceKey = KeyFactory.createKey(userKey, "UserOccurrence", data.occurrenceID);
 			
 			// Save occurrence
 			Entity occurrenceEntity = datastore.get(txn, occurrenceKey);
@@ -247,14 +249,16 @@ public class OccurrenceResource {
 			if(data.description != null && data.description != "") {
 				occurrenceEntity.setProperty("user_occurrence_description", data.description);
 			}
-			if(data.level != 0) {
-				occurrenceEntity.setProperty("user_occurrence_level", data.level);
+			if(data.visibility != null) {
+				occurrenceEntity.setProperty("user_occurrence_visibility", data.visibility);
 			}
-			occurrenceEntity.setProperty("user_occurrence_visibility", data.visibility);
+			if(data.notificationOnResolve != null) {
+				occurrenceEntity.setProperty("user_occurrence_notification_on_resolve", data.notificationOnResolve);
+			}
 			datastore.put(txn, occurrenceEntity);
 			
 			txn.commit();
-			LOG.info("User " + data.token.username + " edited occurrence with id: " + data.id);
+			LOG.info("User " + data.token.username + " edited occurrence with id: " + data.occurrenceID);
 			return Response.ok().build();
 		} catch (EntityNotFoundException e) {
 			return Response.status(Status.BAD_REQUEST).entity("Occurrence not found.").build();

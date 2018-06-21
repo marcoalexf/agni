@@ -1,7 +1,6 @@
 package pt.unl.fct.di.apdc.firstwebapp.resources;
 
 import java.util.Arrays;
-//import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
@@ -24,10 +23,10 @@ import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Transaction;
+import com.google.appengine.repackaged.org.apache.commons.codec.digest.DigestUtils;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.AuthToken;
@@ -80,7 +79,7 @@ public class LoginResource {
 			}
 
 			String hashedPWD = (String) user.getProperty("user_pwd");
-			if (hashedPWD.equals(DigestUtils.shaHex(data.password))) {
+			if (hashedPWD.equals(DigestUtils.sha256Hex(data.password))) {
 				// Password correct
 				
 				// Construct the logs

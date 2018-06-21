@@ -19,13 +19,12 @@ import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Transaction;
 import com.google.appengine.api.datastore.TransactionOptions;
+import com.google.appengine.repackaged.org.apache.commons.codec.digest.DigestUtils;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.RegisterData;
-
-import org.apache.commons.codec.digest.DigestUtils;
 
 @Path("/register")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -66,7 +65,7 @@ public class RegisterResource {
 			Entity user = new Entity("User");
 			user.setProperty("user_username", data.username);
 			user.setProperty("user_name", data.name);
-			user.setProperty("user_pwd", DigestUtils.shaHex(data.password));
+			user.setProperty("user_pwd", DigestUtils.sha256Hex(data.password));
 			user.setProperty("user_email", data.email);
 			user.setUnindexedProperty("user_creation_time", new Date());
 			user.setProperty("user_role", data.role);
@@ -76,6 +75,7 @@ public class RegisterResource {
 			datastore.put(txn, user);
 			if(data.uploadPhoto) {
 				txn.commit();
+				txn = datastore.beginTransaction(options);
 				Entity fileUpload = UploadResource.newUploadFileEntity(
 						"user/" + user.getKey().getId() + "/", 
 						"photo", 

@@ -52,7 +52,7 @@ public class AuthToken {
 		Query ctrQuery = new Query("UserToken").setAncestor(userKey).setFilter(propertyFilter);
 		List<Entity> results = datastore.prepare(ctrQuery).asList(FetchOptions.Builder.withDefaults());
 		for(Entity tokenEntity: results) {
-			if((String)tokenEntity.getProperty("user_token_username")  == username && (long)tokenEntity.getProperty("user_token_creation_data")  == creationData && (long)tokenEntity.getProperty("user_token_expiration_data") == expirationData) {
+			if(((String)tokenEntity.getProperty("user_token_username")).equals(username) && (long)tokenEntity.getProperty("user_token_creation_data")  == creationData && (long)tokenEntity.getProperty("user_token_expiration_data") == expirationData) {
 				if(System.currentTimeMillis() >= expirationData) {
 					datastore.delete(tokenEntity.getKey());
 					return false;
