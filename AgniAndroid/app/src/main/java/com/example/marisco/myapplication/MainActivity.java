@@ -9,6 +9,7 @@ import android.preference.PreferenceManager;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -84,7 +85,6 @@ public class MainActivity extends AppCompatActivity implements Serializable{
 
         handler.postDelayed(runnable, 2000);
 
-        // TODO: MAKE THE FUCKING PASSWORD ENCRYPTED OMG
         this.login_button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if(save_credentials.isChecked()){

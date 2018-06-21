@@ -26,6 +26,7 @@ import SwipeableViews from 'react-swipeable-views';
 import img2 from './img/news2.jpg';
 import List from 'material-ui/List';
 import Functions from './Functions.js';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 function TabContainer(props) {
     return (
@@ -118,17 +119,10 @@ const styles =  theme => ({
     img:{
       width: 200,
     },
+    loading:{
+        margin: theme.spacing.unit * 2,
+    },
 });
-
-// async function info(){
-//     console.log("info");
-//     var info = await informations();
-//     console.log("info!!!!!!!!");
-//     console.log(info);
-//     return info;
-//     // this.setState({email: info.user_email})
-//
-// }
 
 function informations2(){
     return new Promise( resolve => {
@@ -149,7 +143,7 @@ function informations2(){
             var user = {
                 "username": uname,
                 "token": tokenObj
-            }
+            };
 
             var xmlHttp = new XMLHttpRequest();
             xmlHttp.open( "POST", "https://custom-tine-204615.appspot.com/rest/profile/", true);
@@ -173,7 +167,7 @@ function informations2(){
 
                     else{
                         console.log("tempo expirado");
-                        window.localStorage.removeItem('token');
+                        // window.localStorage.removeItem('token');
                         // document.getElementById("tologin").click();
                     }
                 }
@@ -188,117 +182,62 @@ function informations2(){
 
 }
 
-let informations = new Promise(function(resolve) {
-    console.log("informations1");
-    var obj;
-    var token = window.localStorage.getItem('token');
-    var d = new Date();
-    var t = d.getTime();
-    // var expirationData = JSON.parse(token).expirationData;
-    // console.log(token);
-    // console.log(t);
-    // console.log(expirationData);
-
-    if(token != null){
-        var uname = JSON.parse(token).username;
+function xmlRequest(){
+    return new Promise(resolve => {
+        console.log("xmlRequest");
+        // var t = true;
+        var token = window.localStorage.getItem('token');
         var tokenObj = JSON.parse(token);
+        if(token != null){
+            var uname = JSON.parse(token).username;
+            var map;
 
-        var user = {
-            "username": uname,
-            "token": tokenObj
+            var user = {
+                "username": uname,
+                "token": tokenObj,
+                "showPrivate": true //MUDAR ISTO DEPOIS
+            };
+
+            console.log("pedido");
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.open("POST", "https://custom-tine-204615.appspot.com/rest/occurrence/list", true);
+            xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            var myJSON = JSON.stringify(user);
+            xmlHttp.send(myJSON);
+
+            console.log("esperar pelo estado");
+            xmlHttp.onreadystatechange = function () {
+                console.log("1");
+                if (xmlHttp.readyState === 4) {
+                    console.log("2");
+                    if (xmlHttp.status === 200) {
+                        console.log("3");
+                        var response = xmlHttp.response;
+                        var obj = JSON.parse(response);
+                        console.log("obj:");
+                        console.log(obj);
+                        map = obj[0];
+                        console.log("map:");
+                        console.log(map);
+
+                        resolve(obj.mapList);
+                    }
+                    else {
+                        console.log("tempo expirado");
+                        window.localStorage.removeItem('token');
+                    }
+                }
+            }.bind(this)
         }
-
-        var xmlHttp = new XMLHttpRequest();
-        xmlHttp.open( "POST", "https://custom-tine-204615.appspot.com/rest/profile/", true);
-        xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        var myJSON = JSON.stringify(user);
-        xmlHttp.send(myJSON);
-
-        xmlHttp.onreadystatechange = function() {
-            if (xmlHttp.readyState === XMLHttpRequest.DONE){
-                if(xmlHttp.status === 200){
-                    console.log("informations2");
-                    var response = xmlHttp.response;
-                    console.log("XML response: " + response);
-                    obj = JSON.parse(response);
-                    console.log(obj);
-
-                    console.log(uname.charAt(0));
-
-                    resolve(obj);
-                }
-
-                else{
-                    console.log("tempo expirado");
-                    window.localStorage.removeItem('token');
-                    // document.getElementById("tologin").click();
-                }
-            }
-        }.bind(this)
-    }
-    else{
-        console.log("Sem sessao iniciada");
-        // document.getElementById("tologin").click();
-
-    }
-}.bind(this));
-
-let xmlRequest = new Promise(function(resolve, reject) {
-    console.log("xmlRequest");
-    // var t = true;
-    var token = window.localStorage.getItem('token');
-    var tokenObj = JSON.parse(token);
-    if(token != null){
-        var uname = JSON.parse(token).username;
-        var map;
-
-        var user = {
-            "username": uname,
-            "token": tokenObj,
-            "showPrivate": true //MUDAR ISTO DEPOIS
-        };
-
-        console.log("pedido");
-        var xmlHttp = new XMLHttpRequest();
-        xmlHttp.open("POST", "https://custom-tine-204615.appspot.com/rest/occurrence/list", true);
-        xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        var myJSON = JSON.stringify(user);
-        xmlHttp.send(myJSON);
-
-        console.log("esperar pelo estado");
-        xmlHttp.onreadystatechange = function () {
-            console.log("1");
-            if (xmlHttp.readyState === 4) {
-                console.log("2");
-                if (xmlHttp.status === 200) {
-                    console.log("3");
-                    var response = xmlHttp.response;
-                    var obj = JSON.parse(response);
-                    console.log("obj:");
-                    console.log(obj);
-                    map = obj[0];
-                    console.log("map:");
-                    console.log(map);
-
-                    resolve(obj.mapList);
-                }
-                else {
-                    console.log("tempo expirado");
-                    window.localStorage.removeItem('token');
-                }
-            }
-        }.bind(this)
-    }
-    else{
-        console.log("Sem sessao iniciada");
-    }
-}.bind(this));
+        else{
+            console.log("Sem sessao iniciada");
+        }
+    });
+}
 
 class Profile extends React.Component {
     constructor(props){
         super(props);
-
-        // this.loadInformations = this.loadInformations.bind(this);
     }
 
     state = {
@@ -315,87 +254,8 @@ class Profile extends React.Component {
         reports: [
             {user_occurrence_title: ''}],
         hasPhoto: true,
-        s: true,
+        loading: true,
     };
-
-    // loadInformations = () =>{
-    //     var obj;
-    //     var token = window.localStorage.getItem('token');
-    //     var d = new Date();
-    //     var t = d.getTime();
-    //     // var expirationData = JSON.parse(token).expirationData;
-    //     // console.log(token);
-    //     // console.log(t);
-    //     // console.log(expirationData);
-    //
-    //     if(token != null){
-    //         var uname = JSON.parse(token).username;
-    //         var tokenObj = JSON.parse(token);
-    //
-    //         var user = {
-    //             "username": uname,
-    //             "token": tokenObj
-    //         }
-    //
-    //         var xmlHttp = new XMLHttpRequest();
-    //         xmlHttp.open( "POST", "https://custom-tine-204615.appspot.com/rest/profile/", true);
-    //         xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    //         var myJSON = JSON.stringify(user);
-    //         xmlHttp.send(myJSON);
-    //
-    //         xmlHttp.onreadystatechange = function() {
-    //             if (xmlHttp.readyState === XMLHttpRequest.DONE){
-    //                 if(xmlHttp.status === 200){
-    //                     var response = xmlHttp.response;
-    //                     console.log("XML response: " + response);
-    //                     obj = JSON.parse(response);
-    //
-    //                     var username = document.getElementById("showusername");
-    //                     username.innerHTML = uname;
-    //                     console.log(uname.charAt(0));
-    //                     // this.setState({username: uname});
-    //                     // this.setState({firstLetter: uname.charAt(0)});
-    //
-    //                     // var name = document.getElementById("showname");
-    //                     // name.innerHTML = obj.user_name;
-    //                     // this.setState({name: obj.user_name});
-    //                     //
-    //                     // var email = document.getElementById("showemail");
-    //                     // email.innerHTML = obj.user_email;
-    //                     // this.setState({email: obj.user_email});
-    //                     //
-    //                     // var role = document.getElementById("showrole");
-    //                     // role.innerHTML = obj.user_role;
-    //                     // this.setState({role: obj.user_role});
-    //
-    //                     // var img = document.getElementById("profileimg");
-    //                     // img.innerHTML = obj.user_name.charAt(0);
-    //                 }
-    //
-    //                 else{
-    //                     console.log("tempo expirado");
-    //                     window.localStorage.removeItem('token');
-    //                     document.getElementById("tologin").click();
-    //                     {/*<Link to={'/login'}/>*/}
-    //                 }
-    //             }
-    //         }.bind(this)
-    //     }
-    //     else{
-    //         // if(token != null){
-    //         //     window.localStorage.removeItem('token');
-    //         //     console.log("Tempo expirado - faca login");
-    //         //     document.getElementById("tologin").click();
-    //         // }
-    //         // else{
-    //             console.log("Sem sessao iniciada");
-    //             document.getElementById("tologin").click();
-    //         // }
-    //
-    //         {/*<Link to={'/login'}/>*/}
-    //         //document.location.href = '/login';
-    //     }
-    // };
 
     handleToggle = () => {
         this.setState({ accountOpen: !this.state.accountOpen });
@@ -445,79 +305,43 @@ class Profile extends React.Component {
         return event.target.value == this.state.newpass;
     };
 
-    // componentDidUpdate () {
-    //     console.log("update");
-    //     if(this.state.s){
-    //         this.setState({s: false});
-    //         this.setState({email: 'ana'});
-    //     }
-    //     else{
-    //         this.setState({s: true});
-    //         this.setState({email: 'outro'});
-    //     }
-    //
-    // }
-
-    async info() {
-        console.log("info");
-        var info = await informations();
-        console.log("info!!!!!!!!");
-        console.log(info);
-        return info;
-        this.setState({email: info.user_email});
-        console.log(this.state.email);
-    }
-
-    componentDidMount () {
+    async componentDidMount () {
         console.log("componentdidmount");
-        this.setState({s: !this.state.s});
         var token = window.localStorage.getItem('token');
 
         if(token != null){
-            console.log("cdm2");
+            var tokenID = JSON.parse(token);
+            this.setState({email: ''});
+            this.setState({name: ''});
+            this.setState({role: ''});
+
+            let d = await informations2();
+            this.setState({email: d.user_email});
+            this.setState({name: d.user_name});
+            this.setState({role: d.user_role});
+
             var uname = JSON.parse(token).username;
             this.setState({username: uname});
             this.setState({firstLetter: uname.charAt(0)});
 
-            console.log("cdm3");
-
-        // this.info();
-            // var obj = info();
-            // this.setState({email: obj.user_email});
-            // this.setState({name: obj.user_name});
-            // this.setState({role: obj.user_role});
-            // console.log(this.state.email);
-
-
-            informations.then((obj) => {
-                console.log("cdm4");
-                this.setState({email: obj.user_email});
-                this.setState({name: obj.user_name});
-                this.setState({role: obj.user_role});
-                console.log(this.state.name + " " + this.state.email + " " + this.state.role);
-                console.log(obj);
-            });
-
-            xmlRequest.then((value) =>{
-                console.log("cdm5");
-                if(value != undefined && value.length != 0){
-                    this.setState({reports: value});
-                    // if(this.isMounted())
-                    //     this.setState({loggedIn: true});
-                    console.log(this.state.reports);
-                    console.log("loggedIn");
-                    console.log(this.state.isLoggedIn);
-                    console.log(value);
-                    this.setState({hasReports: true});
-                }
-                else{
-                    console.log("not loggedIn");
-                }
-                console.log("state object");
+            let r = await xmlRequest();
+            if(r != undefined && r.length != 0){
+                this.setState({reports: r});
+                // if(this.isMounted())
+                //     this.setState({loggedIn: true});
                 console.log(this.state.reports);
-            });
+                console.log("loggedIn");
+                console.log(this.state.isLoggedIn);
+                console.log(r);
+                this.setState({hasReports: true});
+            }
+            else{
+                console.log("not loggedIn");
+            }
+            console.log("state object");
+            console.log(this.state.reports);
 
-            var url = 'https://storage.googleapis.com/custom-tine-204615.appspot.com/user/' + uname + '/photo' ;
+            var url = 'https://storage.googleapis.com/custom-tine-204615.appspot.com/user/' + tokenID.userID + '/photo' ;
 
             var image = new Image();
 
@@ -534,6 +358,8 @@ class Profile extends React.Component {
 
             console.log("hasphoto:");
             console.log(this.state.hasPhoto);
+
+            this.setState({loading: false});
         }
         else{
             document.getElementById("tologin").click();
@@ -543,7 +369,7 @@ class Profile extends React.Component {
 
     render() {
         const { classes } = this.props;
-        const { accountOpen, value, isLoggedIn, reports, name, email, role, username, firstLetter, hasReports } = this.state;
+        const { accountOpen, value, isLoggedIn, reports, name, email, role, username, firstLetter, hasReports, loading } = this.state;
 
         if(!isLoggedIn){
             return <Redirect to={"/login"}>Link</Redirect>;
@@ -555,6 +381,10 @@ class Profile extends React.Component {
 
                 {/*<Typography variant="display1" className={classes.title}>Perfil</Typography>*/}
 
+                {loading && <CircularProgress className={classes.loading} />}
+
+                {!loading &&
+                <div>
                 <Paper className={classes.paper} style={{margin: '0 auto'}} >
 
                     <Button className={classes.editProfile} onClick={this.handleOpenEdit}> <ProfileIcon /> Editar Perfil </Button>
@@ -734,6 +564,7 @@ class Profile extends React.Component {
                 <Button id={"tologin"} component={Link} to='/login' className={classes.input} color={"primary"}>
                     Sem sessao iniciada
                 </Button>
+                </div>}
             </div>
 
         );
