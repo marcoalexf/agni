@@ -1,6 +1,8 @@
 package com.example.marisco.myapplication;
 
 import android.Manifest;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v4.app.Fragment;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -30,6 +32,7 @@ import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -307,43 +310,40 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback, 
         Log.d("UPLOADING SHIT", "ENTERED THE UPLOAD PHOTO METHOD");
         Log.d("ID IS -> ", String.valueOf(id));
 
-        /*
-        Now we need to do this:
-            - Make a call to the endpoint in the form /upload/{id}
-            - In this endpoint we just send a POST that it's payload is the bytes from the file
+        try {
+            //byte [] data = Files.readAllBytes(photoFile.toPath());
+            Toast toast = Toast.makeText(getActivity(), Long.toString(photoFile.length()/1024), Toast.LENGTH_SHORT);
+            toast.show();
+            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+            Bitmap bitmap = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
+            Bitmap resized = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth()/4, bitmap.getHeight()/4, true);
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            resized.compress(Bitmap.CompressFormat.JPEG, 50, stream);
+            byte[] data = stream.toByteArray();
+            resized.recycle();
+            Log.d("SIZE OF DATA: ", String.valueOf(data.length));
+            RequestBody body = RequestBody.create(MediaType.parse("image/jpeg"), data);
+            String contentType = "image/jpeg";
+            Call <ResponseBody> call = agniAPI.uploadPhoto(id, contentType, body);
 
-           And that's it!
-         */
-
-
-
-                try {
-                    byte [] data = Files.readAllBytes(photoFile.toPath());
-                    Log.d("SIZE OF DATA: ", String.valueOf(data.length));
-                    RequestBody body = RequestBody.create(MediaType.parse("image/jpeg"), data);
-                    String contentType = "image/jpeg";
-                    Call <ResponseBody> call = agniAPI.uploadPhoto(id, contentType, body);
-
-                    call.enqueue(new Callback<ResponseBody>() {
-                        @Override
-                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                            if(response.isSuccessful()){
-                                Toast toast = Toast.makeText(getActivity(), "Photo successfully uploaded", Toast.LENGTH_SHORT);
-                                toast.show();
-                            }
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    if(response.isSuccessful()){
+                        Toast toast = Toast.makeText(getActivity(), "Photo successfully uploaded", Toast.LENGTH_SHORT);
+                        toast.show();
                         }
-
-                        @Override
-                        public void onFailure(Call<ResponseBody> call, Throwable t) {
-                            Toast toast = Toast.makeText(getActivity(), "Failed to upload photo", Toast.LENGTH_SHORT);
-                            toast.show();
-                        }
-                    });
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
 
-
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    Toast toast = Toast.makeText(getActivity(), "Failed to upload photo", Toast.LENGTH_SHORT);
+                    toast.show();
+                    }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
