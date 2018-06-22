@@ -311,19 +311,18 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback, 
         Log.d("ID IS -> ", String.valueOf(id));
 
         try {
-            //byte [] data = Files.readAllBytes(photoFile.toPath());
-            Toast toast = Toast.makeText(getActivity(), Long.toString(photoFile.length()/1024), Toast.LENGTH_SHORT);
-            toast.show();
             BitmapFactory.Options bmOptions = new BitmapFactory.Options();
             Bitmap bitmap = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
-            Bitmap resized = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth()/4, bitmap.getHeight()/4, true);
+            int factor = calculateResizeFactor(bitmap);
+            Bitmap resized = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth()/4,
+                    bitmap.getHeight()/4, true);
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             resized.compress(Bitmap.CompressFormat.JPEG, 50, stream);
             byte[] data = stream.toByteArray();
             resized.recycle();
             Log.d("SIZE OF DATA: ", String.valueOf(data.length));
-            RequestBody body = RequestBody.create(MediaType.parse("image/jpeg"), data);
             String contentType = "image/jpeg";
+            RequestBody body = RequestBody.create(MediaType.parse("image/jpeg"), data);
             Call <ResponseBody> call = agniAPI.uploadPhoto(id, contentType, body);
 
             call.enqueue(new Callback<ResponseBody>() {
@@ -371,6 +370,15 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback, 
                 return;
             }
         }
+    }
+
+    public int calculateResizeFactor(Bitmap bitmap){
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        if(width + height > 2000)
+            return width + height / 2000;
+        else
+            return 1;
     }
 
     @Override
