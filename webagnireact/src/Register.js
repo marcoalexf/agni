@@ -586,6 +586,7 @@ class Register extends Component {
                             value={this.state.address}
                             onChange={this.handleAddressChange}
                             onSelect={this.handleAddressSelect}
+                            className="pac-container"
                         >
                             {({ getInputProps, suggestions, getSuggestionItemProps }) => (
                                 <div>
@@ -595,12 +596,14 @@ class Register extends Component {
                                             className: classes.textField
                                         })}
                                     />
-                                    <div className="autocomplete-dropdown-container">
+                                    {!startedLocation &&
+                                    (validLocation ? <CheckIcon className={classes.validIcon}/> : <CloseIcon className={classes.nonValidIcon}/> )}
+                                    <div className="pac-item">
                                         {suggestions.map(suggestion => {
                                             const className = suggestion.active ? 'suggestion-item--active' : 'suggestion-item';
                                             // inline style for demonstration purpose
                                             const style = suggestion.active
-                                                ? { backgroundColor: '#e6f9ff', cursor: 'pointer' }
+                                                ? { backgroundColor: '#D3D3D3', cursor: 'pointer' }
                                                 : { backgroundColor: '#ffffff', cursor: 'pointer' };
                                             return (
                                                 <div {...getSuggestionItemProps(suggestion, { className, style })}>
@@ -609,12 +612,20 @@ class Register extends Component {
                                             )
                                         })}
                                     </div>
-                                    {!startedLocation &&
-                                    (validLocation ? <CheckIcon className={classes.validIcon}/> : <CloseIcon className={classes.nonValidIcon}/> )}
                                     <div id="helperMessageLocation" className={classes.helperMessage}></div>
                                 </div>
                             )}
                         </PlacesAutocomplete>
+
+                        <div className="pac-container pac-logo"
+                             style={{width: 557, position: 'absolute', left: 66, top: 106, display: 'none',}}>
+                            <div className="pac-item">
+                                <span className="pac-icon pac-icon-marker"></span>
+                                <span className="pac-item-query">
+                                    {/*<span>France</span>*/}
+                                </span>
+                            </div>
+                        </div>
                     </div>
 
                     <div className="input-group">
