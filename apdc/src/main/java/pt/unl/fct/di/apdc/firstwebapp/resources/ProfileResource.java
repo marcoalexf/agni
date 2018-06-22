@@ -22,6 +22,7 @@ import com.google.appengine.api.datastore.Transaction;
 import com.google.appengine.api.datastore.TransactionOptions;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
+import com.google.appengine.repackaged.org.apache.commons.codec.digest.DigestUtils;
 import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.ProfileEditData;
@@ -98,17 +99,42 @@ public class ProfileResource {
 				return Response.status(Status.BAD_REQUEST).build();
 			}
 			Entity user = results.get(0);
-			if(data.email != null && data.email != "") {
+			if(data.email != null && !data.email.isEmpty()) {
+				filter = new FilterPredicate("user_email", FilterOperator.EQUAL, data.email);
+				userQuery.setFilter(filter);
+				results = datastore.prepare(userQuery).asList(FetchOptions.Builder.withDefaults());
+				if(!results.isEmpty()) {
+					txn.rollback();
+					return Response.status(Status.BAD_REQUEST).entity("Email already exists.").build();
+				}
 				user.setProperty("user_email", data.email);
 			}
-			if(data.district != null && data.district != "") {
+			if(data.district != null && !data.district.isEmpty()) {
 				user.setProperty("user_district", data.district);
 			}
-			if(data.county != null && data.county != "") {
+			if(data.county != null && !data.county.isEmpty()) {
 				user.setProperty("user_county", data.county);
 			}
-			if(data.locality != null && data.locality != "") {
+			if(data.locality != null && !data.locality.isEmpty()) {
 				user.setProperty("user_locality", data.locality);
+			}
+			if(data.newUsername != null && !data.newUsername.isEmpty()) {
+				filter = new FilterPredicate("user_username", FilterOperator.EQUAL, data.username);
+				userQuery = new Query("User").setFilter(filter);
+				results = datastore.prepare(userQuery).asList(FetchOptions.Builder.withDefaults());
+				if(!results.isEmpty()) {
+					txn.rollback();
+					return Response.status(Status.BAD_REQUEST).entity("User already exists.").build();
+				}
+				user.setProperty("user_username", data.newPassword);
+			}
+			if(data.password != null && !data.password.isEmpty() && data.newPassword != null && !data.newPassword.isEmpty()) {
+				if(((String)(user.getProperty("user_pwd"))).equals(DigestUtils.sha256Hex(data.password))) {
+					user.setProperty("user_pwd", DigestUtils.sha256Hex(data.newPassword));
+				}
+				else {
+					return Response.status(Status.BAD_REQUEST).entity("Old password doesn't match.").build();
+				}
 			}
 			datastore.put(txn, user);
 			if(data.uploadPhoto) {

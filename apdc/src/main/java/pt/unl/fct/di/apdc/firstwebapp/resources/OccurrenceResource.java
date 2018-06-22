@@ -171,21 +171,23 @@ public class OccurrenceResource {
 		else if(!data.token.username.equals(data.username) && !SecurityManager.userHasAccess("see_private_occurrences", data.token.userID)) {
 			return Response.status(Status.FORBIDDEN).build();
 		}
+		Point nw = null;
+		Point se = null;
 		if(data.lat != null && data.lon != null) {
 			Point geoPoint = Point.at(Coordinate.fromDegrees(data.lat), Coordinate.fromDegrees(data.lon));
 			BoundingArea area = EarthCalc.around(geoPoint, data.radius);
-			Point nw = area.northWest;
-			Point se = area.southEast;
+			nw = area.northWest;
+			se = area.southEast;
 			FilterPredicate geoFilterUpperLat = new FilterPredicate("user_occurrence_lat", FilterOperator.LESS_THAN_OR_EQUAL, nw.latitude);
 			FilterPredicate geoFilterLowerLat = new FilterPredicate("user_occurrence_lat", FilterOperator.GREATER_THAN_OR_EQUAL, se.latitude);
-			FilterPredicate geoFilterLeftmostLon = new FilterPredicate("user_occurrence_lon", FilterOperator.GREATER_THAN_OR_EQUAL, nw.longitude);
-			FilterPredicate geoFilterRightmostLon = new FilterPredicate("user_occurrence_lon", FilterOperator.LESS_THAN_OR_EQUAL, se.longitude);
+			//FilterPredicate geoFilterLeftmostLon = new FilterPredicate("user_occurrence_lon", FilterOperator.GREATER_THAN_OR_EQUAL, nw.longitude);
+			//FilterPredicate geoFilterRightmostLon = new FilterPredicate("user_occurrence_lon", FilterOperator.LESS_THAN_OR_EQUAL, se.longitude);
 			CompositeFilter compositeFilter;
 			if(visibilityFilter != null) {
-				compositeFilter = CompositeFilterOperator.and(visibilityFilter, geoFilterUpperLat, geoFilterLowerLat, geoFilterLeftmostLon, geoFilterRightmostLon);
+				compositeFilter = CompositeFilterOperator.and(visibilityFilter, geoFilterUpperLat, geoFilterLowerLat/*, geoFilterLeftmostLon, geoFilterRightmostLon*/);
 			}
 			else {
-				compositeFilter = CompositeFilterOperator.and(geoFilterUpperLat, geoFilterLowerLat, geoFilterLeftmostLon, geoFilterRightmostLon);
+				compositeFilter = CompositeFilterOperator.and(geoFilterUpperLat, geoFilterLowerLat/*, geoFilterLeftmostLon, geoFilterRightmostLon*/);
 			}
 			ctrQuery.setFilter(compositeFilter);
 		}
@@ -197,18 +199,23 @@ public class OccurrenceResource {
 		QueryResultList<Entity> results = datastore.prepare(ctrQuery).asQueryResultList(fetchOptions);
 		Query ctrQueryMedia;
 		List<Entity> mediaResults;
-		List<Long> mediaIDs;
+		List<String> mediaIDs;
 		for(Entity occurrenceEntity: results) {
+			if(data.lat != null && data.lon != null) {
+				if((double)(occurrenceEntity.getProperty("user_occurrence_lon")) < nw.longitude && (double)(occurrenceEntity.getProperty("user_occurrence_lon")) > se.longitude) {
+					continue;
+				}
+			}
 			occurrenceMap = new HashMap<String, Object>();
 			occurrenceMap.putAll(occurrenceEntity.getProperties());
 			occurrenceMap.put("username", occurrenceEntity.getParent().getName());
-			occurrenceMap.put("occurrenceID", occurrenceEntity.getKey().getId());
-			occurrenceMap.put("userID", occurrenceEntity.getParent().getId());
+			occurrenceMap.put("occurrenceID", String.valueOf(occurrenceEntity.getKey().getId()));
+			occurrenceMap.put("userID", String.valueOf(occurrenceEntity.getParent().getId()));
 			ctrQueryMedia = new Query("UserOccurrenceMedia").setAncestor(occurrenceEntity.getKey());
 			mediaResults = datastore.prepare(ctrQueryMedia).asList(FetchOptions.Builder.withDefaults());
-			mediaIDs = new LinkedList<Long>();
+			mediaIDs = new LinkedList<String>();
 			for(Entity occurrenceMediaEntity: mediaResults) {
-				mediaIDs.add(occurrenceMediaEntity.getKey().getId());
+				mediaIDs.add(String.valueOf(occurrenceMediaEntity.getKey().getId()));
 			}
 			occurrenceMap.put("mediaIDs", mediaIDs);
 			occurrences.add(occurrenceMap);
@@ -249,10 +256,10 @@ public class OccurrenceResource {
 			
 			// Save occurrence
 			Entity occurrenceEntity = datastore.get(txn, occurrenceKey);
-			if(data.title != null && data.title != "") {
+			if(data.title != null && !data.title.isEmpty()) {
 				occurrenceEntity.setProperty("user_occurrence_title", data.title);
 			}
-			if(data.description != null && data.description != "") {
+			if(data.description != null && !data.description.isEmpty()) {
 				occurrenceEntity.setProperty("user_occurrence_description", data.description);
 			}
 			if(data.visibility != null) {
