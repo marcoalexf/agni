@@ -33,9 +33,11 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.VisibleRegion;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -64,6 +66,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private static final String VISIBILITY = "visibility";
     private static final String LEVEL = "level";
     private static final String SAVED_LOCATIONS = "saved_locations";
+    private static final String TOKEN = "token";
 
     private GoogleMap map;
     @BindView(R.id.mapView) MapView mapView;
@@ -82,6 +85,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private Location initialLoc;
     private int minDifficulty;
     private boolean cleanIsChecked, zoneIsChecked, otherIsChecked;
+    private String cursor;
+    private LoginResponse token;
 
     private LayoutInflater inflater;
     private ViewGroup container;
@@ -99,6 +104,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         savedLocations = new ArrayList<>(10);
+
+        Bundle b = this.getArguments();
+        if (b != null) {
+            this.token = (LoginResponse) b.getSerializable(TOKEN);
+        }
         this.inflater = inflater;
         this.container = container;
 
@@ -170,26 +180,52 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     .build();
         }
 
-        AgniAPI agniAPI = retrofit.create(AgniAPI.class);
+        VisibleRegion visibleRegion = map.getProjection().getVisibleRegion();
+        LatLng nearLeft = visibleRegion.nearLeft;
+        LatLng farRight = visibleRegion.farRight;
 
-        Call<CursorList> call = agniAPI.getOccurrences();
+        float[] distanceHeight = new float[2];
 
-        call.enqueue(new Callback<CursorList>() {
-            public void onResponse(Call<CursorList> call, Response<CursorList> response) {
-                if (response.code() == 200) {
-                    CursorList c = response.body();
-                    map_list = c.getMapList();
-                    putAllMarkers();
+        Location.distanceBetween(nearLeft.latitude, nearLeft.longitude, farRight.latitude,
+                farRight.longitude, distanceHeight );
+
+        float lat = (float)(nearLeft.latitude + farRight.latitude)/2;
+        float lon = (float)(nearLeft.longitude + farRight.longitude)/2;
+
+        /*Toast toast = Toast.makeText(getActivity(), "raio: " + (int)distanceHeight[0], Toast.LENGTH_SHORT);
+        toast.show();
+
+        Toast toast2 = Toast.makeText(getActivity(), "lat: " + lat, Toast.LENGTH_SHORT);
+        toast2.show();
+
+        Toast toast3 = Toast.makeText(getActivity(), "lon: " + lon, Toast.LENGTH_SHORT);
+        toast3.show();*/
+        if(Math.abs(lat) > 1 && Math.abs(lon) > 1){
+            AgniAPI agniAPI = retrofit.create(AgniAPI.class);
+
+            Call<CursorList> call = agniAPI.getMoreOccurrences(new ListOccurrenceData(token, false, token.username, cursor,
+                    lat, lon, (int)distanceHeight[0]));
+
+            call.enqueue(new Callback<CursorList>() {
+                public void onResponse(Call<CursorList> call, Response<CursorList> response) {
+                    if (response.code() == 200) {
+                        CursorList c = response.body();
+                        map_list = c.getMapList();
+                        cursor = c.getCursor();
+                        if(!c.getMapList().isEmpty())
+                            putAllMarkers();
+                    }
+                    else {
+                        Toast toast = Toast.makeText(getActivity(), "Failed to get public occurrences: " + response.code(), Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
                 }
-                else {
-                    Toast toast = Toast.makeText(getActivity(), "Failed to get public occurrences" + response.code(), Toast.LENGTH_SHORT);
-                    toast.show();
+                public void onFailure(Call<CursorList> call, Throwable t) {
+                    Log.e("ERROR", t.toString());
                 }
-            }
-            public void onFailure(Call<CursorList> call, Throwable t) {
-                Log.e("ERROR", t.toString());
-            }
-        });
+            });
+        }
+
     }
 
     @Override
@@ -202,7 +238,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         mapPress(latLng);
                     }});
         map.getUiSettings().setMyLocationButtonEnabled(false);
-        getOccurrences();
+
+        map.setOnCameraMoveStartedListener(new GoogleMap.OnCameraMoveStartedListener() {
+            @Override
+            public void onCameraMoveStarted(int i) {
+                getOccurrences();
+            }
+        });
     }
 
     private void putAllMarkers(){
@@ -217,6 +259,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             if(isNotFiltered(entry))
                 putMarker(entry);
         }
+        getOccurrences();
     }
 
     private boolean isNotFiltered(Map<String, Object> entry){
@@ -355,6 +398,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                             savedLocations.get(item.getOrder() -1).getLocation(), 15);
                     map.animateCamera(location);
                 }
+                getOccurrences();
                 return true;
             }
         });
