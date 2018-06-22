@@ -19,6 +19,7 @@ import amber from 'material-ui/colors/amber';
 import yellow from 'material-ui/colors/yellow';
 import {withStyles} from "material-ui/styles/index";
 import {Link} from "react-router-dom";
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const CustomTableCell = withStyles(theme => ({
     head: {
@@ -156,74 +157,64 @@ let prom = new Promise(function(resolve, reject) {
     }, 100)
 });
 
-let xmlRequest = new Promise(function(resolve, reject) {
-    console.log("xmlRequest");
-    // var t = true;
-    // var token = window.localStorage.getItem('token');
-    // var tokenObj = JSON.parse(token);
-    //if(token != null){
-    //     var uname = JSON.parse(token).username;
-        var map;
+function xmlRequest(){
+    return new Promise(resolve => {
+        console.log("xmlRequest");
+        // var t = true;
+        // var token = window.localStorage.getItem('token');
+        // var tokenObj = JSON.parse(token);
+        //if(token != null){
+        //     var uname = JSON.parse(token).username;
+            var map;
 
-        // var user = {
-        //     //"username": uname,
-        //     "token": tokenObj,
-        //     "showPrivate": true //MUDAR ISTO DEPOIS
-        // }
+            // var user = {
+            //     //"username": uname,
+            //     "token": tokenObj,
+            //     "showPrivate": true //MUDAR ISTO DEPOIS
+            // }
 
-        console.log("pedido");
-        var xmlHttp = new XMLHttpRequest();
-        xmlHttp.open("GET", "https://custom-tine-204615.appspot.com/rest/occurrence/list", true);
-        //xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        //var myJSON = JSON.stringify(user);
-        //xmlHttp.send(myJSON);
-        xmlHttp.send();
+            console.log("pedido");
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.open("GET", "https://custom-tine-204615.appspot.com/rest/occurrence/list", true);
+            //xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            //var myJSON = JSON.stringify(user);
+            //xmlHttp.send(myJSON);
+            xmlHttp.send();
 
-        console.log("esperar pelo estado");
-        xmlHttp.onreadystatechange = function () {
-            console.log("1");
-            if (xmlHttp.readyState === 4) {
-                console.log("2");
-                if (xmlHttp.status === 200) {
-                    console.log("3");
-                    var response = xmlHttp.response;
-                    var obj = JSON.parse(response);
-                    console.log("obj:");
-                    console.log(obj);
-                    map = obj[0];
-                    console.log("map:");
-                    console.log(map);
-                    // var array = Object.values(map);
-                    // console.log(array);
-                    // console.log(operationsData);
-                    resolve(obj.mapList);
-                    // resolve('xml value')
-                }
-                else {
-                    console.log("tempo expirado");
-                    // reject(Error('Tempo expirado'));
-                    //TODO - Link to Login
+            console.log("esperar pelo estado");
+            xmlHttp.onreadystatechange = function () {
+                console.log("1");
+                if (xmlHttp.readyState === 4) {
+                    console.log("2");
+                    if (xmlHttp.status === 200) {
+                        console.log("3");
+                        var response = xmlHttp.response;
+                        var obj = JSON.parse(response);
+                        console.log("obj:");
+                        console.log(obj);
+                        map = obj[0];
+                        console.log("map:");
+                        console.log(map);
+                        // var array = Object.values(map);
+                        // console.log(array);
+                        // console.log(operationsData);
+                        resolve(obj.mapList);
+                        // resolve('xml value')
+                    }
+                    else {
+                        console.log("tempo expirado");
+                        // reject(Error('Tempo expirado'));
+                        //TODO - Link to Login
+                    }
                 }
             }
-        }
 
-        // if(t=true)
-        //     resolve('xml value')
-    //}
+            // if(t=true)
+            //     resolve('xml value')
+        //}
 
-});
-
-const obj = [
-    // xmlRequest.then((value) => {
-    //     console.log("value:");
-    //     console.log(value);
-    //     return value;
-    //     }
-    // )
-    // {user_occurrence_title: 'titulo1'},
-    // {user_occurrence_title: 'titulo2'}
-];
-
+    });
+}
 
 class TestOperations extends React.Component {
     state={
@@ -231,15 +222,15 @@ class TestOperations extends React.Component {
             {user_occurrence_title: ''}],
         page: 0,
         rowsPerPage: 5,
+        loading: true,
     };
 
-    componentDidMount () {
-        xmlRequest.then((value) =>{
-                this.setState({object: value});
-                console.log("state object");
-                console.log(this.state.object);
-            }
-        );
+    async componentDidMount () {
+        let r = await xmlRequest();
+        this.setState({object: r});
+        this.setState({loading: false});
+        console.log("state object");
+        console.log(this.state.object);
     }
 
     handleChangePage = (event, page) => {
@@ -265,10 +256,12 @@ class TestOperations extends React.Component {
 
     render () {
         const {classes} = this.props;
-        const { object, rowsPerPage, page } = this.state;
+        const { object, rowsPerPage, page, loading } = this.state;
 
         return (
             <div>
+                {loading && <CircularProgress />}
+                {!loading && <div>
                 <EnhancedTableToolbar></EnhancedTableToolbar>
                 <Table>
                     <TableHead>
@@ -317,6 +310,7 @@ class TestOperations extends React.Component {
                     onChangePage={this.handleChangePage}
                     onChangeRowsPerPage={this.handleChangeRowsPerPage}
                 />
+                </div>}
             </div>
         )
     }

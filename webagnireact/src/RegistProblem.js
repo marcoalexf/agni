@@ -72,6 +72,8 @@ class RegistProblem extends React.Component {
     constructor(){
         super();
         this.handleSeeIfLoggedIn = this.handleSeeIfLoggedIn.bind(this);
+        this._handleImageChange = this._handleImageChange.bind(this);
+        this._handleSubmit = this._handleSubmit.bind(this);
     }
     state = {
         name: 'Nome do Registo do Problema',
@@ -87,7 +89,9 @@ class RegistProblem extends React.Component {
         myLatLng: {
             lat: 49.2827,
             lng: -123.1207
-        }
+        },
+        file: '',
+        imagePreviewUrl: '',
     };
 
     componentDidMount(){
@@ -239,8 +243,64 @@ class RegistProblem extends React.Component {
         zoom: 11
     };
 
+    _handleSubmit(e) {
+        e.preventDefault();
+        // TODO: do something with -> this.state.file
+    }
+
+    _handleImageChange(e) {
+        e.preventDefault();
+
+        let reader = new FileReader();
+        let file = e.target.files[0];
+
+        if(file){
+            reader.onloadend = () => {
+                this.setState({
+                    file: file,
+                    imagePreviewUrl: reader.result,
+                    wantUploadPhoto: true,
+                });
+            };
+
+            reader.readAsDataURL(file)
+        }
+    }
+
+    uploadPhoto = id => {
+        console.log("uploadPhoto");
+        var file = this.state.file;
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open( "POST", 'https://custom-tine-204615.appspot.com/rest/upload/' + id);
+        xmlHttp.setRequestHeader("Content-Type", file.type);
+        // xmlHttp.setRequestHeader("Access-Control-Request-Headers", file.type);
+        // var myJSON = JSON.stringify(file);
+        xmlHttp.send(file);
+
+        xmlHttp.onreadystatechange = function() {//Call a function when the state changes.
+            if(xmlHttp.readyState === XMLHttpRequest.DONE) {
+                if(xmlHttp.status === 200){
+                    console.log("uploadPhoto sucessfully!");
+                    document.getElementById("tologin").click();
+                }
+
+                else{
+                    document.getElementById("errorMessage").innerHTML = "Ocorreu um erro ao carregar a sua foto";
+                }
+            }
+        }.bind(this)
+
+    };
+
     render(){
         const { classes } = this.props;
+        let {imagePreviewUrl} = this.state;
+        let $imagePreview = null;
+            // (<img src={require('./img/registUser2.png')} alt="Avatar2" width={100} style={{marginBottom: '20'}} />);
+        if (imagePreviewUrl) {
+            $imagePreview = (<img src={imagePreviewUrl} width={200} className={classes.accountPhoto} />);
+        }
+
         return(
             <div onLoad={this.handleSeeIfLoggedIn()}>
                 <Typography variant="display1" className={classes.title}>Registar Problema</Typography>

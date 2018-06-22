@@ -218,7 +218,7 @@ function xmlRequest(){
                         console.log(obj);
                         map = obj[0];
                         console.log("map:");
-                        console.log(map);
+                        console.log(obj.mapList);
 
                         resolve(obj.mapList);
                     }
@@ -305,6 +305,52 @@ class Profile extends React.Component {
         return event.target.value == this.state.newpass;
     };
 
+    hasRegistPhoto = (n) => {
+        var url2 = 'https://storage.googleapis.com/custom-tine-204615.appspot.com/user/' + n.userID + '/occurrence/'
+            + n.occurrenceID + "/" + n.mediaIDs[0];
+
+        // function s(){ return new Promise (resolve => {
+        //     var image2 = new Image();
+
+        // image2.onload = function () {
+        //     console.log("success with photo " + n.user_occurrence_title);
+        //     return true;
+        // }.bind(this);
+        //
+        // image2.onerror = function () {
+        //     console.log("error with photo " + n.user_occurrence_title);
+        //     resolve(false);
+        // }.bind(this);
+        //
+        // image2.src = url2;
+        // })};
+
+        return true;
+
+    }
+
+    getPhotoUrl = (n) => {
+        console.log("get photo of " + n.user_occurrence_title);
+        var url2 = 'https://storage.googleapis.com/custom-tine-204615.appspot.com/user/' + n.userID + '/occurrence/'
+            + n.occurrenceID + "/" + n.mediaIDs[0];
+        console.log("photo of " + n.user_occurrence_title);
+        // var image2 = new Image();
+        //
+        // image2.onload = function () {
+        //     console.log("photo of " + n.user_occurrence_title);
+        //     return url2;
+        // }.bind(this);
+        //
+        // image2.onerror = function () {
+        //     console.log("photo of " + n.user_occurrence_title);
+        //     return img2;
+        // }.bind(this);
+        //
+        // image2.src = url2;
+
+        return url2;
+    }
+
     async componentDidMount () {
         console.log("componentdidmount");
         var token = window.localStorage.getItem('token');
@@ -358,6 +404,21 @@ class Profile extends React.Component {
 
             console.log("hasphoto:");
             console.log(this.state.hasPhoto);
+
+            // var url2 = 'https://storage.googleapis.com/custom-tine-204615.appspot.com/user/' + tokenID.userID + '/occurrence/' + 6270652252160000 + "/4863277368606720" ;
+            //
+            // var image2 = new Image();
+            //
+            // image2.onload = function () {
+            //     // this.setState({hasPhoto: true});
+            //     this.setState({photo2: url2});
+            // }.bind(this);
+            //
+            // image2.onerror = function () {
+            //     this.setState({hasPhoto: false});
+            // }.bind(this);
+            //
+            // image2.src = url2;
 
             this.setState({loading: false});
         }
@@ -548,10 +609,12 @@ class Profile extends React.Component {
                                     <h2>{n.user_occurrence_title}</h2>
                                     <p>Tipo: {n.user_occurrence_type}</p>
                                     <p>Grau: {n.user_occurrence_level}</p>
-                                    <p>Data do registo: {n.user_occurrence_data}</p>
-                                    <img key={n.user_occurrence_data} className={classes.img} src={img2} style={{margin: '0 auto'}} alt={n.user_occurrence_title} />
+                                    <p>Data do registo: {n.user_occurrence_date}</p>
+                                    {this.hasRegistPhoto(n) ?
+                                    <img key={n.user_occurrence_date} className={classes.img} src={this.getPhotoUrl(n)} style={{margin: '0 auto'}} alt={n.user_occurrence_title} /> :
+                                        <img key={n.user_occurrence_date} className={classes.img} src={img2} style={{margin: '0 auto'}} alt={n.user_occurrence_title} />
+                                    }
                                 </div>
-
 
                             )
                         })}

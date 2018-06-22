@@ -4,4 +4,12 @@
 		<property name="user_login_time" direction="desc" />
 		<property name="user_login_ip" direction="asc" />
 	</datastore-index>
+	<datastore-index kind="UserOccurrence" ancestor="true" source="manual">
+        <property name="user_occurrence_visibility" direction="asc"/>
+        <property name="user_occurrence_lat" direction="asc"/>
+    </datastore-index>
+    <datastore-index kind="UserOccurrence" ancestor="false" source="manual">
+        <property name="user_occurrence_visibility" direction="asc"/>
+        <property name="user_occurrence_lat" direction="asc"/>
+    </datastore-index>
 </datastore-indexes>

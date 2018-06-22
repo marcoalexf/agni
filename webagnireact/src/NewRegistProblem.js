@@ -124,6 +124,9 @@ class NewRegistProblem extends React.Component {
         super();
         this.handleSeeIfLoggedIn = this.handleSeeIfLoggedIn.bind(this);
         this.getLocation = this.getLocation.bind(this);
+        this._handleImageChange = this._handleImageChange.bind(this);
+        this._handleSubmit = this._handleSubmit.bind(this);
+        this.handleRegistProblem = this.handleRegistProblem.bind(this);
     }
     state = {
         name: 'Nome do Registo do Problema',
@@ -142,6 +145,8 @@ class NewRegistProblem extends React.Component {
             lng: -123.1207
         },
         loading: true,
+        file: '',
+        imagePreviewUrl: '',
     };
 
     componentDidMount(){
@@ -251,10 +256,15 @@ class NewRegistProblem extends React.Component {
             "type": this.state.problemType,
             "level": this.state.urgency,
             "visibility": !this.state.private,
-            "lat": 38.661453,
-            "lon": -9.206618,
+            "lat": 39.269820,
+            "lon": -9.105602,
             "notificationOnResolve": this.state.open,
+            "uploadMedia": this.state.wantUploadPhoto,
+            "nUploads": 1,
         };
+        console.log("lat " + this.state.myLatLng.lat);
+        console.log("lon " + this.state.myLatLng.lat);
+
 
         console.log(data);
 
@@ -268,9 +278,20 @@ class NewRegistProblem extends React.Component {
             if(xmlHttp.readyState === XMLHttpRequest.DONE) {
 
                 if(xmlHttp.status === 200){
-                    console.log("Sucesso");
+                    console.log("Sucesso")
+                    var response = xmlHttp.response;
+                    var id = JSON.parse(response);
+                    var length = id.length;
+
+                    if(this.state.file != ''){
+                        console.log("id");
+                        console.log(id);
+                        console.log(id.uploadMediaIDs);
+                        console.log(id.uploadMediaIDs[0]);
+                        this.uploadPhoto(id.uploadMediaIDs[0]);
+                    }
+
                     document.getElementById("tothankyou").click();
-                    //document.location.href = '/obrigada';
                 }
 
                 else{
@@ -279,7 +300,7 @@ class NewRegistProblem extends React.Component {
                 }
             }
 
-        }
+        }.bind(this)
     };
 
     handleSeeIfLoggedIn = () => {
@@ -301,9 +322,65 @@ class NewRegistProblem extends React.Component {
         zoom: 11
     };
 
+    _handleSubmit(e) {
+        e.preventDefault();
+        // TODO: do something with -> this.state.file
+    }
+
+    _handleImageChange(e) {
+        e.preventDefault();
+
+        let reader = new FileReader();
+        let file = e.target.files[0];
+
+        if(file){
+            reader.onloadend = () => {
+                this.setState({
+                    file: file,
+                    imagePreviewUrl: reader.result,
+                    wantUploadPhoto: true,
+                });
+            };
+
+            reader.readAsDataURL(file)
+        }
+    }
+
+    uploadPhoto = id => {
+        console.log("uploadPhoto");
+        var file = this.state.file;
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open( "POST", 'https://custom-tine-204615.appspot.com/rest/upload/' + id);
+        xmlHttp.setRequestHeader("Content-Type", file.type);
+        // xmlHttp.setRequestHeader("Access-Control-Request-Headers", file.type);
+        // var myJSON = JSON.stringify(file);
+        xmlHttp.send(file);
+
+        xmlHttp.onreadystatechange = function() {//Call a function when the state changes.
+            if(xmlHttp.readyState === XMLHttpRequest.DONE) {
+                if(xmlHttp.status === 200){
+                    console.log("uploadPhoto sucessfully!");
+                    // document.getElementById("tologin").click();
+                }
+
+                else{
+                    // document.getElementById("errorMessage").innerHTML = "Ocorreu um erro ao carregar a sua foto";
+                }
+            }
+        }.bind(this)
+
+    };
+
     render(){
         const { classes } = this.props;
         const {loading} = this.state;
+        let {imagePreviewUrl} = this.state;
+        let $imagePreview = null;
+        // (<img src={require('./img/registUser2.png')} alt="Avatar2" width={100} style={{marginBottom: '20'}} />);
+        if (imagePreviewUrl) {
+            $imagePreview = (<img src={imagePreviewUrl} width={300} className={classes.accountPhoto} />);
+        }
+
         return(
             <div onLoad={this.handleSeeIfLoggedIn()}>
                 <EnhancedTableToolbar></EnhancedTableToolbar>
@@ -322,6 +399,7 @@ class NewRegistProblem extends React.Component {
                         </TableRow>
                         <TableRow>
                             <TableCell>
+                                {$imagePreview}
                                 <form onSubmit={this._handleSubmit}>
                                     <input type="file" onChange={this._handleImageChange} />
                                     {/*<button type="submit" onClick={this._handleSubmit}>Upload Image</button>*/}
