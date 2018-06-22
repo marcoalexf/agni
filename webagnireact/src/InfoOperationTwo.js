@@ -11,7 +11,7 @@ import Button from 'material-ui/Button';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import SwipeableViews from 'react-swipeable-views';
-import img2 from './img/news2.jpg';
+import img2 from './img/matasuja.jpg';
 import {Map, InfoWindow, Marker, GoogleApiWrapper, Listing} from 'google-maps-react';
 import GoogleMapReact from 'google-map-react';
 import CircularProgress from '@material-ui/core/CircularProgress';

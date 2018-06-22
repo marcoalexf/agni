@@ -30,6 +30,9 @@ import Tooltip from 'material-ui/Tooltip';
 import PropTypes from 'prop-types';
 import IconButton from 'material-ui/IconButton';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import PlacesAutocomplete from 'react-places-autocomplete';
+import { geocodeByAddress, geocodeByPlaceId, getLatLng } from 'react-places-autocomplete';
+import {SearchBox, Marker} from 'react-google-maps';
 
 const AnyReactComponent = ({ text }) => <div>{text}</div>;
 
@@ -43,7 +46,7 @@ const styles =  theme => ({
     }),
     textField: {
         margin: theme.spacing.unit,
-        width: 350,
+        width: 550,
     },
     formControl: {
         margin: theme.spacing.unit,
@@ -147,6 +150,8 @@ class NewRegistProblem extends React.Component {
         loading: true,
         file: '',
         imagePreviewUrl: '',
+        address: '',
+        nUploads: 0,
     };
 
     componentDidMount(){
@@ -256,14 +261,15 @@ class NewRegistProblem extends React.Component {
             "type": this.state.problemType,
             "level": this.state.urgency,
             "visibility": !this.state.private,
-            "lat": 39.269820,
-            "lon": -9.105602,
+            "lat": this.state.myLatLng.lat,
+            "lon": this.state.myLatLng.lng,
             "notificationOnResolve": this.state.open,
             "uploadMedia": this.state.wantUploadPhoto,
-            "nUploads": 1,
+            "nUploads": this.state.nUploads,
         };
+        console.log("nuploads" + this.state.nUploads);
         console.log("lat " + this.state.myLatLng.lat);
-        console.log("lon " + this.state.myLatLng.lat);
+        console.log("lon " + this.state.myLatLng.lng);
 
 
         console.log(data);
@@ -278,12 +284,12 @@ class NewRegistProblem extends React.Component {
             if(xmlHttp.readyState === XMLHttpRequest.DONE) {
 
                 if(xmlHttp.status === 200){
-                    console.log("Sucesso")
-                    var response = xmlHttp.response;
-                    var id = JSON.parse(response);
-                    var length = id.length;
+                    console.log("Sucesso");
 
                     if(this.state.file != ''){
+                        var response = xmlHttp.response;
+                        var id = JSON.parse(response);
+                        var length = id.length;
                         console.log("id");
                         console.log(id);
                         console.log(id.uploadMediaIDs);
@@ -339,6 +345,7 @@ class NewRegistProblem extends React.Component {
                     file: file,
                     imagePreviewUrl: reader.result,
                     wantUploadPhoto: true,
+                    nUploads: 1,
                 });
             };
 
@@ -369,6 +376,23 @@ class NewRegistProblem extends React.Component {
             }
         }.bind(this)
 
+    };
+
+    handleAddressChange = (address) => {
+        this.setState({address});
+        // this.setState({locality: ''});
+    };
+
+    handleAddressSelect = (address) => {
+        geocodeByAddress(address)
+            .then(results => getLatLng(results[0]))
+            .then(latLng => console.log('Success', latLng))
+            .catch(error => console.error('Error', error));
+
+        this.setState({address});
+        // this.setState({ locality: address });
+        // this.setState({validLocation: true});
+        // console.log("locality: " + this.state.locality);
     };
 
     render(){
@@ -416,6 +440,39 @@ class NewRegistProblem extends React.Component {
                                         onChange={this.handleChange('location')}
                                         className={classes.textField}
                                     />
+
+                                    {/*<PlacesAutocomplete*/}
+                                        {/*value={this.state.address}*/}
+                                        {/*onChange={this.handleAddressChange}*/}
+                                        {/*onSelect={this.handleAddressSelect}*/}
+                                    {/*>*/}
+                                        {/*{({ getInputProps, suggestions, getSuggestionItemProps }) => (*/}
+                                            {/*<div>*/}
+                                                {/*<input*/}
+                                                    {/*{...getInputProps({*/}
+                                                        {/*placeholder: 'Search Places ...',*/}
+                                                        {/*className: 'location-search-input'*/}
+                                                    {/*})}*/}
+                                                {/*/>*/}
+                                                {/*<div className="autocomplete-dropdown-container">*/}
+                                                    {/*{suggestions.map(suggestion => {*/}
+                                                        {/*const className = suggestion.active ? 'suggestion-item--active' : 'suggestion-item';*/}
+                                                        {/*// inline style for demonstration purpose*/}
+                                                        {/*const style = suggestion.active*/}
+                                                            {/*? { backgroundColor: '#fafafa', cursor: 'pointer' }*/}
+                                                            {/*: { backgroundColor: '#ffffff', cursor: 'pointer' };*/}
+                                                        {/*return (*/}
+                                                            {/*<div {...getSuggestionItemProps(suggestion, { className, style })}>*/}
+                                                                {/*<span>{suggestion.description}</span>*/}
+                                                            {/*</div>*/}
+                                                        {/*)*/}
+                                                    {/*})}*/}
+                                                {/*</div>*/}
+                                            {/*</div>*/}
+                                        {/*)}*/}
+                                    {/*</PlacesAutocomplete>*/}
+
+
                                     <Button variant="fab" mini className={classes.searchButton}
                                             onClick={this.getLocation}> <SearchIcon/> </Button>
                                 </div>
@@ -431,6 +488,34 @@ class NewRegistProblem extends React.Component {
                                             {/*lat={38.661453}*/}
                                             {/*lng={-9.206618}*/}
                                         {/*/>*/}
+
+                                        {/*<SearchBox*/}
+                                            {/*ref={this.props.onSearchBoxMounted}*/}
+                                            {/*bounds={this.props.bounds}*/}
+                                            {/*controlPosition={window.google.maps.ControlPosition.TOP_LEFT}*/}
+                                            {/*onPlacesChanged={this.props.onPlacesChanged}*/}
+                                        {/*>*/}
+                                            {/*<input*/}
+                                                {/*type="text"*/}
+                                                {/*placeholder="Customized your placeholder"*/}
+                                                {/*style={{*/}
+                                                    {/*boxSizing: `border-box`,*/}
+                                                    {/*border: `1px solid transparent`,*/}
+                                                    {/*width: `240px`,*/}
+                                                    {/*height: `32px`,*/}
+                                                    {/*marginTop: `27px`,*/}
+                                                    {/*padding: `0 12px`,*/}
+                                                    {/*borderRadius: `3px`,*/}
+                                                    {/*boxShadow: `0 2px 6px rgba(0, 0, 0, 0.3)`,*/}
+                                                    {/*fontSize: `14px`,*/}
+                                                    {/*outline: `none`,*/}
+                                                    {/*textOverflow: `ellipses`,*/}
+                                                {/*}}*/}
+                                            {/*/>*/}
+                                        {/*</SearchBox>*/}
+                                        {/*{this.props.markers.map((marker, index) =>*/}
+                                            {/*<Marker key={index} position={marker.position} />*/}
+                                        {/*)}*/}
                                     </GoogleMapReact>
                                 </div>}
                             </TableCell>

@@ -617,15 +617,15 @@ class Register extends Component {
                             )}
                         </PlacesAutocomplete>
 
-                        <div className="pac-container pac-logo"
-                             style={{width: 557, position: 'absolute', left: 66, top: 106, display: 'none',}}>
-                            <div className="pac-item">
-                                <span className="pac-icon pac-icon-marker"></span>
-                                <span className="pac-item-query">
-                                    {/*<span>France</span>*/}
-                                </span>
-                            </div>
-                        </div>
+                        {/*<div className="pac-container pac-logo"*/}
+                             {/*style={{width: 557, position: 'absolute', left: 66, top: 106, display: 'none',}}>*/}
+                            {/*<div className="pac-item">*/}
+                                {/*<span className="pac-icon pac-icon-marker"></span>*/}
+                                {/*<span className="pac-item-query">*/}
+                                    {/*/!*<span>France</span>*!/*/}
+                                {/*</span>*/}
+                            {/*</div>*/}
+                        {/*</div>*/}
                     </div>
 
                     <div className="input-group">
