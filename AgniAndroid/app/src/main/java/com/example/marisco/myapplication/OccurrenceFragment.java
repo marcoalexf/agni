@@ -305,6 +305,7 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback, 
     }
 
     public void uploadPhoto(File photoFile, List<Long> list_of_ids_to_upload_to){
+        this.button.setEnabled(false);
         AgniAPI agniAPI = retrofit.create(AgniAPI.class);
         Long id = list_of_ids_to_upload_to.get(0);
         Log.d("UPLOADING SHIT", "ENTERED THE UPLOAD PHOTO METHOD");
@@ -343,6 +344,7 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback, 
         } catch (Exception e) {
             e.printStackTrace();
         }
+        this.button.setEnabled(true);
     }
 
     @Override
