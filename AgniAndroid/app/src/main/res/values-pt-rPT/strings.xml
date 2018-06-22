@@ -55,8 +55,8 @@
     <string name="occurrence_location">Localização:</string>
     <string name="register_occurrence">Registar ocorrência</string>
     <string name="occurrence_type">Tipo da ocorrência:</string>
-    <string name="occurrence_type_clean">Limpeza de matas</string>
-    <string name="occurrence_type_zone">Zona de difícil acesso</string>
+    <string name="occurrence_type_clean">Limpeza de mato</string>
+    <string name="occurrence_type_zone">Zona de mau acesso</string>
     <string name="occurrence_type_other">Outro</string>
 
 

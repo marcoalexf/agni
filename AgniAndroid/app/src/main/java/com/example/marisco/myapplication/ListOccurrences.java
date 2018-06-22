@@ -105,7 +105,7 @@ public class ListOccurrences extends Fragment implements AbsListView.OnScrollLis
 
         AgniAPI agniAPI = retrofit.create(AgniAPI.class);
 
-        Call<CursorList> call = agniAPI.getMoreOccurrences(new ListOccurrenceData(null, false, null, cursor));
+        Call<CursorList> call = agniAPI.getMoreOccurrences(new ListOccurrenceData(null, false, null, cursor, null, null, null));
 
         call.enqueue(new Callback<CursorList>() {
             public void onResponse(Call<CursorList> call, Response<CursorList> response) {

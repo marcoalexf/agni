@@ -205,6 +205,10 @@ public class HomePage extends AppCompatActivity
 
             MapFragment map = new MapFragment();
             FragmentManager fman = getSupportFragmentManager();
+            Bundle args = new Bundle();
+            args.putSerializable(TOKEN, token);
+
+            map.setArguments(args);
             fman.beginTransaction().replace(R.id.fragment, map).commit();
         } else if (id == R.id.nav_statistics) {
 
