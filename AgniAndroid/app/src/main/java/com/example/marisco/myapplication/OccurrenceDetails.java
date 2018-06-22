@@ -70,9 +70,9 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback, L
         lon = 0;
         boolean visibility = false;
         double level = 1;
-        long occurence_id = 0;
-        long userID = 0;
-        ArrayList<Long> mediaIDs = null;
+        String occurence_id = "";
+        String userID = "";
+        ArrayList<String> mediaIDs = null;
         if (b != null) {
             title = (String)b.getSerializable(TITLE);
             description = (String)b.getSerializable(DESCRIPTION);
@@ -80,9 +80,9 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback, L
             lon = (double)b.getSerializable(LONGITUDE);
             visibility = (boolean)b.getSerializable(VISIBILITY);
             level = (double)b.getSerializable(LEVEL);
-            occurence_id = (long) b.getSerializable(ID);
-            userID = (long) b.getSerializable("userID");
-            mediaIDs = (ArrayList<Long>) b.getSerializable("mediaIDs");
+            occurence_id = (String) b.getSerializable(ID);
+            userID = (String) b.getSerializable("userID");
+            mediaIDs = (ArrayList<String>) b.getSerializable("mediaIDs");
         }
 
         map.onCreate(savedInstanceState);
@@ -94,7 +94,7 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback, L
     }
 
     private void fillInfo(String title, String description, double lat, double lon, boolean visibility, double level
-    , long occurrence_id, long userID, ArrayList<Long> mediaIDs){
+    , String occurrence_id, String userID, ArrayList<String> mediaIDs){
         o_title.setText(title);
         o_description.setText(description);
 
@@ -105,7 +105,7 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback, L
         else o_visibility.setText(R.string.occurrence_private);
 
         Picasso.get().load("https://storage.googleapis.com/custom-tine-204615.appspot.com/user/"
-                    + userID + "/occurrence/" + occurrence_id + "/" + mediaIDs.get(0) + "/").into(this.image);
+                    + userID + "/occurrence/" + occurrence_id + "/" + mediaIDs.get(0)).into(image);
     }
 
 

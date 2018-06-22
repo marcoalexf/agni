@@ -87,8 +87,8 @@ public class ListOccurrences extends Fragment implements AbsListView.OnScrollLis
         args.putSerializable(VISIBILITY, (boolean) map_list.get(position).get("user_occurrence_visibility"));
         args.putSerializable(LATITUDE, (double) map_list.get(position).get("user_occurrence_lat"));
         args.putSerializable(LONGITUDE, (double) map_list.get(position).get("user_occurrence_lon"));
-        args.putSerializable(ID, (long) map_list.get(position).get("occurrenceID"));
-        args.putSerializable("userID", (long) map_list.get(position).get("userID"));
+        args.putSerializable(ID, (String) map_list.get(position).get("occurrenceID"));
+        args.putSerializable("userID", (String) map_list.get(position).get("userID"));
         args.putSerializable("mediaIDs", (ArrayList) map_list.get(position).get("mediaIDs"));
 
         od.setArguments(args);
