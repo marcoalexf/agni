@@ -199,10 +199,14 @@ class MiniDrawer extends React.Component {
 
             var data = {
                 "username": uname,
+                "userID": tokenID.userID,
                 "tokenID": tokenID.tokenID,
                 "creationData": tokenID.creationData,
                 "expirationData": tokenID.expirationData
             }
+
+            console.log("token:");
+            console.log(token);
 
             if(uname!= null){
                 var xmlHttp = new XMLHttpRequest();
@@ -228,13 +232,14 @@ class MiniDrawer extends React.Component {
 
                             document.getElementById("tologin").click();
                             // document.location.href = '/login';
+                            // window.localStorage.removeItem('token');
                         }
 
                         else {
                             console.log("tempo expirado");
                         }
                     }
-                    window.localStorage.removeItem('token');
+                     window.localStorage.removeItem('token');
                 }.bind(this)
             }
         }
@@ -264,6 +269,9 @@ class MiniDrawer extends React.Component {
             // this.setState({username: uname});
             // this.setState({firstLetter: uname.charAt(0)});
             return uname;
+        }
+        else{
+            return '';
         }
     };
 

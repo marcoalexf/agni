@@ -1,6 +1,7 @@
 package pt.unl.fct.di.apdc.firstwebapp.resources;
 
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
@@ -14,16 +15,16 @@ import javax.ws.rs.core.Response.Status;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.EntityNotFoundException;
-import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.FetchOptions;
+import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Transaction;
 import com.google.appengine.api.datastore.TransactionOptions;
+import com.google.appengine.repackaged.org.apache.commons.codec.digest.DigestUtils;
+import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.RegisterData;
-
-import org.apache.commons.codec.digest.DigestUtils;
 
 @Path("/register")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -36,6 +37,70 @@ public class RegisterResource {
 	public RegisterResource() { } //Nothing to be done here...
 	
 	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response registerUser(RegisterData data) {
+		LOG.fine("Attempt to register user: " + data.username);
+		
+		if(!data.valid()) {
+			return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
+		}
+		
+		TransactionOptions options = TransactionOptions.Builder.withXG(true);
+		Transaction txn = datastore.beginTransaction(options);
+		try {
+			FilterPredicate filter = new FilterPredicate("user_username", FilterOperator.EQUAL, data.username);
+			Query ctrQuery = new Query("User").setFilter(filter);
+			List<Entity> results = datastore.prepare(ctrQuery).asList(FetchOptions.Builder.withDefaults());
+			if(!results.isEmpty()) {
+				txn.rollback();
+				return Response.status(Status.BAD_REQUEST).entity("User already exists.").build();
+			}
+			filter = new FilterPredicate("user_email", FilterOperator.EQUAL, data.email);
+			ctrQuery.setFilter(filter);
+			results = datastore.prepare(ctrQuery).asList(FetchOptions.Builder.withDefaults());
+			if(!results.isEmpty()) {
+				txn.rollback();
+				return Response.status(Status.BAD_REQUEST).entity("Email already exists.").build();
+			}
+			Entity user = new Entity("User");
+			user.setProperty("user_username", data.username);
+			user.setProperty("user_name", data.name);
+			user.setProperty("user_pwd", DigestUtils.sha256Hex(data.password));
+			user.setProperty("user_email", data.email);
+			user.setUnindexedProperty("user_creation_time", new Date());
+			user.setProperty("user_role", data.role);
+			user.setProperty("user_district", data.district);
+			user.setProperty("user_county", data.county);
+			user.setProperty("user_locality", data.locality);
+			datastore.put(txn, user);
+			if(data.uploadPhoto) {
+				txn.commit();
+				txn = datastore.beginTransaction(options);
+				Entity fileUpload = UploadResource.newUploadFileEntity(
+						"user/" + user.getKey().getId() + "/", 
+						"photo", 
+						"IMAGE",
+						true,
+						false
+						);
+				datastore.put(txn, fileUpload);
+				txn.commit();
+				LOG.info("User registered " + data.username + " with id " + user.getKey().getId());
+				return Response.ok(g.toJson(fileUpload.getKey().getId())).build();
+			}
+			else {
+				txn.commit();
+				LOG.info("User registered " + data.username + " with id " + user.getKey().getId());
+				return Response.ok().build();
+			}
+		} finally {
+			if (txn.isActive() ) {
+				txn.rollback();
+			}
+		}
+	}
+	
+	/**@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response registerUser(RegisterData data) {
 		LOG.fine("Attempt to register user: " + data.username);
@@ -87,7 +152,7 @@ public class RegisterResource {
 				txn.rollback();
 			}
 		}
-	}
+	}**/
 	
 	/**@POST
 	@Consumes(MediaType.APPLICATION_JSON)

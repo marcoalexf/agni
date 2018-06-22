@@ -1,6 +1,7 @@
 package pt.unl.fct.di.apdc.firstwebapp.resources;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -15,11 +16,12 @@ import javax.ws.rs.core.Response.Status;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.EntityNotFoundException;
-import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.FetchOptions;
+import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Transaction;
 import com.google.appengine.api.datastore.TransactionOptions;
+import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.ProfileEditData;
@@ -43,27 +45,28 @@ public class ProfileResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response getProfile(ProfileData data) {
 		LOG.info("Attempt to get user: " + data.username + "profile information requested by user: " + data.token.username);
-		Key userKey = KeyFactory.createKey("User", data.username);
-		try {
-			Entity user = datastore.get(userKey);
-			if(!data.token.isTokenValid()) {
-				LOG.warning("Failed to request profile, token for user: " + data.token.username + " is invalid");
-				return Response.status(Status.FORBIDDEN).build();
-			}
-			if(!data.token.username.equals(data.username) && !SecurityManager.userHasAccess("see_user_profile", data.token.username)) {
-				LOG.warning("Failed to request profile, user: " + data.token.username + " does not have the rights to do it");
-				return Response.status(Status.FORBIDDEN).build();
-			}
-			Map<String, Object> profile = new HashMap<String, Object>();
-			profile.putAll(user.getProperties());
-			profile.remove("user_pwd");
-			LOG.info("User " + data.username + " profile was sent successfully to user " + data.token.username);
-			return Response.ok(g.toJson(profile)).build();
-		} catch (EntityNotFoundException e) {
+		FilterPredicate filter = new FilterPredicate("user_username", FilterOperator.EQUAL, data.username);
+		Query userQuery = new Query("User").setFilter(filter);
+		List<Entity> results = datastore.prepare(userQuery).asList(FetchOptions.Builder.withDefaults());
+		if(results.isEmpty()) {
 			// Username does not exist
 			LOG.warning("Failed to request profile, user:" + data.username + " does not exist");
 			return Response.status(Status.BAD_REQUEST).build();
 		}
+		Entity user = results.get(0);
+		if(!data.token.isTokenValid()) {
+			LOG.warning("Failed to request profile, token for user: " + data.token.username + " is invalid");
+			return Response.status(Status.FORBIDDEN).build();
+		}
+		if(!data.token.username.equals(data.username) && !SecurityManager.userHasAccess("see_user_profile", data.token.userID)) {
+			LOG.warning("Failed to request profile, user: " + data.token.username + " does not have the rights to do it");
+			return Response.status(Status.FORBIDDEN).build();
+		}
+		Map<String, Object> profile = new HashMap<String, Object>();
+		profile.putAll(user.getProperties());
+		profile.remove("user_pwd");
+		LOG.info("User " + data.username + " profile was sent successfully to user " + data.token.username);
+		return Response.ok(g.toJson(profile)).build();
 	}
 	
 	@POST
@@ -78,15 +81,23 @@ public class ProfileResource {
 			LOG.warning("Failed to edit profile, token for user: " + data.token.username + " is invalid");
 			return Response.status(Status.FORBIDDEN).build();
 		}
-		if(!data.token.username.equals(data.username) && !SecurityManager.userHasAccess("edit_user_profile", data.token.username)) {
+		if(!data.token.username.equals(data.username) && !SecurityManager.userHasAccess("edit_user_profile", data.token.userID)) {
 			LOG.warning("Failed to edit profile, user: " + data.token.username + " does not have the rights to do it");
 			return Response.status(Status.FORBIDDEN).build();
 		}
 		TransactionOptions options = TransactionOptions.Builder.withXG(true);
 		Transaction txn = datastore.beginTransaction(options);
 		try {
-			Key userKey = KeyFactory.createKey("User", data.username);
-			Entity user = datastore.get(userKey);
+			FilterPredicate filter = new FilterPredicate("user_username", FilterOperator.EQUAL, data.username);
+			Query userQuery = new Query("User").setFilter(filter);
+			List<Entity> results = datastore.prepare(userQuery).asList(FetchOptions.Builder.withDefaults());
+			if(results.isEmpty()) {
+				// Username does not exist
+				txn.rollback();
+				LOG.warning("Failed to edit profile, user:" + data.username + " does not exist");
+				return Response.status(Status.BAD_REQUEST).build();
+			}
+			Entity user = results.get(0);
 			if(data.email != null && data.email != "") {
 				user.setProperty("user_email", data.email);
 			}
@@ -102,7 +113,7 @@ public class ProfileResource {
 			datastore.put(txn, user);
 			if(data.uploadPhoto) {
 				Entity fileUpload = UploadResource.newUploadFileEntity(
-						"user/" + data.username + "/", 
+						"user/" + user.getKey().getId() + "/", 
 						"photo", 
 						"IMAGE",
 						true,
@@ -116,9 +127,6 @@ public class ProfileResource {
 			txn.commit();
 			LOG.info("User " + data.username + " profile updated");
 			return Response.ok().build();
-		} catch (EntityNotFoundException e) {
-			txn.rollback();
-			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		} finally {
 			if (txn.isActive()) {
 				txn.rollback();

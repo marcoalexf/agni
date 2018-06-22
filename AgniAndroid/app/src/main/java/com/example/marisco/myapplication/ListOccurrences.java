@@ -1,5 +1,6 @@
 package com.example.marisco.myapplication;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -13,6 +14,7 @@ import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.Toast;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,6 +39,7 @@ public class ListOccurrences extends Fragment implements AbsListView.OnScrollLis
     private static final String LATITUDE = "latitude";
     private static final String LONGITUDE = "longitude";
     private static final String VISIBILITY = "visibility";
+    private static final String ID = "occurrence_id";
     private static final String LEVEL = "level";
 
     private Retrofit retrofit;
@@ -84,6 +87,9 @@ public class ListOccurrences extends Fragment implements AbsListView.OnScrollLis
         args.putSerializable(VISIBILITY, (boolean) map_list.get(position).get("user_occurrence_visibility"));
         args.putSerializable(LATITUDE, (double) map_list.get(position).get("user_occurrence_lat"));
         args.putSerializable(LONGITUDE, (double) map_list.get(position).get("user_occurrence_lon"));
+        args.putSerializable(ID, (String) map_list.get(position).get("occurrenceID"));
+        args.putSerializable("userID", (String) map_list.get(position).get("userID"));
+        args.putSerializable("mediaIDs", (ArrayList) map_list.get(position).get("mediaIDs"));
 
         od.setArguments(args);
         fman.beginTransaction().replace(R.id.fragment, od).commit();

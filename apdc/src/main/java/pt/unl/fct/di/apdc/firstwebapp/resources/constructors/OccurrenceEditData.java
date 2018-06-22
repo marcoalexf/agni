@@ -3,40 +3,37 @@ package pt.unl.fct.di.apdc.firstwebapp.resources.constructors;
 public class OccurrenceEditData {
 	
 	public AuthToken token;
-	public String username;
-	public long id;
+	public Long userID;
+	public Long occurrenceID;
 	public String title;
 	public String description;
-	public String type;
-	public int level;
-	public boolean visibility;
-	public double lat;
-	public double lon;
-	public boolean notificationOnResolve;
+	public Boolean visibility;
+	public Boolean notificationOnResolve;
+	public Boolean uploadMedia;
+	public int nUploads;
+
 
 	
 	public OccurrenceEditData() {
 		
 	}
 	
-	public OccurrenceEditData(AuthToken token, String username,  long id, String title, 
-			String description, int level, boolean visibility, boolean notificationOnResolve) {
+	public OccurrenceEditData(AuthToken token, Long userID, Long occurrenceID, String title, 
+			String description,  Boolean visibility, Boolean notificationOnResolve, 
+			Boolean uploadMedia, int nUploads) {
 		this.token = token;
-		this.username = username;
-		this.id = id;
+		this.userID = userID;
+		this.occurrenceID = occurrenceID;
 		this.title = title;
 		this.description = description;
-		this.level = level;
 		this.visibility = visibility;
 		this.notificationOnResolve = notificationOnResolve;
-	}
-	
-	private boolean nonEmptyField(String field) {
-		return field != null && !field.isEmpty();
+		this.uploadMedia = uploadMedia;
+		this.nUploads = nUploads;
 	}
 	
 	public boolean valid() {
-		return id != 0 && nonEmptyField(username);
+		return occurrenceID != null && userID != null;
 	}
 	
 }

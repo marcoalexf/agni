@@ -3,26 +3,22 @@ package pt.unl.fct.di.apdc.firstwebapp.resources.constructors;
 public class OccurrenceDeleteData {
 	
 	public AuthToken token;
-	public String username;
-	public long id;
+	public Long userID;
+	public Long occurrenceID;
 
 	
 	public OccurrenceDeleteData() {
 		
 	}
 	
-	public OccurrenceDeleteData(AuthToken token, String username,  long id) {
+	public OccurrenceDeleteData(AuthToken token, Long userID,  Long occurrenceID) {
 		this.token = token;
-		this.username = username;
-		this.id = id;
-	}
-	
-	private boolean nonEmptyField(String field) {
-		return field != null && !field.isEmpty();
+		this.userID = userID;
+		this.occurrenceID = occurrenceID;
 	}
 	
 	public boolean valid() {
-		return id != 0 && nonEmptyField(username);
+		return userID != null && occurrenceID != null;
 	}
 	
 }

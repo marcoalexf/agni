@@ -15,6 +15,8 @@ import Paper from 'material-ui/Paper';
 import Typography from 'material-ui/Typography';
 import CheckIcon from '@material-ui/icons/CheckCircle';
 import CloseIcon from '@material-ui/icons/Close';
+import PlacesAutocomplete from 'react-places-autocomplete';
+import { geocodeByAddress, geocodeByPlaceId, getLatLng } from 'react-places-autocomplete';
 
 const styles = theme => ({
     textField: {
@@ -77,6 +79,10 @@ const styles = theme => ({
         borderRadius: 20,
         marginBottom: 20
     },
+    geosuggestions:{
+        fontFamily: 'Roboto Mono',
+        borderColor: '#d6d7da',
+    },
 });
 
 //TODO
@@ -115,9 +121,11 @@ class Register extends Component {
             startedName: true,
             startedPassword: true,
             startedConfPass: true,
+            startedLocation: true,
             file: '',
             imagePreviewUrl: '',
             wantUploadPhoto: false,
+            address: '',
         };
 
         this.handleCreateAccount = this.handleCreateAccount.bind(this);
@@ -281,7 +289,7 @@ class Register extends Component {
         // }
 
         if(this.state.validUsername && this.state.validName && this.state.validEmail
-            && this.state.validPassword && this.state.validConfPass){
+            && this.state.validPassword && this.state.validConfPass && this.state.validLocation){
             console.log("valid informations");
             console.log("uploadPhoto1 " + this.state.uploadPhoto);
 
@@ -432,12 +440,30 @@ class Register extends Component {
         }
     }
 
+    handleAddressChange = (address) => {
+        this.setState({address});
+        this.setState({locality: ''});
+        this.setState({startedLocation: false});
+        this.setState({validLocation: false});
+    };
+
+    handleAddressSelect = (address) => {
+        geocodeByAddress(address)
+            .then(results => getLatLng(results[0]))
+            .then(latLng => console.log('Success', latLng))
+            .catch(error => console.error('Error', error));
+
+        this.setState({address});
+        this.setState({ locality: address });
+        this.setState({validLocation: true});
+        console.log("locality: " + this.state.locality);
+    };
 
     render() {
         const { loggingIn } = this.props;
         const { username, email, password, locality, confirmPass, submitted, validUsername, startedUsername,
             startedEmail, startedName, startedPassword, startedConfPass, validEmail, validName, validPassword,
-        validConfPass} = this.state;
+        validConfPass, startedLocation, validLocation} = this.state;
         const { classes } = this.props;
         let {imagePreviewUrl} = this.state;
         let $imagePreview = (<img src={require('./img/registUser2.png')} alt="Avatar2" width={100} style={{marginBottom: '20'}} />);
@@ -546,15 +572,49 @@ class Register extends Component {
                     </div>
 
                     <div className="input-group">
-                        <div className={'form-group' + (submitted && !locality ? ' has-error' : '')}>
-                            <TextField required id="locality" label="Localidade" className={classes.textField} value={this.state.locality}
-                                       onChange={this.handleLocalityChange('locality')}/>
-                            {/*{!startedEmail &&*/}
-                            {/*(validEmail ? <CheckIcon className={classes.validIcon}/> : <CloseIcon className={classes.nonValidIcon}/> )}*/}
-                            {/*{submitted && !locality &&*/}
-                            {/*<div className="help-block">Localidade is required</div>*/}
-                            {/*}*/}
-                        </div>
+                        {/*<div className={'form-group' + (submitted && !locality ? ' has-error' : '')}>*/}
+                            {/*<TextField required id="locality" label="Localidade" className={classes.textField} value={this.state.locality}*/}
+                                       {/*onChange={this.handleLocalityChange('locality')}/>*/}
+                            {/*/!*{!startedEmail &&*!/*/}
+                            {/*/!*(validEmail ? <CheckIcon className={classes.validIcon}/> : <CloseIcon className={classes.nonValidIcon}/> )}*!/*/}
+                            {/*/!*{submitted && !locality &&*!/*/}
+                            {/*/!*<div className="help-block">Localidade is required</div>*!/*/}
+                            {/*/!*}*!/*/}
+                        {/*</div>*/}
+
+                        <PlacesAutocomplete
+                            value={this.state.address}
+                            onChange={this.handleAddressChange}
+                            onSelect={this.handleAddressSelect}
+                        >
+                            {({ getInputProps, suggestions, getSuggestionItemProps }) => (
+                                <div>
+                                    <TextField label={'Localidade'}
+                                        {...getInputProps({
+                                            // placeholder: 'Localidade',
+                                            className: classes.textField
+                                        })}
+                                    />
+                                    <div className="autocomplete-dropdown-container">
+                                        {suggestions.map(suggestion => {
+                                            const className = suggestion.active ? 'suggestion-item--active' : 'suggestion-item';
+                                            // inline style for demonstration purpose
+                                            const style = suggestion.active
+                                                ? { backgroundColor: '#e6f9ff', cursor: 'pointer' }
+                                                : { backgroundColor: '#ffffff', cursor: 'pointer' };
+                                            return (
+                                                <div {...getSuggestionItemProps(suggestion, { className, style })}>
+                                                    <span className={classes.geosuggestions}>{suggestion.description}</span>
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                    {!startedLocation &&
+                                    (validLocation ? <CheckIcon className={classes.validIcon}/> : <CloseIcon className={classes.nonValidIcon}/> )}
+                                    <div id="helperMessageLocation" className={classes.helperMessage}></div>
+                                </div>
+                            )}
+                        </PlacesAutocomplete>
                     </div>
 
                     <div className="input-group">
