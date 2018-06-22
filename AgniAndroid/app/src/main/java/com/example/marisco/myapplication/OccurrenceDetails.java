@@ -104,8 +104,10 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback, L
             o_visibility.setText(R.string.occurrence_public);
         else o_visibility.setText(R.string.occurrence_private);
 
-        Picasso.get().load("https://storage.googleapis.com/custom-tine-204615.appspot.com/user/"
+        if(!mediaIDs.isEmpty()) {
+            Picasso.get().load("https://storage.googleapis.com/custom-tine-204615.appspot.com/user/"
                     + userID + "/occurrence/" + occurrence_id + "/" + mediaIDs.get(0)).into(image);
+        }
     }
 
 
