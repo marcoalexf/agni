@@ -203,7 +203,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         if(Math.abs(lat) > 1 && Math.abs(lon) > 1){
             AgniAPI agniAPI = retrofit.create(AgniAPI.class);
 
-            Call<CursorList> call = agniAPI.getMoreOccurrences(new ListOccurrenceData(token, false, token.username, cursor,
+            Call<CursorList> call = agniAPI.getMoreOccurrences(new ListOccurrenceData(token, false, null, cursor,
                     lat, lon, (int)distanceHeight[0]));
 
             call.enqueue(new Callback<CursorList>() {
@@ -212,8 +212,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         CursorList c = response.body();
                         map_list = c.getMapList();
                         cursor = c.getCursor();
-                        if(!c.getMapList().isEmpty())
+                        if(!c.getMapList().isEmpty()) {
+                            Toast toast = Toast.makeText(getActivity(), "Ocorrências recebidas: " + map_list.size(), Toast.LENGTH_SHORT);
+                            toast.show();
                             putAllMarkers();
+                        }
                     }
                     else {
                         Toast toast = Toast.makeText(getActivity(), "Failed to get public occurrences: " + response.code(), Toast.LENGTH_SHORT);
@@ -242,6 +245,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         map.setOnCameraMoveStartedListener(new GoogleMap.OnCameraMoveStartedListener() {
             @Override
             public void onCameraMoveStarted(int i) {
+                cursor = null;
                 getOccurrences();
             }
         });
@@ -264,6 +268,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private boolean isNotFiltered(Map<String, Object> entry){
         if((int) Math.round((double)entry.get("user_occurrence_level")) >= minDifficulty){
+            if(cleanIsChecked && zoneIsChecked && otherIsChecked)
+                return true;
             if( (cleanIsChecked && entry.get("user_occurrence_type").equals(getResources().getString(R.string.occurrence_type_clean))) ||
                     (zoneIsChecked && entry.get("user_occurrence_type").equals(getResources().getString(R.string.occurrence_type_zone))) ||
                     (otherIsChecked && entry.get("user_occurrence_type").equals(getResources().getString(R.string.occurrence_type_other)))){
