@@ -57,8 +57,8 @@ public class SecurityManager {
 		return roleRights.contains(request);
 	}
 	
-	public static boolean userHasAccess(String request, String username) {
-		Key userKey = KeyFactory.createKey("User", username);
+	public static boolean userHasAccess(String request, long userID) {
+		Key userKey = KeyFactory.createKey("User", userID);
 		Entity user;
 		try {
 			user = datastore.get(userKey);

@@ -7,11 +7,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -38,7 +41,10 @@ import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.ListOccurrenceData;
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceData;
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceDeleteData;
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceEditData;
+import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceMediaData;
 import pt.unl.fct.di.apdc.firstwebapp.util.CursorList;
+import pt.unl.fct.di.apdc.firstwebapp.util.GcsManager;
+import pt.unl.fct.di.apdc.firstwebapp.util.ListIds;
 import pt.unl.fct.di.apdc.firstwebapp.util.SecurityManager;
 import pt.unl.fct.di.apdc.firstwebapp.util.geocalc.BoundingArea;
 import pt.unl.fct.di.apdc.firstwebapp.util.geocalc.Coordinate;
@@ -71,18 +77,19 @@ public class OccurrenceResource {
 		TransactionOptions options = TransactionOptions.Builder.withXG(true);
 		Transaction txn = datastore.beginTransaction(options);
 		try {
-			Key userKey = KeyFactory.createKey("User", data.token.username);
+			Key userKey = KeyFactory.createKey("User", data.token.userID);
 			
 			// Save occurrence
 			Entity occurrenceEntity = new Entity("UserOccurrence", userKey);
 			occurrenceEntity.setProperty("user_occurrence_title", data.title);
 			occurrenceEntity.setProperty("user_occurrence_description", data.description);
-			occurrenceEntity.setProperty("user_occurrence_data", new Date());
+			occurrenceEntity.setProperty("user_occurrence_date", new Date());
 			occurrenceEntity.setProperty("user_occurrence_type", data.type);
 			occurrenceEntity.setProperty("user_occurrence_level", data.level);
 			occurrenceEntity.setProperty("user_occurrence_visibility", data.visibility);
 			occurrenceEntity.setProperty("user_occurrence_lat", data.lat);
 			occurrenceEntity.setProperty("user_occurrence_lon", data.lon);
+			occurrenceEntity.setProperty("user_occurrence_notification_on_resolve", data.notificationOnResolve);
 			datastore.put(txn, occurrenceEntity);
 			
 			// Create occurrence media entities
@@ -101,7 +108,7 @@ public class OccurrenceResource {
 				txn = datastore.beginTransaction(options);
 				for(Entity mediaEntity : mediaEntities) {
 					Entity fileUpload = UploadResource.newUploadFileEntity(
-							"user/" + data.token.username + "/occurrence/" + occurrenceID + "/", 
+							"user/" + data.token.userID + "/occurrence/" + occurrenceID + "/", 
 							String.valueOf(mediaEntity.getKey().getId()), 
 							"IMAGE&VIDEO",
 							data.visibility,
@@ -115,7 +122,7 @@ public class OccurrenceResource {
 					uploadMediaIDs.add(uploadEntity.getKey().getId());
 				}
 				LOG.info("User " + data.token.username + " registered occurrence " + data.title);
-				return Response.ok(g.toJson(uploadMediaIDs)).build();
+				return Response.ok(g.toJson(new ListIds(uploadMediaIDs))).build();
 			}
 			else {
 				txn.commit();
@@ -144,7 +151,16 @@ public class OccurrenceResource {
 		List<Map<String, Object>> occurrences = new LinkedList<Map<String, Object>>();
 		Query ctrQuery = new Query("UserOccurrence");
 		if(data.username != null) {
-			Key userKey = KeyFactory.createKey("User", data.username);
+			FilterPredicate filter = new FilterPredicate("user_username", FilterOperator.EQUAL, data.username);
+			Query userQuery = new Query("User").setFilter(filter);
+			List<Entity> results = datastore.prepare(userQuery).asList(FetchOptions.Builder.withDefaults());
+			if(results.isEmpty()) {
+				// Username does not exist
+				LOG.warning("Searched username does not exist: " + data.username);
+				return Response.status(Status.BAD_REQUEST).build();
+			}
+			Entity user = results.get(0);
+			Key userKey = user.getKey();
 			ctrQuery.setAncestor(userKey);
 		}
 		FilterPredicate visibilityFilter = null;
@@ -152,7 +168,7 @@ public class OccurrenceResource {
 			visibilityFilter = new FilterPredicate("user_occurrence_visibility", FilterOperator.EQUAL, true);
 			ctrQuery.setFilter(visibilityFilter);
 		}
-		else if(!data.token.username.equals(data.username) && !SecurityManager.userHasAccess("see_private_occurrences", data.token.username)) {
+		else if(!data.token.username.equals(data.username) && !SecurityManager.userHasAccess("see_private_occurrences", data.token.userID)) {
 			return Response.status(Status.FORBIDDEN).build();
 		}
 		if(data.lat != null && data.lon != null) {
@@ -187,6 +203,7 @@ public class OccurrenceResource {
 			occurrenceMap.putAll(occurrenceEntity.getProperties());
 			occurrenceMap.put("username", occurrenceEntity.getParent().getName());
 			occurrenceMap.put("occurrenceID", occurrenceEntity.getKey().getId());
+			occurrenceMap.put("userID", occurrenceEntity.getParent().getId());
 			ctrQueryMedia = new Query("UserOccurrenceMedia").setAncestor(occurrenceEntity.getKey());
 			mediaResults = datastore.prepare(ctrQueryMedia).asList(FetchOptions.Builder.withDefaults());
 			mediaIDs = new LinkedList<Long>();
@@ -211,9 +228,10 @@ public class OccurrenceResource {
 	@Path("/edit")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response editOccurrence(OccurrenceEditData data) {
-		Transaction txn = datastore.beginTransaction();
+		TransactionOptions options = TransactionOptions.Builder.withXG(true);
+		Transaction txn = datastore.beginTransaction(options);
 		try {
-			LOG.fine("Attempt to edit ocurrence with id: " + data.id + " by user: " + data.token.username);
+			LOG.fine("Attempt to edit ocurrence with id: " + data.occurrenceID + " by user: " + data.token.username);
 			if(!data.valid()) {
 				return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
 			}
@@ -221,13 +239,13 @@ public class OccurrenceResource {
 				LOG.warning("Failed to edit occurrence, token for user: " + data.token.username + "is invalid");
 				return Response.status(Status.FORBIDDEN).build();
 			}
-			if(!data.token.username.equals(data.username) && !SecurityManager.userHasAccess("edit_user_occurrence", data.token.username)) {
+			if(!(data.token.userID == data.userID) && !SecurityManager.userHasAccess("edit_user_occurrence", data.token.userID)) {
 				LOG.warning("Failed to edit occurrence, user: " + data.token.username + " does not have the rights to do it");
 				return Response.status(Status.FORBIDDEN).build();
 			}
 		
-			Key userKey = KeyFactory.createKey("User", data.token.username);
-			Key occurrenceKey = KeyFactory.createKey(userKey, "UserOccurrence", data.id);
+			Key userKey = KeyFactory.createKey("User", data.userID);
+			Key occurrenceKey = KeyFactory.createKey(userKey, "UserOccurrence", data.occurrenceID);
 			
 			// Save occurrence
 			Entity occurrenceEntity = datastore.get(txn, occurrenceKey);
@@ -237,15 +255,51 @@ public class OccurrenceResource {
 			if(data.description != null && data.description != "") {
 				occurrenceEntity.setProperty("user_occurrence_description", data.description);
 			}
-			if(data.level != 0) {
-				occurrenceEntity.setProperty("user_occurrence_level", data.level);
+			if(data.visibility != null) {
+				occurrenceEntity.setProperty("user_occurrence_visibility", data.visibility);
 			}
-			occurrenceEntity.setProperty("user_occurrence_visibility", data.visibility);
+			if(data.notificationOnResolve != null) {
+				occurrenceEntity.setProperty("user_occurrence_notification_on_resolve", data.notificationOnResolve);
+			}
 			datastore.put(txn, occurrenceEntity);
 			
-			txn.commit();
-			LOG.info("User " + data.token.username + " edited occurrence with id: " + data.id);
-			return Response.ok().build();
+			// Create occurrence media entities
+			if(data.uploadMedia) {
+				List<Entity> mediaEntities = new LinkedList<Entity>();
+				List<Entity> uploadEntities = new LinkedList<Entity>();
+				List<Long> uploadMediaIDs = new LinkedList<Long>();
+				Entity occurrenceMediaEntity;
+				long occurrenceID = occurrenceEntity.getKey().getId();
+				for(int i = 0; i < data.nUploads; i++) {
+					occurrenceMediaEntity = new Entity("UserOccurrenceMedia", occurrenceEntity.getKey());
+					mediaEntities.add(occurrenceMediaEntity);
+				}
+				datastore.put(txn, mediaEntities);
+				txn.commit();
+				txn = datastore.beginTransaction(options);
+				for(Entity mediaEntity : mediaEntities) {
+					Entity fileUpload = UploadResource.newUploadFileEntity(
+							"user/" + data.token.userID + "/occurrence/" + occurrenceID + "/", 
+							String.valueOf(mediaEntity.getKey().getId()), 
+							"IMAGE&VIDEO",
+							data.visibility,
+							false
+							);
+					uploadEntities.add(fileUpload);
+				}
+				datastore.put(txn, uploadEntities);
+				txn.commit();
+				for(Entity uploadEntity: uploadEntities) {
+					uploadMediaIDs.add(uploadEntity.getKey().getId());
+				}
+				LOG.info("User " + data.token.username + " edited occurrence with id: " + data.occurrenceID);
+				return Response.ok(g.toJson(new ListIds(uploadMediaIDs))).build();
+			}
+			else {
+				txn.commit();
+				LOG.info("User " + data.token.username + " edited occurrence with id: " + data.occurrenceID);
+				return Response.ok().build();
+			}
 		} catch (EntityNotFoundException e) {
 			return Response.status(Status.BAD_REQUEST).entity("Occurrence not found.").build();
 		} finally {
@@ -261,7 +315,7 @@ public class OccurrenceResource {
 	public Response deleteOccurrence(OccurrenceDeleteData data) {
 		Transaction txn = datastore.beginTransaction();
 		try {
-			LOG.fine("Attempt to delete ocurrence with id: " + data.id + " by user: " + data.token.username);
+			LOG.fine("Attempt to delete ocurrence with id: " + data.occurrenceID + " by user: " + data.token.username);
 			if(!data.valid()) {
 				return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
 			}
@@ -269,24 +323,62 @@ public class OccurrenceResource {
 				LOG.warning("Failed to delete occurrence, token for user: " + data.token.username + "is invalid");
 				return Response.status(Status.FORBIDDEN).build();
 			}
-			if(!data.token.username.equals(data.username) && !SecurityManager.userHasAccess("delete_user_occurrence", data.token.username)) {
+			if(!(data.token.userID == data.userID) && !SecurityManager.userHasAccess("delete_user_occurrence", data.token.userID)) {
 				LOG.warning("Failed to delete occurrence, user: " + data.token.username + " does not have the rights to do it");
 				return Response.status(Status.FORBIDDEN).build();
 			}
 		
-			Key userKey = KeyFactory.createKey("User", data.token.username);
-			Key occurrenceKey = KeyFactory.createKey(userKey, "UserOccurrence", data.id);
+			Key userKey = KeyFactory.createKey("User", data.userID);
+			Key occurrenceKey = KeyFactory.createKey(userKey, "UserOccurrence", data.occurrenceID);
 			
 			// Delete occurrence
 			datastore.delete(txn, occurrenceKey);
 			
 			txn.commit();
-			LOG.info("User " + data.token.username + " deleted occurrence with id: " + data.id);
+			LOG.info("User " + data.token.username + " deleted occurrence with id: " + data.occurrenceID);
 			return Response.ok().build();
 		} finally {
 			if (txn.isActive() ) {
 				txn.rollback();
 			}
+		}
+	}
+	
+	@POST
+	@Path("/media")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response occurrenceMedia(@Context HttpServletRequest req, @Context HttpServletResponse resp, OccurrenceMediaData data) {
+		try {
+			LOG.fine("Attempt to get media with id " + data.mediaID + " for ocurrence with id " + data.occurrenceID + " by user: " + data.token.username);
+			if(!data.valid()) {
+				return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
+			}
+			if(!data.token.isTokenValid()) {
+				LOG.warning("Failed to get occurrence media, token for user: " + data.token.username + "is invalid");
+				return Response.status(Status.FORBIDDEN).build();
+			}
+			if(!(data.token.userID == data.userID) && !SecurityManager.userHasAccess("see_private_occurrences", data.token.userID)) {
+				LOG.warning("Failed to get occurrence media, user: " + data.token.username + " does not have the rights to do it");
+				return Response.status(Status.FORBIDDEN).build();
+			}
+		
+			Key userKey = KeyFactory.createKey("User", data.userID);
+			Key occurrenceKey = KeyFactory.createKey(userKey, "UserOccurrence", data.occurrenceID);
+			Key mediaKey = KeyFactory.createKey(occurrenceKey, "UserOccurrenceMedia", data.mediaID);
+			
+			// Check media existence
+			datastore.get(mediaKey);
+			
+			if(GcsManager.gcsGet(resp, "user/" + data.userID + "/occurrence/" + data.occurrenceID + "/" + data.mediaID)) {
+				LOG.info("User " + data.token.username + " got media with id " + data.mediaID + " for occurrence with id " + data.occurrenceID);
+				return Response.created(null).status(HttpServletResponse.SC_OK).build();
+			}
+			else {
+				LOG.warning("Failed to get occurrence media, couldn't retrieve media from storage");
+				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+			}
+		} catch (EntityNotFoundException e) {
+			return Response.status(Status.BAD_REQUEST).entity("Media not found.").build();
 		}
 	}
 

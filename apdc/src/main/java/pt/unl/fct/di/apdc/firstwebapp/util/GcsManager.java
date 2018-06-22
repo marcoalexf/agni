@@ -40,9 +40,12 @@ public class GcsManager {
   
 	public static boolean gcsGet(HttpServletResponse resp, String filename, boolean temporary) {
 		try {
+			/**GcsFilename fileName = temporary?
+			new GcsFilename("staging.liquid-layout-196103.appspot.com", filename)
+			:new GcsFilename("liquid-layout-196103.appspot.com", filename);**/
 			GcsFilename fileName = temporary?
-					new GcsFilename("staging.liquid-layout-196103.appspot.com", filename)
-					:new GcsFilename("liquid-layout-196103.appspot.com", filename);
+					new GcsFilename("staging.custom-tine-204615.appspot.com", filename)
+					:new GcsFilename("custom-tine-204615.appspot.com", filename);
 			GcsFileMetadata metadata = gcsService.getMetadata(fileName);
 			String contentType = metadata.getOptions().getContentEncoding();
 			if (SERVE_USING_BLOBSTORE_API) {
