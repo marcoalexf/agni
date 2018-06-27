@@ -243,12 +243,11 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback, 
 
         if(data.getUploadMedia()){
             Call <MediaUploadResponse> call = agniAPI.registerOccurrencePhoto(data);
-            Log.d("UPLOADING SHIT", "UPLOADING SHIT");
             call.enqueue(new Callback<MediaUploadResponse>() {
                 @Override
                 public void onResponse(Call<MediaUploadResponse> call, Response<MediaUploadResponse> response) {
                     if(response.code() == 200){
-                        Toast toast = Toast.makeText(getActivity(), "Nova ocorrência registada, como foto"
+                        Toast toast = Toast.makeText(getActivity(), "Nova ocorrência registada, com foto"
                                 , Toast.LENGTH_SHORT);
                         toast.show();
 
@@ -308,7 +307,6 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback, 
         this.button.setEnabled(false);
         AgniAPI agniAPI = retrofit.create(AgniAPI.class);
         Long id = list_of_ids_to_upload_to.get(0);
-        Log.d("UPLOADING SHIT", "ENTERED THE UPLOAD PHOTO METHOD");
         Log.d("ID IS -> ", String.valueOf(id));
 
         try {

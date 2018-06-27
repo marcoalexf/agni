@@ -7,7 +7,7 @@
     android:paddingTop="25dp"
     android:paddingBottom="25dp"
     android:orientation="vertical"
-    android:background="@android:color/darker_gray"
+    android:background="@android:color/white"
     android:alpha="0.9">
 
     <EditText
