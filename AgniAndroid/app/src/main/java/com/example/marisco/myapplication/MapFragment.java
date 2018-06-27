@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
@@ -263,6 +264,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     listOccurrenceDetails(marker_list.get(marker));
             }
         });
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                getOccurrences();
+            }
+        }, 2000);
     }
 
     private void putAllMarkers(){
