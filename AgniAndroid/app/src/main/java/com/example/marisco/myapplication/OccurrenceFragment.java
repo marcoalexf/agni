@@ -52,7 +52,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 
-public class OccurrenceFragment extends Fragment implements OnMapReadyCallback, LocationListener {
+public class OccurrenceFragment extends Fragment implements OnMapReadyCallback {
 
     public static final String ENDPOINT = "https://custom-tine-204615.appspot.com/rest/";
     private static final String TOKEN = "token";
@@ -409,23 +409,4 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback, 
     }
 
 
-    @Override
-    public void onLocationChanged(Location location) {
-
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
-    }
 }

@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/colorPrimary"
-    android:orientation="vertical"
-    tools:context=".ProfileFragment">
+    android:layout_height="match_parent">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimary"
+        android:orientation="vertical"
+        tools:context=".ProfileFragment">
 
         <TextView
             android:id="@+id/detail_title"
@@ -14,7 +21,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="#000000"
-            android:textSize="30dp" />
+            android:textSize="30sp" />
 
 
     <ImageView
@@ -26,13 +33,13 @@
 
         <TextView
             android:id="@+id/detail_description"
-            android:layout_width="370dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="#000000"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
 
@@ -42,17 +49,30 @@
             android:layout_height="wrap_content"
             android:text="@string/occurrence_severity"
             android:textColor="#000000"
-            android:textSize="20dp" />
+            android:textSize="20sp" />
 
 
         <TextView
             android:id="@+id/detail_level"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/occurrence_severity"
             android:textColor="#000000"
-            android:textSize="20dp"
-            />
+            android:textSize="20sp"/>
+
+        <Button
+            android:id="@+id/likeBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_gravity="end"
+            android:layout_marginStart="210dp"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/bg_button"
+            android:drawableEnd="@drawable/ic_baseline_favorite_24px"
+            android:text="0"
+            android:textColor="#000000"
+            android:textSize="20sp"/>
+
+
     </LinearLayout>
 
     <LinearLayout
@@ -66,7 +86,7 @@
             android:layout_height="wrap_content"
             android:text="@string/occurrence_area"
             android:textColor="#000000"
-            android:textSize="20dp"
+            android:textSize="20sp"
             android:layout_alignLeft="@+id/level_text"
             />
 
@@ -74,9 +94,9 @@
             android:id="@+id/detail_visibility"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="left"
+            android:layout_gravity="start"
             android:textColor="#000000"
-            android:textSize="20dp" />
+            android:textSize="20sp" />
 
     </LinearLayout>
 
@@ -87,4 +107,40 @@
             android:layout_marginStart="4dp"
             android:layout_marginTop="8dp" />
 
-</LinearLayout>
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/comments"
+                android:textSize="30sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"/>
+
+            <EditText
+                android:id="@+id/new_comment_text"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/insert_comment"
+                android:inputType="text">
+            </EditText>
+
+            <Button
+                android:id="@+id/comment_btn"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/send_comment" >
+            </Button>
+        <ListView
+            android:id="@+id/comment_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

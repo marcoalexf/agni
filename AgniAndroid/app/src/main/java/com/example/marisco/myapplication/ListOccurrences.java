@@ -41,6 +41,8 @@ public class ListOccurrences extends Fragment implements AbsListView.OnScrollLis
     private static final String VISIBILITY = "visibility";
     private static final String ID = "occurrence_id";
     private static final String LEVEL = "level";
+    private static final String TOKEN = "token";
+
 
     private Retrofit retrofit;
 
@@ -48,6 +50,7 @@ public class ListOccurrences extends Fragment implements AbsListView.OnScrollLis
 
     private List<Map<String, Object>> map_list;
     private String cursor;
+    private LoginResponse token;
 
     public ListOccurrences() { }
 
@@ -73,6 +76,10 @@ public class ListOccurrences extends Fragment implements AbsListView.OnScrollLis
         map_list = new LinkedList<Map<String, Object>>();
         getMoreOccurrences();
         lv.setOnScrollListener(this);
+        Bundle b = this.getArguments();
+        if (b != null) {
+            this.token = (LoginResponse) b.getSerializable(TOKEN);
+        }
         return v;
     }
 
@@ -87,9 +94,10 @@ public class ListOccurrences extends Fragment implements AbsListView.OnScrollLis
         args.putSerializable(VISIBILITY, (boolean) map_list.get(position).get("user_occurrence_visibility"));
         args.putSerializable(LATITUDE, (double) map_list.get(position).get("user_occurrence_lat"));
         args.putSerializable(LONGITUDE, (double) map_list.get(position).get("user_occurrence_lon"));
-        args.putSerializable(ID, (String) map_list.get(position).get("occurrenceID"));
-        args.putSerializable("userID", (String) map_list.get(position).get("userID"));
+        args.putSerializable(ID, Long.parseLong((String) map_list.get(position).get("occurrenceID")));
+        args.putSerializable("userID", Long.parseLong((String)map_list.get(position).get("userID")) );
         args.putSerializable("mediaIDs", (ArrayList) map_list.get(position).get("mediaIDs"));
+        args.putSerializable(TOKEN, token);
 
         od.setArguments(args);
         fman.beginTransaction().replace(R.id.fragment, od).commit();

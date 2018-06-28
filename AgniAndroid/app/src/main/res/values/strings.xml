@@ -88,4 +88,9 @@
     <string name="apply">Apply</string>
     <string name="cancel">Cancel</string>
 
+    <!--Comment section-->
+    <string name="comments">Comments</string>
+    <string name="insert_comment">Insert your comment</string>
+    <string name="send_comment">Send</string>
+
 </resources>
