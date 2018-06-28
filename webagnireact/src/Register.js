@@ -181,7 +181,7 @@ class Register extends Component {
         var specialChars = /[!#$%^&*()+\-=\[\]{};':"\\|,<>\/?]+/;
         this.setState({ [email]: event.target.value });
 
-        if(event.target.value.indexOf('@') <= -1 || event.target.value.length < 9 || event.target.value.length > 30
+        if(event.target.value.indexOf('@') <= -1 || event.target.value.length < 9 || event.target.value.length > 35
             || specialChars.test(event.target.value)){
             this.setState({validEmail: false});
         }

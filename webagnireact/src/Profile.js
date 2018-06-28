@@ -27,6 +27,10 @@ import img2 from './img/news2.jpg';
 import List from 'material-ui/List';
 import Functions from './Functions.js';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import Divider from 'material-ui/Divider';
+import InfoIcon from '@material-ui/icons/Info';
+import Tooltip from 'material-ui/Tooltip';
+// import Slide from '@material-ui/core/Slide';
 
 function TabContainer(props) {
     return (
@@ -44,16 +48,17 @@ const styles =  theme => ({
         marginLeft: 40,
     },
     paper:theme.mixins.gutters({
-        width: 800,
+        width: 900,
         padding: 40,
         height: 400,
     }),
-    paperTwo:theme.mixins.gutters({
-        width: 800,
+    paperTwo:{
+        width: 900,
         padding: 40,
-    }),
+        // flexGrow: 1,
+    },
     editProfile:{
-        marginLeft: 500,
+        marginLeft: 600,
         marginBottom: 20,
     },
     settings: {
@@ -124,6 +129,10 @@ const styles =  theme => ({
     },
 });
 
+// function Transition(props) {
+//     return <Slide direction="up" {...props} />;
+// }
+
 function informations2(){
     return new Promise( resolve => {
         console.log("informations1");
@@ -166,9 +175,16 @@ function informations2(){
                     }
 
                     else{
-                        console.log("tempo expirado");
-                        // window.localStorage.removeItem('token');
-                        // document.getElementById("tologin").click();
+                        console.log("erro");
+                        var expirationData = JSON.parse(token).expirationData;
+                        console.log(token);
+                        console.log("tempo atual: " + t);
+                        console.log("data de expiracao: " + expirationData);
+                        if(expirationData <= t){
+                            console.log("tempo expirado");
+                            window.localStorage.removeItem('token');
+                            document.getElementById("tologin").click();
+                        }
                     }
                 }
             }.bind(this)
@@ -245,6 +261,7 @@ class Profile extends React.Component {
         value: 0,
         editProfile: false,
         editPass: false,
+        editOccurrence: false,
         isLoggedIn: true,
         username: '',
         email: '',
@@ -281,6 +298,10 @@ class Profile extends React.Component {
         this.setState({ editPass: true });
     };
 
+    handleOpenEditOccurrence = () => {
+        this.setState({ editOccurrence: true});
+    }
+
     handleCloseEdit = () => {
         this.setState({ editProfile: false });
     };
@@ -288,6 +309,11 @@ class Profile extends React.Component {
     handleClosePassword = () => {
         this.setState({ editPass: false });
     };
+
+    handleCloseOccurrence = () => {
+        console.log("close occurrence!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        this.setState({ editOccurrence: false});
+    }
 
     handleEditChange = username => event => {
         this.setState({[username]: event.target.value,});
@@ -327,6 +353,34 @@ class Profile extends React.Component {
 
         return true;
 
+    }
+
+    editOccurrence = (n) => {
+        const{classes} = this.props;
+        // return(
+        {/*<Dialog*/}
+            {/*fullScreen*/}
+            {/*open={this.state.editOccurrence}*/}
+            {/*onClose={this.handleCloseOccurrence}*/}
+            {/*aria-labelledby="simple-dialog-title"*/}
+            {/*aria-describedby="simple-dialog-description"*/}
+            {/*// TransitionComponent={Transition}*/}
+        {/*>*/}
+            {/*<DialogTitle id="simple-dialog-title">{"Editar Ocorrência"}</DialogTitle>*/}
+
+            {/*<DialogContent>*/}
+                {/*<div>{n.user_occurrence_title}</div>*/}
+            {/*</DialogContent>*/}
+            {/*<DialogActions>*/}
+                {/*<Button onClick={this.handleCloseOccurrence} color="primary">*/}
+                    {/*Cancelar*/}
+                {/*</Button>*/}
+                {/*<Button onClick={this.handleCloseOccurrence} color="primary" autoFocus>*/}
+                    {/*Guardar alteracoes*/}
+                {/*</Button>*/}
+            {/*</DialogActions>*/}
+        {/*</Dialog>*/}
+        // )
     }
 
     getPhotoUrl = (n) => {
@@ -595,33 +649,48 @@ class Profile extends React.Component {
                         fullWidth
                         indicatorColor="primary"
                         textColor="primary"
+                        centered
                     >
                         <Tab icon={<ReportsIcon />} label="REPORTES" />
                         <Tab icon={<FavoriteIcon />} label="A APOIAR" />
-                        <Tab icon={<PersonPinIcon />} label="AMIGOS" />
+                        {/*<Tab icon={<ProfileIcon/>} label={"AMIGOS"}/>*/}
                     </Tabs>
-
+                {/*</Paper>*/}
+                {/*<Paper>*/}
                     {value === 0 && hasReports &&
                         <TabContainer>
                         {reports.map(n => {
                             return(
                                 <div style={{marginBottom: '50px'}}>
-                                    <h2>{n.user_occurrence_title}</h2>
-                                    <p>Tipo: {n.user_occurrence_type}</p>
-                                    <p>Grau: {n.user_occurrence_level}</p>
-                                    <p>Data do registo: {n.user_occurrence_date}</p>
-                                    {this.hasRegistPhoto(n) ?
-                                    <img key={n.user_occurrence_date} className={classes.img} src={this.getPhotoUrl(n)} style={{margin: '0 auto'}} alt={n.user_occurrence_title} /> :
-                                        <img key={n.user_occurrence_date} className={classes.img} src={img2} style={{margin: '0 auto'}} alt={n.user_occurrence_title} />
-                                    }
-                                </div>
+                                        <div>
+                                            <Tooltip title={"Editar Ocorrência"}>
+                                                <IconButton aria-label={"Editar Ocorrência"} style={{marginLeft: 650}} onClick={this.handleOpenEditOccurrence}>
+                                                    <ProfileIcon />
+                                                </IconButton>
+                                            </Tooltip>
 
+                                            {/*{this.editOccurrence(n)}*/}
+
+                                            <Tooltip title={"Ver detalhes da ocorrência"}>
+                                                <IconButton><InfoIcon/></IconButton>
+                                            </Tooltip>
+                                            <h2>{n.user_occurrence_title}</h2>
+                                            <p>Tipo: {n.user_occurrence_type}</p>
+                                            <p>Grau: {n.user_occurrence_level}</p>
+                                            <p>Data do registo: {n.user_occurrence_date}</p>
+                                            {this.hasRegistPhoto(n) ?
+                                            <img key={n.user_occurrence_date} className={classes.img} src={this.getPhotoUrl(n)} style={{margin: '0 auto'}} alt={n.user_occurrence_title} /> :
+                                                <img key={n.user_occurrence_date} className={classes.img} src={img2} style={{margin: '0 auto'}} alt={n.user_occurrence_title} />
+                                            }
+                                        </div>
+                                    <Divider style={{marginTop: 50}}/>
+                                </div>
                             )
                         })}
                     </TabContainer>}
                     {value === 0 && !hasReports && <TabContainer>Sem registos de momento</TabContainer>}
                     {value === 1 && <TabContainer>Sem apoios de momento</TabContainer>}
-                    {value === 2 && <TabContainer>Sem amigos de momento</TabContainer>}
+                    {/*{value === 2 && <TabContainer>Sem amigos de momento</TabContainer>}*/}
                 </Paper>
 
                 <Button id={"tologin"} component={Link} to='/login' className={classes.input} color={"primary"}>

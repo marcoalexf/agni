@@ -18,6 +18,13 @@ import {
 import PropTypes from 'prop-types';
 import GpsIcon from '@material-ui/icons/LocationSearching';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import {noAccess1, noAccess2, noAccess3, noAccess4, noAccess5} from './mapIcons';
+import {trash1, trash2, trash3, trash4, trash5} from "./mapIcons";
+import {greenIcon, redIcon, yellowIcon, ligthGreenIcon, orangeIcon} from "./mapIcons";
+import {cuttree1, cuttree2, cuttree3, cuttree4, cuttree5} from "./mapIcons";
+// import {MapContainer} from "./MapTwo";
+//import {MapContainer} from "leaflet";
+// import {Legend} from 'leaflet';
 
 const { BaseLayer, Overlay } = LayersControl;
 
@@ -80,76 +87,39 @@ EnhancedTableToolbar.propTypes = {
 
 EnhancedTableToolbar = withStyles(styles)(EnhancedTableToolbar);
 
-var greenIcon = L.icon({
-    iconUrl: require('./img/marker-green.png'),
-    // shadowUrl: require('./img/leaf-shadow.png'),
-    //
-    // iconSize:     [38, 95], // size of the icon
-    // shadowSize:   [50, 64], // size of the shadow
-    iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
-    // shadowAnchor: [4, 62],  // the same for the shadow
-    popupAnchor:  [-6, -90] // point from which the popup should open relative to the iconAnchor
-});
+function xmlRequest (){
+    return new Promise(resolve => {
+        console.log("xmlRequest");
+        var map;
+        console.log("pedido");
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open("GET", "https://custom-tine-204615.appspot.com/rest/occurrence/list", true);
+        xmlHttp.send();
 
-var redIcon = L.icon({
-    iconUrl: require('./img/marker-red.png'),
-    iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
-    // shadowAnchor: [4, 62],  // the same for the shadow
-    popupAnchor:  [-6, -90] // point from which the popup should open relative to the iconAnchor
-});
-
-var yellowIcon = L.icon({
-    iconUrl: require('./img/marker-yellow.png'),
-    iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
-    // shadowAnchor: [4, 62],  // the same for the shadow
-    popupAnchor:  [-6, -90] // point from which the popup should open relative to the iconAnchor
-});
-
-var orangeIcon = L.icon({
-    iconUrl: require('./img/marker-orange.png'),
-    iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
-    // shadowAnchor: [4, 62],  // the same for the shadow
-    popupAnchor:  [-6, -90] // point from which the popup should open relative to the iconAnchor
-});
-
-var ligthGreenIcon = L.icon({
-    iconUrl: require('./img/marker-ligthgreen.png'),
-    iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
-    // shadowAnchor: [4, 62],  // the same for the shadow
-    popupAnchor:  [-6, -90] // point from which the popup should open relative to the iconAnchor
-});
-
-let xmlRequest = new Promise(function(resolve, reject) {
-    console.log("xmlRequest");
-    var map;
-    console.log("pedido");
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open("GET", "https://custom-tine-204615.appspot.com/rest/occurrence/list", true);
-    xmlHttp.send();
-
-    console.log("esperar pelo estado");
-    xmlHttp.onreadystatechange = function () {
-        console.log("1");
-        if (xmlHttp.readyState === 4) {
-            console.log("2");
-            if (xmlHttp.status === 200) {
-                console.log("3");
-                var response = xmlHttp.response;
-                var obj = JSON.parse(response);
-                console.log("obj:");
-                console.log(obj);
-                map = obj[0];
-                console.log("map:");
-                console.log(obj.mapList);
-                resolve(obj.mapList);
-            }
-            else {
-                console.log("tempo expirado");
+        console.log("esperar pelo estado");
+        xmlHttp.onreadystatechange = function () {
+            console.log("1");
+            if (xmlHttp.readyState === 4) {
+                console.log("2");
+                if (xmlHttp.status === 200) {
+                    console.log("3");
+                    var response = xmlHttp.response;
+                    var obj = JSON.parse(response);
+                    console.log("obj:");
+                    console.log(obj);
+                    map = obj[0];
+                    console.log("map:");
+                    console.log(obj.mapList);
+                    resolve(obj.mapList);
+                }
+                else {
+                    console.log("tempo expirado");
+                }
             }
         }
-    }
 
-});
+    });
+}
 
 export default class SimpleExample extends Component {
     state = {
@@ -168,13 +138,11 @@ export default class SimpleExample extends Component {
         level5: true,
     };
 
-    componentDidMount() {
-        xmlRequest.then((value) =>{
-                this.setState({object: value});
-                console.log("state object");
-                console.log(this.state.object);
-            }
-        );
+    async componentDidMount() {
+        let o = await xmlRequest();
+        this.setState({object: o});
+        console.log("map occurrences:");
+        console.log(this.state.object);
 
         this.getLocation();
     }
@@ -211,17 +179,58 @@ export default class SimpleExample extends Component {
         }
     }
 
-    iconWithLevel = (level) => {
-        if(level == 1)
-            return greenIcon;
-        else if(level == 2)
-            return ligthGreenIcon;
-        else if(level == 3)
-            return yellowIcon;
-        else if(level == 4)
-            return orangeIcon;
-        else
-            return redIcon;
+    iconWithLevel = (type, level) => {
+        if (level == 1) {
+            if (type == 'Limpeza de mato' || type=='Limpeza de Mato')
+                return trash1;
+            else if (type == 'Zona de mau acesso')
+                return noAccess1;
+            else if (type == "Corte de árvores")
+                return cuttree1;
+            else
+                return greenIcon;
+        }
+        else if (level == 2) {
+            if (type == 'Limpeza de mato' || type=='Limpeza de Mato')
+                return trash2;
+            else if (type == 'Zona de mau acesso')
+                return noAccess2;
+            else if (type == "Corte de árvores")
+                return cuttree2;
+            else
+                return ligthGreenIcon;
+        }
+        else if (level == 3) {
+            if (type == 'Limpeza de mato' || type=='Limpeza de Mato')
+                return trash3;
+            else if (type == 'Zona de mau acesso')
+                return noAccess3;
+            else if (type == "Corte de árvores")
+                return cuttree3;
+            else
+                return yellowIcon;
+        }
+        else if (level == 4) {
+            if(type=='Limpeza de mato'|| type=='Limpeza de Mato')
+                return trash4;
+            else if(type=='Zona de mau acesso')
+                return noAccess4;
+            else if(type=="Corte de árvores")
+                return cuttree4;
+            else
+                return orangeIcon;
+        }
+        else{
+            if(type=='Limpeza de mato'|| type=='Limpeza de Mato')
+                return trash5;
+            else if(type=='Zona de mau acesso')
+                return noAccess5;
+            else if(type=="Corte de árvores")
+                return cuttree5;
+            else
+                return redIcon;
+        }
+
     };
 
     nameByLevel = (level) => {
@@ -246,7 +255,7 @@ export default class SimpleExample extends Component {
             if(obj[i].user_occurrence_level == level){
                 result.push(
                     <Marker position={[obj[i].user_occurrence_lat, obj[i].user_occurrence_lon]}
-                            icon={this.iconWithLevel(obj[i].user_occurrence_level)}>
+                            icon={this.iconWithLevel(obj[i].user_occurrence_type, obj[i].user_occurrence_level)}>
                         <Popup>
                             <div className={classes.opName}>{obj[i].user_occurrence_title}</div>
                             <b>Data de registo:</b> {obj[i].user_occurrence_data} <br />
@@ -275,11 +284,48 @@ export default class SimpleExample extends Component {
 
     }
 
+
+
     render() {
         const position = [this.state.lat, this.state.lng];
         const {object, loading} = this.state;
         const center = [51.505, -0.09];
         const rectangle = [[51.49, -0.08], [51.5, -0.06]];
+
+        // // initialize the map
+        // var map = L.map('map').setView([42.35, -71.08], 13);
+        //
+        // // load a tile layer
+        // L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+        //     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+        //     maxZoom: 18,
+        //     id: 'mapbox.streets',
+        //     accessToken: 'your.mapbox.access.token'
+        // }).addTo(map);
+        //
+        // var legend = L.control({position: 'bottomright'});
+        //
+        // // var map = document.getElementById("map");
+        //
+        // legend.onAdd = function (map) {
+        //
+        //     var div = L.DomUtil.create('div', 'info legend'),
+        //         grades = [0, 10, 20, 50, 100, 200, 500, 1000],
+        //         labels = [];
+        //
+        //     //loop through our density intervals and generate a label with a colored square for each interval
+        //     for (var i = 0; i < grades.length; i++) {
+        //         div.innerHTML +=
+        //             '<i style="background:' +
+        //             // getColor(grades[i] + 1) +
+        //             '"></i> ' +
+        //             grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+        //     }
+        //
+        //     return div;
+        // };
+        // //
+        // // legend.addTo(map);
 
         return (
             <div>
@@ -287,7 +333,10 @@ export default class SimpleExample extends Component {
 
                 {loading && <CircularProgress/>}
 
-                {!loading && <Map center={position} zoom={this.state.zoom}>
+                <div id={"map"} style={{heigth: 570}}></div>
+
+                {!loading && <Map id={"map"} center={position} zoom={this.state.zoom} style={{width: '100%', height: 570}}>
+
                     <LayersControl position="topright">
                         <BaseLayer checked name="Cores">
                             <TileLayer
@@ -410,6 +459,7 @@ export default class SimpleExample extends Component {
                         {/*</Overlay>*/}
 
                     </LayersControl>
+
                 </Map>}
 
                 {/*<IconButton onClick={this.getLocation}><GpsIcon/></IconButton> Localizar por GPS*/}

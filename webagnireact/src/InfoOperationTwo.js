@@ -262,7 +262,7 @@ class SwipeableTextMobileStepper extends React.Component {
                     <p>Grau de urgencia: </p><Typography> {object[activeStep].user_occurrence_level}</Typography>
                 </Paper>
                 <Paper square elevation={0} className={classes.headerTwo}>
-                    <p>Data: </p><Typography> {object[activeStep].user_occurrence_data}</Typography>
+                    <p>Data: </p><Typography> {object[activeStep].user_occurrence_date}</Typography>
                 </Paper>
                 <SwipeableViews
                     axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}

@@ -138,7 +138,7 @@ class NewRegistProblem extends React.Component {
         visibility: "public",
         spaceType: "public",
         problemType: 'Limpeza de Mato',
-        problem: 1,
+        problem: "Limpeza de Mato",
         urgency: 3,
         location: '',
         open: false,
@@ -238,6 +238,7 @@ class NewRegistProblem extends React.Component {
 
     handleTypeChange = event => {
         this.setState({ [event.target.name]: event.target.value });
+        console.log("tipo de problema " + this.state.problem);
         //this.setState({ problemType: event.target.toString()});
         //console.log("problemType: " + this.state.problemType);
     };
@@ -319,6 +320,9 @@ class NewRegistProblem extends React.Component {
         }
 
     };
+    handleNotificationChange = () =>{
+
+    }
 
     static defaultProps = {
         center: {
@@ -567,9 +571,9 @@ class NewRegistProblem extends React.Component {
                                             id: 'problem-name',
                                         }}
                                     >
-                                        <MenuItem value={1}>Limpeza de Mato</MenuItem>
-                                        <MenuItem value={2}>Zona de mau acesso</MenuItem>
-                                        <MenuItem value={3}>Outro</MenuItem>
+                                        <MenuItem value={"Limpeza de Mato"}>Limpeza de Mato</MenuItem>
+                                        <MenuItem value={"Zona de mau acesso"}>Zona de mau acesso</MenuItem>
+                                        <MenuItem value={"Outro"}>Outro</MenuItem>
                                     </Select>
                                 </FormControl>
                             </TableCell>
@@ -626,6 +630,7 @@ class NewRegistProblem extends React.Component {
                                         <Checkbox icon={<NotificationsOff />} checkedIcon={<NotificationsActive />} color={"primary"} />
                                     }
                                     label="Notificar quando estiver resolvido"
+                                    onChange={this.handleNotificationChange}
                                 />
                             </TableCell>
                         </TableRow>

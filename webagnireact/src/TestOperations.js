@@ -4,7 +4,7 @@ import Table, { TableBody, TableCell, TablePagination, TableHead, TableRow } fro
 import Async from 'react-promise';
 import operationsData from './operationsData';
 import Radio, { RadioGroup } from 'material-ui/Radio';
-import InfoIcon from '@material-ui/icons/EventNote';
+import InfoIcon from '@material-ui/icons/Info';
 import WarningIcon from '@material-ui/icons/Error';
 import IconButton from 'material-ui/IconButton';
 import UpdateListIcon from '@material-ui/icons/Cached';
@@ -284,7 +284,7 @@ class TestOperations extends React.Component {
                                                             to="/operacao"> <InfoIcon/> </IconButton></TableCell>
                                     <TableCell>{n.user_occurrence_title}</TableCell>
                                     <TableCell>{n.user_occurrence_type}</TableCell>
-                                    <TableCell>{n.user_occurrence_data}</TableCell>
+                                    <TableCell>{n.user_occurrence_date}</TableCell>
                                     <TableCell>nao tratado</TableCell>
                                     <TableCell numeric
                                                style={{color: this.colorByLevel(n.user_occurrence_level)}}>
