@@ -26,11 +26,21 @@ public class SecurityManager {
         // Set rights
         ////////////////////////////////////////////
         
+		////////////// WORKER //////////////////////
+		Set<String> workerSet = new HashSet<String>();
+		map.put("WORKER", workerSet);
+		// Set rights
+		workerSet.addAll(userSet);
+		workerSet.add("see_private_occurrences");
+		workerSet.add("accept_user_occurrence");
+		////////////////////////////////////////////
+        
 		//////////////// MOD ///////////////////////
         Set<String> modSet = new HashSet<String>();
 		map.put("MOD", modSet);
 		// Set rights
 		modSet.addAll(userSet);
+		modSet.add("edit_user_occurrence_comment");
 		modSet.add("see_private_occurrences");
 		modSet.add("see_user_profile");
 		modSet.add("edit_user_occurrence");

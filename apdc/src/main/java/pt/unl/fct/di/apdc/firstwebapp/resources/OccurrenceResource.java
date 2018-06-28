@@ -34,6 +34,7 @@ import com.google.appengine.api.datastore.Query.CompositeFilter;
 import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
+import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.datastore.QueryResultList;
 import com.google.gson.Gson;
 
@@ -56,7 +57,7 @@ import pt.unl.fct.di.apdc.firstwebapp.util.geocalc.Point;
 public class OccurrenceResource {
 
 	private static final int QUERY_LIMIT = 100;
-	private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
+	private static final Logger LOG = Logger.getLogger(OccurrenceResource.class.getName());
 	private final Gson g = new Gson();
 	private static final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 	
@@ -90,6 +91,7 @@ public class OccurrenceResource {
 			occurrenceEntity.setProperty("user_occurrence_lat", data.lat);
 			occurrenceEntity.setProperty("user_occurrence_lon", data.lon);
 			occurrenceEntity.setProperty("user_occurrence_notification_on_resolve", data.notificationOnResolve);
+			occurrenceEntity.setProperty("user_occurrence_status", "OPEN");
 			datastore.put(txn, occurrenceEntity);
 			
 			// Create occurrence media entities
@@ -196,6 +198,7 @@ public class OccurrenceResource {
 		if(data.cursor != null) {
 			fetchOptions.startCursor(Cursor.fromWebSafeString(data.cursor));
 		}
+		ctrQuery.addSort("user_occurrence_date", SortDirection.DESCENDING);
 		QueryResultList<Entity> results = datastore.prepare(ctrQuery).asQueryResultList(fetchOptions);
 		Query ctrQueryMedia;
 		List<Entity> mediaResults;
@@ -320,21 +323,20 @@ public class OccurrenceResource {
 	@Path("/delete")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response deleteOccurrence(OccurrenceDeleteData data) {
+		LOG.fine("Attempt to delete ocurrence with id: " + data.occurrenceID + " by user: " + data.token.username);
+		if(!data.valid()) {
+			return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
+		}
+		if(!data.token.isTokenValid()) {
+			LOG.warning("Failed to delete occurrence, token for user: " + data.token.username + " is invalid");
+			return Response.status(Status.FORBIDDEN).build();
+		}
+		if(!(data.token.userID == data.userID) && !SecurityManager.userHasAccess("delete_user_occurrence", data.token.userID)) {
+			LOG.warning("Failed to delete occurrence, user: " + data.token.username + " does not have the rights to do it");
+			return Response.status(Status.FORBIDDEN).build();
+		}
 		Transaction txn = datastore.beginTransaction();
 		try {
-			LOG.fine("Attempt to delete ocurrence with id: " + data.occurrenceID + " by user: " + data.token.username);
-			if(!data.valid()) {
-				return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
-			}
-			if(!data.token.isTokenValid()) {
-				LOG.warning("Failed to delete occurrence, token for user: " + data.token.username + "is invalid");
-				return Response.status(Status.FORBIDDEN).build();
-			}
-			if(!(data.token.userID == data.userID) && !SecurityManager.userHasAccess("delete_user_occurrence", data.token.userID)) {
-				LOG.warning("Failed to delete occurrence, user: " + data.token.username + " does not have the rights to do it");
-				return Response.status(Status.FORBIDDEN).build();
-			}
-		
 			Key userKey = KeyFactory.createKey("User", data.userID);
 			Key occurrenceKey = KeyFactory.createKey(userKey, "UserOccurrence", data.occurrenceID);
 			
@@ -349,6 +351,9 @@ public class OccurrenceResource {
 				txn.rollback();
 			}
 		}
+		/**TODO
+		 * delete media, comments and likes
+		 */
 	}
 	
 	@POST
@@ -388,5 +393,5 @@ public class OccurrenceResource {
 			return Response.status(Status.BAD_REQUEST).entity("Media not found.").build();
 		}
 	}
-
+	
 }

@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
@@ -37,11 +38,10 @@ import com.google.android.gms.maps.model.VisibleRegion;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -67,6 +67,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private static final String LEVEL = "level";
     private static final String SAVED_LOCATIONS = "saved_locations";
     private static final String TOKEN = "token";
+    private static final String MEDIA_IDS = "mediaIDs";
+    private static final String ID = "occurrence_id";
+    private static final String USER_ID = "userID";
 
     private GoogleMap map;
     @BindView(R.id.mapView) MapView mapView;
@@ -75,8 +78,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private List<Map<String, Object>> map_list;
     private Retrofit retrofit;
-
-    private Marker locationMarker;
 
     private List<SavedLocation> savedLocations;
 
@@ -87,6 +88,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private boolean cleanIsChecked, zoneIsChecked, otherIsChecked;
     private String cursor;
     private LoginResponse token;
+    private Marker locationMarker;
 
     private LayoutInflater inflater;
     private ViewGroup container;
@@ -98,6 +100,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         otherIsChecked = true;
         marker_list = new HashMap<>();
         savedLocations = new ArrayList<>(10);
+        map_list = new LinkedList<>();
     }
 
     @Override
@@ -210,17 +213,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 public void onResponse(Call<CursorList> call, Response<CursorList> response) {
                     if (response.code() == 200) {
                         CursorList c = response.body();
-                        map_list = c.getMapList();
+                        if(c.getMapList() != null)
+                            map_list.addAll(c.getMapList());
                         cursor = c.getCursor();
                         if(!c.getMapList().isEmpty()) {
-                            Toast toast = Toast.makeText(getActivity(), "Ocorrências recebidas: " + map_list.size(), Toast.LENGTH_SHORT);
-                            toast.show();
+                            //Toast toast = Toast.makeText(getActivity(), "Ocorrências recebidas: " + map_list.size(), Toast.LENGTH_SHORT);
+                            //toast.show();
                             putAllMarkers();
                         }
                     }
                     else {
                         Toast toast = Toast.makeText(getActivity(), "Failed to get public occurrences: " + response.code(), Toast.LENGTH_SHORT);
-                        toast.show();
+                        //toast.show();
                     }
                 }
                 public void onFailure(Call<CursorList> call, Throwable t) {
@@ -249,16 +253,28 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 getOccurrences();
             }
         });
-    }
 
-    private void putAllMarkers(){
-        map.clear();
         map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
-                listOccurrenceDetails(marker_list.get(marker));
+                if(marker.getTitle().equals(getResources().getString(R.string.new_saved_location))){
+                    saveLocationWindow();
+                }
+                else
+                    listOccurrenceDetails(marker_list.get(marker));
             }
         });
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                getOccurrences();
+            }
+        }, 2000);
+    }
+
+    private void putAllMarkers(){
+        //map.clear();
+
         for(Map<String, Object> entry: map_list){
             if(isNotFiltered(entry))
                 putMarker(entry);
@@ -322,6 +338,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             args.putSerializable(VISIBILITY, (boolean) entry.get("user_occurrence_visibility"));
             args.putSerializable(LATITUDE, (double) entry.get("user_occurrence_lat"));
             args.putSerializable(LONGITUDE, (double) entry.get("user_occurrence_lon"));
+            args.putSerializable(MEDIA_IDS, (ArrayList)entry.get("mediaIDs"));
+            args.putSerializable(ID, (String)entry.get("occurrenceID"));
+            args.putSerializable(USER_ID, (String) entry.get("userID"));
 
             od.setArguments(args);
             fman.beginTransaction().replace(R.id.fragment, od).commit();
@@ -358,6 +377,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 cleanIsChecked = cb_clean.isChecked();
                 zoneIsChecked = cb_zone.isChecked();
                 otherIsChecked = cb_other.isChecked();
+                map.clear();
                 putAllMarkers();
                 popupWindow.dismiss();
             }
@@ -385,8 +405,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         //Inflating the Popup using xml file
         popup.getMenu().add(getResources().getString(R.string.currentLocation));
         if(savedLocations != null){
-            //for(SavedLocation s: savedLocations)
-              //  popup.getMenu().add(s.getTitle());
+
             for(int i = 1; i < savedLocations.size() +1; i++){
                 popup.getMenu().add(i, i, i, savedLocations.get(i-1).getTitle());
             }
@@ -427,50 +446,47 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void mapPress(final LatLng location){
+        if(locationMarker != null)
+            locationMarker.remove();
+
         MarkerOptions mp = new MarkerOptions();
         mp.position(location);
         mp.title(getResources().getString(R.string.new_saved_location));
-        final Marker m = map.addMarker(mp);
-        m.setIcon(BitmapDescriptorFactory
+        locationMarker = map.addMarker(mp);
+        locationMarker.setIcon(BitmapDescriptorFactory
                 .defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+    }
 
-        if(locationMarker != null)
-            locationMarker.remove();
-        locationMarker = m;
+    private void saveLocationWindow(){
+        final View popupView = inflater.inflate(R.layout.save_location_menu, container, false);
+        Button btnOk = (Button) popupView.findViewById(R.id.btnSave);
+        Button btnCancel = (Button) popupView.findViewById(R.id.btnCancelSave);
 
-        map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+        popupView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        final PopupWindow popupWindow = new PopupWindow(popupView, popupView.getMeasuredWidth(), popupView.getMeasuredHeight(), true);
+        popupWindow.showAtLocation(popupView, Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL, 0, 0);
+        popupWindow.setOutsideTouchable(false);
+        popupWindow.setIgnoreCheekPress();
+
+        btnOk.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onInfoWindowClick(Marker marker) {
-                final View popupView = inflater.inflate(R.layout.save_location_menu, container, false);
-                Button btnOk = (Button) popupView.findViewById(R.id.btnSave);
-                Button btnCancel = (Button) popupView.findViewById(R.id.btnCancelSave);
-
-                popupView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-                final PopupWindow popupWindow = new PopupWindow(popupView, popupView.getMeasuredWidth(), popupView.getMeasuredHeight(), true);
-                popupWindow.showAtLocation(popupView, Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL, 0, 0);
-                popupWindow.setOutsideTouchable(false);
-                popupWindow.setIgnoreCheekPress();
-
-                btnOk.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        EditText locationName = (EditText) popupView.findViewById(R.id.locationName);
-                        String name = locationName.getText().toString();
-                        if(name != null && name.length() > 0){
-                            saveNewLocation(name, location);
-                            popupWindow.dismiss();
-                            m.remove();
-                        }
-                    }
-                });
-                btnCancel.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        m.remove();
-                        popupWindow.dismiss();
-                    }
-                });
+            public void onClick(View v) {
+                EditText locationName = (EditText) popupView.findViewById(R.id.locationName);
+                String name = locationName.getText().toString();
+                if(name != null && name.length() > 0){
+                    saveNewLocation(name, locationMarker.getPosition());
+                    popupWindow.dismiss();
+                    locationMarker.remove();
+                }
             }
         });
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                locationMarker.remove();
+                popupWindow.dismiss();
+            }
+        });
+
     }
 }

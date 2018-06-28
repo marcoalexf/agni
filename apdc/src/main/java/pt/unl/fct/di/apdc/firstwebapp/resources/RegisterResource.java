@@ -30,7 +30,7 @@ import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.RegisterData;
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class RegisterResource {
 
-	private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
+	private static final Logger LOG = Logger.getLogger(RegisterResource.class.getName());
 	private final Gson g = new Gson();
 	private static final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 	

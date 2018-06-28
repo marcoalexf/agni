@@ -44,4 +44,7 @@ public interface AgniAPI {
 
     @POST("occurrence/list")
     Call<CursorList > getMoreOccurrences(@Body ListOccurrenceData data);
+
+    @POST("occurrence/comment")
+    Call<ResponseBody> postComment(@Body OccurrenceCommentData data);
 }

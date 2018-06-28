@@ -220,6 +220,10 @@ public class HomePage extends AppCompatActivity
 
             ListOccurrences lo = new ListOccurrences();
             FragmentManager fman = getSupportFragmentManager();
+            Bundle args = new Bundle();
+            args.putSerializable(TOKEN, token);
+
+            lo.setArguments(args);
             fman.beginTransaction().replace(R.id.fragment, lo).commit();
         }
 
