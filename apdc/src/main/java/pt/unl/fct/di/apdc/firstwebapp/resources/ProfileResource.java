@@ -16,7 +16,10 @@ import javax.ws.rs.core.Response.Status;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.FetchOptions;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Transaction;
 import com.google.appengine.api.datastore.TransactionOptions;
@@ -26,6 +29,7 @@ import com.google.appengine.repackaged.org.apache.commons.codec.digest.DigestUti
 import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.ProfileEditData;
+import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.ProfileUsernameData;
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.ProfileData;
 import pt.unl.fct.di.apdc.firstwebapp.util.SecurityManager;
 
@@ -158,6 +162,26 @@ public class ProfileResource {
 				txn.rollback();
 			}
 		}
+	}
+	
+	@POST
+	@Path("/username")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response usernameByUserID(ProfileUsernameData data) {
+		LOG.fine("Attempt to get username for userID: " + data.userID);
+		if(!data.valid()) {
+			return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
+		}
+		Key userKey = KeyFactory.createKey("User", data.userID);
+		Entity userEntity;
+		try {
+			userEntity = datastore.get(userKey);
+		} catch (EntityNotFoundException e) {
+			return Response.status(Status.BAD_REQUEST).entity("User not found.").build();
+		}
+		String username = (String)userEntity.getProperty("user_username");
+		LOG.info("Username: " + username + " for userID: " + data.userID + " was sent successfully");
+		return Response.ok(g.toJson(username)).build();
 	}
 
 }

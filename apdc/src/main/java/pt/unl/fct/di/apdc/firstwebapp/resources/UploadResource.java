@@ -30,7 +30,7 @@ import pt.unl.fct.di.apdc.firstwebapp.util.GcsManager;
 @Path("/")
 public class UploadResource {
 
-	private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
+	private static final Logger LOG = Logger.getLogger(UploadResource.class.getName());
 	private static final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 	private static final long EXPIRATION_TIME = 1000*60*30; //30min
 	private static final Map<String, Set<String>> acceptedContentTypes;
