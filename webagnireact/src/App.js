@@ -251,12 +251,26 @@ class MiniDrawer extends React.Component {
 
     isLogin = () => {
         var token = window.localStorage.getItem('token');
+        var d = new Date();
+        var t = d.getTime();
 
         if(token == null){
             return false;
         }
         else{
-            return true;
+            var expirationData = JSON.parse(token).expirationData;
+            console.log("tempo atual: " + t);
+            console.log("data de expiracao: " + expirationData);
+
+            if(expirationData <= t){
+                console.log("tempo expirado");
+                window.localStorage.removeItem('token');
+                return false;
+            }
+
+            else{
+                return true;
+            }
         }
 
     };
