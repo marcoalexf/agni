@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
+import classNames from 'classnames';
 import MobileStepper from 'material-ui/MobileStepper';
 import Paper from 'material-ui/Paper';
 import Stepper from '@material-ui/core/Stepper';
@@ -23,12 +24,17 @@ import Checkbox from 'material-ui/Checkbox';
 import { FormLabel, FormControlLabel } from 'material-ui/Form';
 import TextField from "material-ui/TextField";
 import {redIcon} from './mapIcons';
+import Card from '@material-ui/core/Card';
+import CardHeader from '@material-ui/core/CardHeader';
+import CardMedia from '@material-ui/core/CardMedia';
+import CardContent from '@material-ui/core/CardContent';
+import CardActions from '@material-ui/core/CardActions';
 
 const AnyReactComponent = ({ text }) => <div>{text}</div>;
 
 const styles = theme => ({
     root: {
-        width: 800,
+        width: 700,
         flexGrow: 1,
     },
     header: {
@@ -49,11 +55,12 @@ const styles = theme => ({
         backgroundColor: theme.palette.background.default,
     },
     img: {
-        height: 255,
-        maxWidth: 400,
-        overflow: 'hidden',
-        width: '100%',
-        marginBottom: 20,
+        // height: 255,
+        // maxWidth: 400,
+        // overflow: 'hidden',
+        // width: '100%',
+        // marginBottom: 20,
+        // marginTop: 20,
     },
     opName:{
         fontFamily: 'Montserrat',
@@ -87,7 +94,7 @@ const styles = theme => ({
         border: "1px solid #ced4da",
         fontSize: 16,
         padding: "10px 12px",
-        width: 500,
+        width: 630,
         transition: theme.transitions.create(["border-color", "box-shadow"]),
         fontFamily: [
             "-apple-system",
@@ -110,8 +117,27 @@ const styles = theme => ({
         backgroundColor: lightBlue,
         color: white,
         marginTop: 10,
-        marginLeft: 420,
-    }
+        marginLeft: 550,
+    },
+    comments:{
+        marginBottom: 20,
+        borderRadius: 4,
+        backgroundColor: theme.palette.common.white,
+        border: "1px solid #ced4da",
+        fontSize: 16,
+        padding: "10px 12px",
+        //width: 500,
+    },
+    info:{
+        backgroundColor: lightGrey,
+    },
+    location:{
+        display: 'inline-block',
+        marginLeft: 30,
+    },
+    basicInfo:{
+        display: 'inline-block',
+    },
 });
 
 const mapstyle = {
@@ -180,9 +206,9 @@ function xmlRequest (){
 
 });}
 
-function getComments (obj){
+function getComments (obj, index){
     return new Promise(resolve => {
-        console.log("listar comentários de: " + obj[0].user_occurrence_title);
+        console.log("listar comentários de: " + obj[index].user_occurrence_title);
         //console.log("listar comentários de: " + this.state.object[this.state.activeStep].user_occurrence_title);
         var token = window.localStorage.getItem('token');
         var d = new Date();
@@ -204,8 +230,8 @@ function getComments (obj){
             else{
                 var data = {
                     "token": tokenjson,
-                    "userID": Number(obj[0].userID),
-                    "occurrenceID": Number(obj[0].occurrenceID),
+                    "userID": Number(obj[index].userID),
+                    "occurrenceID": Number(obj[index].occurrenceID),
                     "cursor": null,
                 }
 
@@ -264,6 +290,9 @@ function getStepContent(stepIndex) {
 class SwipeableTextMobileStepper extends React.Component {
     constructor(){
         super();
+
+        this.handleNext = this.handleNext.bind(this);
+        this.handleBack = this.handleBack.bind(this);
     }
     state={
         activeStep: 0,
@@ -304,13 +333,18 @@ class SwipeableTextMobileStepper extends React.Component {
         console.log(this.state.object);
 
         // getComments.bind(this);
-        let c = await getComments(o);
+        let c = await getComments(o, 0);
         this.setState({comments: c});
         console.log("comments: " + c[0].comment_text);
         this.setState({loading: false});
     }
 
-    handleNext = () => {
+    async handleNext (){
+
+        console.log(this.state.activeStep);
+        let c = await getComments(this.state.object, this.state.activeStep + 1);
+        this.setState({comments: c});
+
         this.setState(prevState => ({
             activeStep: prevState.activeStep + 1,
         }));
@@ -321,9 +355,15 @@ class SwipeableTextMobileStepper extends React.Component {
         this.setState({lat: this.state.object[this.state.activeStep].user_occurrence_lat});
         this.setState({lng: this.state.object[this.state.activeStep].user_occurrence_lon});
         console.log("lat: " + this.state.lat + "lng: " + this.state.lng);
+
     };
 
-    handleBack = () => {
+    async handleBack() {
+
+        console.log(this.state.activeStep);
+        let c = await getComments(this.state.object, this.state.activeStep - 1);
+        this.setState({comments: c});
+
         this.setState(prevState => ({
             activeStep: prevState.activeStep - 1,
         }));
@@ -468,48 +508,63 @@ class SwipeableTextMobileStepper extends React.Component {
 
                 {!loading &&
                 <div className={classes.root} style={{margin: '0 auto'}}>
-                <Paper square elevation={0} className={classes.header}>
-                    <div className={classes.opName}>{object[activeStep].user_occurrence_title}</div>
-                </Paper>
-                <Paper square elevation={0} className={classes.headerTwo}>
-                    <p>Tipo:</p> <Typography>{object[activeStep].user_occurrence_type}</Typography>
-                </Paper>
-                <Paper square elevation={0} className={classes.headerTwo}>
-                    <p>Grau de urgencia: </p><Typography> {object[activeStep].user_occurrence_level}</Typography>
-                </Paper>
-                <Paper square elevation={0} className={classes.headerTwo}>
-                    <p>Data: </p><Typography> {object[activeStep].user_occurrence_date}</Typography>
-                </Paper>
-
-                <img key={object[activeStep].user_occurrence_data} className={classes.img} src={img2} style={{margin: '0 auto'}} alt={object[activeStep].user_occurrence_title}/>
-
-                <p>Localização: </p>
-                {/*<div className={classes.map} style={{ height: '30vh', width: '100%' }}>*/}
-                    {/*<GoogleMapReact*/}
-                        {/*bootstrapURLKeys={{ key: 'AIzaSyAM-jV8q7-FWs7RdP0G4cH938jWgQwlGVo' }}*/}
-                        {/*center={this.state.myLatLng}*/}
-                        {/*defaultZoom={11}*/}
-                    {/*>*/}
-                        {/*<Marker name={"Localização"} position={myLatLng}/>*/}
-                        {/*<InfoWindow/>*/}
-                    {/*</GoogleMapReact>*/}
-                {/*</div>*/}
-
-                <Map id={"map"} center={position} zoom={this.state.zoom} style={{width: 400}}>
-                    <TileLayer
-                        attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                <Card>
+                    <CardHeader
+                        title={object[activeStep].user_occurrence_title}
+                        subheader={object[activeStep].user_occurrence_date}
                     />
-                    <Marker position={position}
-                            icon={redIcon}
-                    >
-                        <Popup>
-                            {object[activeStep].user_occurrence_title}
-                        </Popup>
-                    </Marker>
-                </Map>
 
-                <div>
+                    <CardContent>
+
+                        <div style={{margin: 20}}>
+                            <img key={object[activeStep].user_occurrence_data} className={classes.img} src={img2} style={{margin: '0 auto'}} alt={object[activeStep].user_occurrence_title}/>
+                        </div>
+
+                        <div className={classNames(classes.info, "w3-container")}>
+                            <div className={"w3-third"}>
+                            {/*<Paper square elevation={0} className={classes.header}>*/}
+                                {/*<div className={classes.opName}>{object[activeStep].user_occurrence_title}</div>*/}
+                            {/*</Paper>*/}
+                            {/*<Paper square elevation={0} className={classes.headerTwo}>*/}
+                                <p>Tipo: <Typography>{object[activeStep].user_occurrence_type}</Typography></p>
+                            {/*</Paper>*/}
+                            {/*<Paper square elevation={0} className={classes.headerTwo}>*/}
+                                <p>Grau de urgencia: <Typography> {object[activeStep].user_occurrence_level}</Typography></p>
+                            {/*</Paper>*/}
+                            {/*<Paper square elevation={0} className={classes.headerTwo}>*/}
+                                {/*<p>Data: </p><Typography> {object[activeStep].user_occurrence_date}</Typography>*/}
+                            {/*</Paper>*/}
+                            </div>
+                            <div className={"w3-twothird"} style={{marginBottom: 10}}>
+                                <p>Localização: </p>
+                                {/*<div className={classes.map} style={{ height: '30vh', width: '100%' }}>*/}
+                                {/*<GoogleMapReact*/}
+                                {/*bootstrapURLKeys={{ key: 'AIzaSyAM-jV8q7-FWs7RdP0G4cH938jWgQwlGVo' }}*/}
+                                {/*center={this.state.myLatLng}*/}
+                                {/*defaultZoom={11}*/}
+                                {/*>*/}
+                                {/*<Marker name={"Localização"} position={myLatLng}/>*/}
+                                {/*<InfoWindow/>*/}
+                                {/*</GoogleMapReact>*/}
+                                {/*</div>*/}
+
+                                <Map id={"map"} center={position} zoom={this.state.zoom} style={{width: 350, height: 190}}>
+                                    <TileLayer
+                                        attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
+                                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                    />
+                                    <Marker position={position}
+                                            icon={redIcon}
+                                    >
+                                        <Popup>
+                                            {object[activeStep].user_occurrence_title}
+                                        </Popup>
+                                    </Marker>
+                                </Map>
+                            </div>
+                        </div>
+
+                        <div>
                     <FormControlLabel
                         control={
                             <Checkbox icon={<NonLikeIcon />} checkedIcon={<LikeIcon />} color={"primary"} />
@@ -520,16 +575,15 @@ class SwipeableTextMobileStepper extends React.Component {
                 </div>
 
                 <div>
+                    <p>Comentários</p>
                     {comments.map(c =>{
                         return(
-                        <div>
-                            <p>UserID:</p> {c.comment_userID}
-                            <p>Comentário: {c.comment_text}</p>
-                            <p>Data: {c.comment_date}</p>
+                        <div className={classes.comments}>
+                            <b>{c.comment_userID} </b>{c.comment_text}
+                            <Typography>{c.comment_date}</Typography>
                         </div>
                         )})}
                 </div>
-
 
                 <div>
                     <TextField
@@ -549,7 +603,7 @@ class SwipeableTextMobileStepper extends React.Component {
                     />
                 </div>
                 <Button variant={"raised"} color={"primary"} className={classes.commentButton} onClick={this.handleComment}>Comentar</Button>
-
+                    </CardContent>
                     {/*<div>{this.props.occurrences.map(n => <p>n.user_occurrence_title</p>)}</div>*/}
 
                 {/*<SwipeableViews*/}
@@ -660,7 +714,7 @@ class SwipeableTextMobileStepper extends React.Component {
                     {/*</div>*/}
                 {/*</div>*/}
 
-
+                </Card>
                 <MobileStepper
                     variant="text"
                     steps={maxSteps}
