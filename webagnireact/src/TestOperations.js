@@ -12,7 +12,6 @@ import Toolbar from 'material-ui/Toolbar';
 import Tooltip from 'material-ui/Tooltip';
 import Typography from 'material-ui/Typography';
 import blue from 'material-ui/colors/blue';
-import grey from 'material-ui/colors/grey';
 import green from 'material-ui/colors/lightGreen';
 import red from 'material-ui/colors/red';
 import amber from 'material-ui/colors/amber';
@@ -20,11 +19,12 @@ import yellow from 'material-ui/colors/yellow';
 import {withStyles} from "material-ui/styles/index";
 import {Link} from "react-router-dom";
 import CircularProgress from '@material-ui/core/CircularProgress';
+import {skyBlue, lightGrey, white} from "./Colors";
 
 const CustomTableCell = withStyles(theme => ({
     head: {
-        backgroundColor: blue[200],
-        color: grey[50],
+        backgroundColor: skyBlue,
+        color: white,
         //color: theme.palette.common.white,
     },
     body: {

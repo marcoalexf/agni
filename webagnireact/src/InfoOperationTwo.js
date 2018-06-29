@@ -15,6 +15,12 @@ import img2 from './img/matasuja.jpg';
 import {Map, InfoWindow, Marker, GoogleApiWrapper, Listing} from 'google-maps-react';
 import GoogleMapReact from 'google-map-react';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import {skyBlue, lightGrey, white, lightBlue} from "./Colors";
+import LikeIcon from '@material-ui/icons/Favorite';
+import NonLikeIcon from '@material-ui/icons/FavoriteBorder';
+import Checkbox from 'material-ui/Checkbox';
+import { FormLabel, FormControlLabel } from 'material-ui/Form';
+import TextField from "material-ui/TextField";
 
 const AnyReactComponent = ({ text }) => <div>{text}</div>;
 
@@ -64,6 +70,44 @@ const styles = theme => ({
     map:{
         marginBottom: 20,
     },
+    likeButton:{
+        color: skyBlue,
+    },
+    bootstrapRoot: {
+        padding: 0,
+        "label + &": {
+            marginTop: theme.spacing.unit * 3
+        }
+    },
+    bootstrapInput: {
+        borderRadius: 4,
+        backgroundColor: theme.palette.common.white,
+        border: "1px solid #ced4da",
+        fontSize: 16,
+        padding: "10px 12px",
+        width: 400,
+        transition: theme.transitions.create(["border-color", "box-shadow"]),
+        fontFamily: [
+            "-apple-system",
+            "BlinkMacSystemFont",
+            '"Segoe UI"',
+            "Roboto",
+            '"Helvetica Neue"',
+            "Arial",
+            "sans-serif",
+            '"Apple Color Emoji"',
+            '"Segoe UI Emoji"',
+            '"Segoe UI Symbol"'
+        ].join(","),
+        "&:focus": {
+            borderColor: "#80bdff",
+            boxShadow: "0 0 0 0.2rem rgba(0,123,255,.25)"
+        }
+    },
+    commentButton:{
+        backgroundColor: lightBlue,
+        color: white,
+    }
 });
 
 const mapstyle = {
@@ -240,6 +284,10 @@ class SwipeableTextMobileStepper extends React.Component {
         }
     };
 
+    handleLikeChange = () => {
+        console.log("Gosto mudado");
+    }
+
     render() {
         const { classes, theme } = this.props;
         const { activeStep, object, activeStepTwo, center, zoom, loading } = this.state;
@@ -271,7 +319,36 @@ class SwipeableTextMobileStepper extends React.Component {
                     enableMouseEvents
                 >
                     {object.map(step => (
-                        <img key={step.user_occurrence_data} className={classes.img} src={img2} style={{margin: '0 auto'}} alt={step.user_occurrence_title} />
+                        <div>
+                            <img key={step.user_occurrence_data} className={classes.img} src={img2} style={{margin: '0 auto'}} alt={step.user_occurrence_title} />
+
+                            <div>
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox icon={<NonLikeIcon />} checkedIcon={<LikeIcon />} color={"primary"} />
+                                    }
+                                    onChange={this.handleLikeChange}
+
+                                />Apoiar
+                            </div>
+
+                            <div>
+                                <TextField
+                                    placeholder="(Escreva aqui o seu comentário)"
+                                    id="bootstrap-input"
+                                    InputProps={{
+                                        disableUnderline: true,
+                                        classes: {
+                                            root: classes.bootstrapRoot,
+                                            input: classes.bootstrapInput
+                                        }
+                                    }}
+                                    multiline
+                                    rows="4"
+                                />
+                            </div>
+                            <Button variant={"raised"} color={"primary"} className={classes.commentButton}>Comentar</Button>
+                        </div>
                     ))}
                 </SwipeableViews>
 
