@@ -12,6 +12,7 @@ import Toolbar from 'material-ui/Toolbar';
 import Tooltip from 'material-ui/Tooltip';
 import Typography from 'material-ui/Typography';
 import blue from 'material-ui/colors/blue';
+import grey from 'material-ui/colors/grey';
 import green from 'material-ui/colors/lightGreen';
 import red from 'material-ui/colors/red';
 import amber from 'material-ui/colors/amber';
@@ -19,12 +20,12 @@ import yellow from 'material-ui/colors/yellow';
 import {withStyles} from "material-ui/styles/index";
 import {Link} from "react-router-dom";
 import CircularProgress from '@material-ui/core/CircularProgress';
-import {skyBlue, lightGrey, white} from "./Colors";
+import InfoOperationTwo from './InfoOperationTwo';
 
 const CustomTableCell = withStyles(theme => ({
     head: {
-        backgroundColor: skyBlue,
-        color: white,
+        backgroundColor: blue[200],
+        color: grey[50],
         //color: theme.palette.common.white,
     },
     body: {
@@ -254,6 +255,12 @@ class TestOperations extends React.Component {
             return red[600];
     };
 
+    // goToInformations = () => {
+    //     return(
+    //         <Link to={'/operacao'} params={{occurrences: this.state.object}}/>
+    //     )
+    // }
+
     render () {
         const {classes} = this.props;
         const { object, rowsPerPage, page, loading } = this.state;
@@ -280,8 +287,15 @@ class TestOperations extends React.Component {
                         {object.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(n => {
                             return (
                                 <TableRow key={n.user_occurrence_data}>
-                                    <TableCell> <IconButton component={Link}
-                                                            to="/operacao"> <InfoIcon/> </IconButton></TableCell>
+                                    <TableCell>
+                                        <IconButton
+                                            component={Link}
+                                            to={"/operacao"}>
+                                            {/*// to={{pathname:"/operacao", occurrences: object}}>*/}
+                                            {/*// onClick={this.goToInformations}>*/}
+                                            <InfoIcon/>
+                                        </IconButton>
+                                    </TableCell>
                                     <TableCell>{n.user_occurrence_title}</TableCell>
                                     <TableCell>{n.user_occurrence_type}</TableCell>
                                     <TableCell>{n.user_occurrence_date}</TableCell>
