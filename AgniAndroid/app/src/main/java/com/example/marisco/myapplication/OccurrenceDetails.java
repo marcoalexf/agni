@@ -6,11 +6,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,7 +39,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class OccurrenceDetails extends Fragment implements OnMapReadyCallback, AbsListView.OnScrollListener {
+public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
 
     private static final String TITLE = "title";
     private static final String DESCRIPTION = "description";
@@ -80,6 +81,8 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback, A
     EditText comment_text;
     @BindView(R.id.comment_list)
     ListView comment_list;
+    @BindView(R.id.scroll_view)
+    ScrollView scrollView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -122,6 +125,16 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback, A
         });
         comments = new LinkedList<Map<String, Object>>();
         getMoreComments();
+        scrollView.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
+            @Override
+            public void onScrollChanged() {
+                if (scrollView != null) {
+                    if (scrollView.getChildAt(0).getBottom() <= (scrollView.getHeight() + scrollView.getScrollY())) {
+                        getMoreComments();
+                    }
+                }
+            }
+        });
         return v;
     }
 
@@ -180,8 +193,7 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback, A
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                     if (response.code() == 200) {
                         addCommentToList(text);
-                        Toast toast = Toast.makeText(getActivity(), "Comentário publicado", Toast.LENGTH_SHORT);
-                        toast.show();
+                        comment_text.setText("");
                     }
                     else {
                         Toast toast = Toast.makeText(getActivity(), "Failed to post comment: " + response.code(), Toast.LENGTH_SHORT);
@@ -211,14 +223,14 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback, A
             public void onResponse(Call<CursorList> call, Response<CursorList> response) {
                 if (response.code() == 200) {
                     CursorList c = response.body();
-                    cursor = c.getCursor();
-                    if(!c.getMapList().isEmpty()){
-                        comments.addAll( c.getMapList());
-                        adapter = new ListAdapterComments(getContext(), comments, android.R.layout.simple_list_item_1);
-                        comment_list.setAdapter(adapter);
-                        putComments();
-                        Toast toast = Toast.makeText(getActivity(), "Comentários : " + comments.size(), Toast.LENGTH_SHORT);
-                        toast.show();
+                    if(!c.getCursor().equals(cursor)){
+                        cursor = c.getCursor();
+                        if(!c.getMapList().isEmpty()){
+                            comments.addAll( c.getMapList());
+                            adapter = new ListAdapterComments(getContext(), comments, android.R.layout.simple_list_item_1);
+                            comment_list.setAdapter(adapter);
+                            putComments();
+                        }
                     }
                 }
                 else {
@@ -231,19 +243,6 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback, A
             }
         });
     }
-
-    @Override
-    public void onScrollStateChanged (AbsListView view, int scrollState){
-        if(comment_list != null && comment_list.getAdapter() != null) {
-            if (comment_list.getLastVisiblePosition() == comment_list.getAdapter().getCount() - 1){
-                getMoreComments();
-            }
-        }
-    }
-
-    @Override
-    public void onScroll (AbsListView view, int firstVisibleItem, int visibleItemCount,
-                          int totalItemCount){  }
 
     private void putComments(){
         if (adapter == null) {
@@ -268,8 +267,11 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback, A
         Map<String, Object> newComment = new HashMap<>();
         newComment.put("comment_text", text);
         newComment.put("comment_date", new Date());
-        newComment.put("comment_userID", token.userID);
+        newComment.put("comment_userID", Double.parseDouble(token.userID));
+        newComment.put("comment_author", token.username);
         comments.add(0, newComment);
-        adapter.notifyDataSetChanged();
+        adapter = new ListAdapterComments(getContext(), comments, android.R.layout.simple_list_item_1);
+        comment_list.setAdapter(adapter);
+        putComments();
     }
 }

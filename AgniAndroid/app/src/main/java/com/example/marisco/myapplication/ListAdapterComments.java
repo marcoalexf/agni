@@ -27,7 +27,7 @@ public class ListAdapterComments extends ArrayAdapter {
 
     public static final String ENDPOINT = "https://custom-tine-204615.appspot.com/rest/";
 
-    private ArrayList<Map<String, Object>> mData;
+    private List<Map<String, Object>> mData;
     Context context;
     private Retrofit retrofit;
 
@@ -64,8 +64,13 @@ public class ListAdapterComments extends ArrayAdapter {
         }
 
         Map<String, Object> temp = getItem(i);
-        getCommentUsername((double)temp.get("comment_userID"), result);
-
+        if((String)temp.get("comment_author") == null){
+            getCommentUsername((double)temp.get("comment_userID"), result, i);
+        }
+        else{
+            //Toast.makeText(context, "Author cached", Toast.LENGTH_LONG).show();
+            ((TextView) result.findViewById(R.id.comment_author)).setText(temp.get("comment_author").toString());
+        }
 
         ((TextView) result.findViewById(R.id.comment_text)).setText(temp.get("comment_text").toString());
         ((TextView) result.findViewById(R.id.comment_date)).setText(temp.get("comment_date").toString());
@@ -73,7 +78,7 @@ public class ListAdapterComments extends ArrayAdapter {
         return result;
     }
 
-    private void getCommentUsername(double userID, final View result){
+    private void getCommentUsername(double userID, final View result, final int i){
         if (retrofit == null) {
             retrofit = new Retrofit.Builder()
                     .baseUrl(ENDPOINT)
@@ -88,6 +93,7 @@ public class ListAdapterComments extends ArrayAdapter {
         call.enqueue(new Callback<String>() {
             public void onResponse(Call<String> call, Response<String> response) {
                 if (response.code() == 200) {
+                    getItem(i).put("comment_author", response.body());
                     ((TextView) result.findViewById(R.id.comment_author)).setText(response.body());
                 }
                 else {
