@@ -217,6 +217,34 @@ function xmlRequest(){
     });
 }
 
+function isLogin () {
+    var token = window.localStorage.getItem('token');
+    var d = new Date();
+    var t = d.getTime();
+
+    if(token == null){
+        console.log("token diferente de null");
+        return false;
+    }
+    else{
+        console.log("nop");
+        var expirationData = JSON.parse(token).expirationData;
+        console.log("tempo atual: " + t);
+        console.log("data de expiracao: " + expirationData);
+
+        if(expirationData <= t){
+            console.log("tempo expirado");
+            window.localStorage.removeItem('token');
+            return false;
+        }
+
+        else{
+            return true;
+        }
+    }
+
+};
+
 class TestOperations extends React.Component {
     state={
         object: [
@@ -261,6 +289,17 @@ class TestOperations extends React.Component {
     //     )
     // }
 
+    seeInformations = () =>{
+        console.log("ver informacao de uma operacao");
+        var token = window.localStorage.getItem('token');
+        if(token != null)
+            document.getElementById("toinfo").click();
+    };
+
+    showErrorMessage = () =>{
+        console.log("Nao está autorizado a ver as informacoes - primeiro faca login");
+    };
+
     render () {
         const {classes} = this.props;
         const { object, rowsPerPage, page, loading } = this.state;
@@ -288,9 +327,8 @@ class TestOperations extends React.Component {
                             return (
                                 <TableRow key={n.user_occurrence_data}>
                                     <TableCell>
-                                        <IconButton
-                                            component={Link}
-                                            to={"/operacao"}>
+                                        <IconButton onClick={isLogin() ? this.seeInformations : this.showErrorMessage}>
+                                            <Link id={"toinfo"} to={"/operacao"}/>
                                             {/*// to={{pathname:"/operacao", occurrences: object}}>*/}
                                             {/*// onClick={this.goToInformations}>*/}
                                             <InfoIcon/>
@@ -301,8 +339,11 @@ class TestOperations extends React.Component {
                                     <TableCell>{n.user_occurrence_date}</TableCell>
                                     <TableCell>nao tratado</TableCell>
                                     <TableCell numeric
-                                               style={{color: this.colorByLevel(n.user_occurrence_level)}}>
-                                        <WarningIcon color={this.colorByLevel(n.user_occurrence_level)}/>
+                                               style={{color: this.colorByLevel(n.user_occurrence_level)}}
+                                    >
+                                        <WarningIcon
+                                            //color={this.colorByLevel(n.user_occurrence_level)}
+                                        />
                                         {n.user_occurrence_level}</TableCell>
                                     <TableCell>{n.user_occurrence_visibility ? 'publico' : 'privado'}</TableCell>
                                 </TableRow>

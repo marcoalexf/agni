@@ -526,14 +526,16 @@ class SwipeableTextMobileStepper extends React.Component {
                                 {/*<div className={classes.opName}>{object[activeStep].user_occurrence_title}</div>*/}
                             {/*</Paper>*/}
                             {/*<Paper square elevation={0} className={classes.headerTwo}>*/}
-                                <p>Tipo: <Typography>{object[activeStep].user_occurrence_type}</Typography></p>
+                                <p>Tipo:</p> <Typography>{object[activeStep].user_occurrence_type}</Typography>
                             {/*</Paper>*/}
                             {/*<Paper square elevation={0} className={classes.headerTwo}>*/}
-                                <p>Grau de urgencia: <Typography> {object[activeStep].user_occurrence_level}</Typography></p>
+                                <p>Grau de urgencia:</p> <Typography> {object[activeStep].user_occurrence_level}</Typography>
                             {/*</Paper>*/}
                             {/*<Paper square elevation={0} className={classes.headerTwo}>*/}
                                 {/*<p>Data: </p><Typography> {object[activeStep].user_occurrence_date}</Typography>*/}
                             {/*</Paper>*/}
+                                <p>Estado:</p>
+                                <p>Data de previsão da limpeza:</p>
                             </div>
                             <div className={"w3-twothird"} style={{marginBottom: 10}}>
                                 <p>Localização: </p>
@@ -548,7 +550,7 @@ class SwipeableTextMobileStepper extends React.Component {
                                 {/*</GoogleMapReact>*/}
                                 {/*</div>*/}
 
-                                <Map id={"map"} center={position} zoom={this.state.zoom} style={{width: 350, height: 190}}>
+                                <Map id={"map"} center={position} zoom={this.state.zoom} scrollWheelZoom={false} style={{width: 350, height: 190}}>
                                     <TileLayer
                                         attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
                                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -578,10 +580,13 @@ class SwipeableTextMobileStepper extends React.Component {
                     <p>Comentários</p>
                     {comments.map(c =>{
                         return(
-                        <div className={classes.comments}>
-                            <b>{c.comment_userID} </b>{c.comment_text}
-                            <Typography>{c.comment_date}</Typography>
-                        </div>
+                            <div>
+                                <Typography variant={"caption"} gutterBottom align={"right"}>{c.comment_date}</Typography>
+                                <div className={classes.comments}>
+                                    <b>{c.comment_userID} </b>{c.comment_text}
+                                </div>
+
+                            </div>
                         )})}
                 </div>
 
