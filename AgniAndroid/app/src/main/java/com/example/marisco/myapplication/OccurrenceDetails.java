@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -22,6 +23,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -32,7 +38,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
+public class OccurrenceDetails extends Fragment implements OnMapReadyCallback, AbsListView.OnScrollListener {
 
     private static final String TITLE = "title";
     private static final String DESCRIPTION = "description";
@@ -51,6 +57,10 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
     private Long occurrence_id ,userID;
     private Retrofit retrofit;
     private LoginResponse token;
+    private String cursor;
+    private List<Map<String, Object>> comments;
+    private ListAdapterComments adapter;
+
 
     @BindView(R.id.detail_title)
     TextView o_title;
@@ -77,7 +87,6 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
 
         View v = inflater.inflate(R.layout.detail_occurrence, container, false);
         ButterKnife.bind(this, v);
-        o_description.setText("teste descricao");
         Bundle b = this.getArguments();
         title = "";
         String description = "";
@@ -111,6 +120,8 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
                 newComment();
             }
         });
+        comments = new LinkedList<Map<String, Object>>();
+        getMoreComments();
         return v;
     }
 
@@ -149,7 +160,7 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
     }
 
     private void newComment(){
-        String text = comment_text.getText().toString();
+        final String text = comment_text.getText().toString();
         if(text == null || text.equals("")){
             Toast toast = Toast.makeText(getActivity(), "Texto do comentário inválido ", Toast.LENGTH_SHORT);
              toast.show();
@@ -168,6 +179,7 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
             call.enqueue(new Callback<ResponseBody>() {
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                     if (response.code() == 200) {
+                        addCommentToList(text);
                         Toast toast = Toast.makeText(getActivity(), "Comentário publicado", Toast.LENGTH_SHORT);
                         toast.show();
                     }
@@ -181,5 +193,83 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
                 }
             });
         }
+    }
+
+    private void getMoreComments(){
+        if (retrofit == null) {
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(ENDPOINT)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+        }
+
+        AgniAPI agniAPI = retrofit.create(AgniAPI.class);
+
+        Call<CursorList> call = agniAPI.getMoreComments(new ListOccurrenceCommentData(token, userID, occurrence_id, cursor));
+
+        call.enqueue(new Callback<CursorList>() {
+            public void onResponse(Call<CursorList> call, Response<CursorList> response) {
+                if (response.code() == 200) {
+                    CursorList c = response.body();
+                    cursor = c.getCursor();
+                    if(!c.getMapList().isEmpty()){
+                        comments.addAll( c.getMapList());
+                        adapter = new ListAdapterComments(getContext(), comments, android.R.layout.simple_list_item_1);
+                        comment_list.setAdapter(adapter);
+                        putComments();
+                        Toast toast = Toast.makeText(getActivity(), "Comentários : " + comments.size(), Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
+                }
+                else {
+                    Toast toast = Toast.makeText(getActivity(), "Failed to get comments: " + response.code(), Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+            }
+            public void onFailure(Call<CursorList> call, Throwable t) {
+                Log.e("ERROR", t.toString());
+            }
+        });
+    }
+
+    @Override
+    public void onScrollStateChanged (AbsListView view, int scrollState){
+        if(comment_list != null && comment_list.getAdapter() != null) {
+            if (comment_list.getLastVisiblePosition() == comment_list.getAdapter().getCount() - 1){
+                getMoreComments();
+            }
+        }
+    }
+
+    @Override
+    public void onScroll (AbsListView view, int firstVisibleItem, int visibleItemCount,
+                          int totalItemCount){  }
+
+    private void putComments(){
+        if (adapter == null) {
+            // pre-condition
+            return;
+        }
+
+        int totalHeight = 0;
+        for (int i = 0; i < adapter.getCount(); i++) {
+            View listItem = adapter.getView(i, null, comment_list);
+            listItem.measure(0, 0);
+            totalHeight += listItem.getMeasuredHeight();
+        }
+
+        ViewGroup.LayoutParams params = comment_list.getLayoutParams();
+        params.height = totalHeight + (comment_list.getDividerHeight() * (adapter.getCount() - 1));
+        comment_list.setLayoutParams(params);
+        comment_list.requestLayout();
+    }
+
+    private void addCommentToList(String text){
+        Map<String, Object> newComment = new HashMap<>();
+        newComment.put("comment_text", text);
+        newComment.put("comment_date", new Date());
+        newComment.put("comment_userID", token.userID);
+        comments.add(0, newComment);
+        adapter.notifyDataSetChanged();
     }
 }

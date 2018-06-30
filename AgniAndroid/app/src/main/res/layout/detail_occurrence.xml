@@ -59,20 +59,6 @@
             android:textColor="#000000"
             android:textSize="20sp"/>
 
-        <Button
-            android:id="@+id/likeBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:layout_gravity="end"
-            android:layout_marginStart="210dp"
-            android:layout_marginTop="5dp"
-            android:background="@drawable/bg_button"
-            android:drawableEnd="@drawable/ic_baseline_favorite_24px"
-            android:text="0"
-            android:textColor="#000000"
-            android:textSize="20sp"/>
-
-
     </LinearLayout>
 
     <LinearLayout
@@ -106,6 +92,14 @@
             android:layout_height="214dp"
             android:layout_marginStart="4dp"
             android:layout_marginTop="8dp" />
+        <ImageButton
+            android:id="@+id/likeBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_gravity="start"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/ic_baseline_favorite_24px"
+            android:background="@android:color/white"/>
 
         <LinearLayout
             android:layout_width="fill_parent"

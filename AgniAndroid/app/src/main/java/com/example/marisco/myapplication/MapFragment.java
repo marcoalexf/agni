@@ -339,8 +339,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             args.putSerializable(LATITUDE, (double) entry.get("user_occurrence_lat"));
             args.putSerializable(LONGITUDE, (double) entry.get("user_occurrence_lon"));
             args.putSerializable(MEDIA_IDS, (ArrayList)entry.get("mediaIDs"));
-            args.putSerializable(ID, (String)entry.get("occurrenceID"));
-            args.putSerializable(USER_ID, (String) entry.get("userID"));
+            args.putSerializable(ID, Long.parseLong((String) entry.get("occurrenceID")));
+            args.putSerializable(USER_ID, Long.parseLong((String)entry.get("userID")) );
+            args.putSerializable(TOKEN, token);
 
             od.setArguments(args);
             fman.beginTransaction().replace(R.id.fragment, od).commit();

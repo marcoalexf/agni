@@ -27,6 +27,9 @@ public interface AgniAPI {
     @POST("profile")
     Call<ProfileResponse> getProfile(@Body ProfileRequest request);
 
+    @POST("profile/username")
+    Call<String> getUsername(@Body ProfileUsernameData request);
+
     @POST("profile/edit")
     Call<ResponseBody> changeProfile(@Body EditProfileData request);
 
@@ -47,4 +50,7 @@ public interface AgniAPI {
 
     @POST("occurrence/comment")
     Call<ResponseBody> postComment(@Body OccurrenceCommentData data);
+
+    @POST("occurrence/comment/list")
+    Call<CursorList> getMoreComments(@Body ListOccurrenceCommentData data);
 }

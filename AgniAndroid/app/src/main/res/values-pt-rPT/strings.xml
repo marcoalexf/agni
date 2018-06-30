@@ -46,7 +46,7 @@
 
     <!--Occurrence info-->
     <string name="occurrence_title">Título:</string>
-    <string name="occurrence_description">Descrição da ocurrência:</string>
+    <string name="occurrence_description">Descrição da ocorrência:</string>
     <string name="occurrence_area">Espaço:</string>
     <string name="occurrence_public">Público</string>
     <string name="occurrence_private">Privado</string>
