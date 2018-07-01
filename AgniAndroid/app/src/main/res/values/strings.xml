@@ -61,6 +61,11 @@
     <!--Occurrence info-->
     <string name="occurrence_title">Title:</string>
     <string name="occurrence_description">Occurrence description:</string>
+    <string-array name="visibility_types">
+        <item name="occurrence_public">Public</item>
+        <item name="occurrence_private">Private</item>
+    </string-array>
+
     <string name="occurrence_area">Area:</string>
     <string name="occurrence_public">Public</string>
     <string name="occurrence_private">Private</string>
@@ -92,5 +97,7 @@
     <string name="comments">Comments</string>
     <string name="insert_comment">Insert your comment</string>
     <string name="send_comment">Send</string>
+
+    <string name="edit">Edit</string>
 
 </resources>

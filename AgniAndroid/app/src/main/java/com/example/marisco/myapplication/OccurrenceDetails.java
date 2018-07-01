@@ -2,16 +2,19 @@ package com.example.marisco.myapplication;
 
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ScrollView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -62,15 +65,18 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
     private List<Map<String, Object>> comments;
     private ListAdapterComments adapter;
 
+    private String i_title, i_description;
+    private boolean i_visibility;
+
 
     @BindView(R.id.detail_title)
-    TextView o_title;
+    EditText o_title;
     @BindView(R.id.detail_description)
-    TextView o_description;
+    EditText o_description;
     @BindView(R.id.detail_level)
-    TextView o_level;
-    @BindView(R.id.detail_visibility)
-    TextView o_visibility;
+    EditText o_level;
+    @BindView(R.id.spinner_visibility)
+    Spinner o_visibility;
     @BindView(R.id.occurrence_map)
     MapView map;
     @BindView(R.id.occurrence_image)
@@ -83,6 +89,12 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
     ListView comment_list;
     @BindView(R.id.scroll_view)
     ScrollView scrollView;
+    @BindView(R.id.edit_button)
+    Button edit_btn;
+    @BindView(R.id.btnSave)
+    Button save_btn;
+    @BindView(R.id.btnCancelSave)
+    Button cancel_btn;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -135,7 +147,98 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
                 }
             }
         });
+        save_btn.setVisibility(View.GONE);
+        cancel_btn.setVisibility(View.GONE);
+        fieldsSetup();
+        if(userID != Long.parseLong(token.userID)){
+            edit_btn.setVisibility(View.GONE);
+        }
+        edit_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveInitialValues();
+                setEditMode();
+            }
+        });
+        save_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fieldsSetup();
+                editOccurrence();
+            }
+        });
+        cancel_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fieldsSetup();
+                restoreInitialValues();
+            }
+        });
+
+        //Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
+                R.array.visibility_types, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        o_visibility.setAdapter(adapter);
         return v;
+    }
+
+    private void saveInitialValues(){
+        i_title = o_title.getText().toString();
+        i_description = o_description.getText().toString();
+
+        if(o_visibility.getSelectedItem().toString().equals(getResources().getString(R.string.occurrence_public)))
+            i_visibility = true;
+        else i_visibility = false;
+    }
+
+    private void restoreInitialValues(){
+        o_title.setText(i_title);
+        o_description.setText(i_description);
+
+        if(i_visibility)
+            o_visibility.setSelection(0);
+        else o_visibility.setSelection(1);
+    }
+
+    private void fieldsSetup(){
+        o_title.setInputType(InputType.TYPE_NULL);
+        o_title.setEnabled(false);
+        o_title.setTextIsSelectable(false);
+
+        o_description.setInputType(InputType.TYPE_NULL);
+        o_description.setEnabled(false);
+        o_description.setTextIsSelectable(false);
+
+        o_level.setInputType(InputType.TYPE_NULL);
+        o_level.setEnabled(false);
+        o_level.setTextIsSelectable(false);
+
+        o_visibility.setEnabled(false);
+
+        save_btn.setVisibility(View.GONE);
+        cancel_btn.setVisibility(View.GONE);
+    }
+
+    private void setEditMode(){
+        o_title.setInputType(InputType.TYPE_CLASS_TEXT);
+        o_title.setEnabled(true);
+        o_title.setTextIsSelectable(true);
+
+        o_description.setInputType(InputType.TYPE_CLASS_TEXT);
+        o_description.setEnabled(true);
+        o_description.setTextIsSelectable(true);
+
+        o_level.setInputType(InputType.TYPE_CLASS_TEXT);
+        o_level.setEnabled(true);
+        o_level.setTextIsSelectable(true);
+
+        o_visibility.setEnabled(true);
+
+        save_btn.setVisibility(View.VISIBLE);
+        cancel_btn.setVisibility(View.VISIBLE);
     }
 
     private void fillInfo(String title, String description, boolean visibility, double level
@@ -146,8 +249,9 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
         o_level.setText((int)level + "");
 
         if(visibility)
-            o_visibility.setText(R.string.occurrence_public);
-        else o_visibility.setText(R.string.occurrence_private);
+            o_visibility.setSelection(0);
+        else o_visibility.setSelection(1);
+
 
         if(mediaIDs != null && !mediaIDs.isEmpty()) {
             Picasso.get().load("https://storage.googleapis.com/custom-tine-204615.appspot.com/user/"
@@ -273,5 +377,42 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
         adapter = new ListAdapterComments(getContext(), comments, android.R.layout.simple_list_item_1);
         comment_list.setAdapter(adapter);
         putComments();
+    }
+
+    private void editOccurrence(){
+        String title = o_title.getText().toString();
+        String description = o_description.getText().toString();
+        boolean visibility = false;
+        if(o_visibility.getSelectedItem().toString().equals(getResources().getString(R.string.occurrence_public)))
+            visibility = true;
+
+        if (retrofit == null) {
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(ENDPOINT)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+        }
+
+        AgniAPI agniAPI = retrofit.create(AgniAPI.class);
+
+        Call<ResponseBody> call = agniAPI.editOccurrence(new OccurrenceEditData(token, userID, occurrence_id,
+                title, description, visibility, false, false, 0));
+
+        call.enqueue(new Callback<ResponseBody>() {
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.code() == 200) {
+                    Toast toast = Toast.makeText(getActivity(), "Ocorrência editada", Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+                else {
+                    Toast toast = Toast.makeText(getActivity(), "Failed edit occurrence: " + response.code(), Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+            }
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.e("ERROR", t.toString());
+            }
+        });
+
     }
 }

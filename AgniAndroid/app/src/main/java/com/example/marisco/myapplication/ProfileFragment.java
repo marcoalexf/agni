@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import butterknife.BindView;
@@ -44,7 +45,7 @@ public class ProfileFragment extends Fragment {
     @BindView(R.id.edit_button) Button edit_button;
     @BindView(R.id.btnSave) Button save_button;
     @BindView(R.id.btnCancelSave) Button cancel_button;
-
+    @BindView(R.id.occurrences_img)ImageView occurrences_img;
 
     public ProfileFragment() {
 
@@ -81,6 +82,13 @@ public class ProfileFragment extends Fragment {
             public void onClick(View v) {
                 fieldsSetup();
                 restoreInitialValues();
+            }
+        });
+        occurrences_img.setClickable(true);
+        occurrences_img.setOnClickListener( new View.OnClickListener(){
+            public void onClick(View v) {
+                Toast toast = Toast.makeText(getActivity(), "Teste", Toast.LENGTH_SHORT);
+                toast.show();
             }
         });
         return v;

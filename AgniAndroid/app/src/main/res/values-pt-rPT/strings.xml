@@ -58,6 +58,10 @@
     <string name="occurrence_type_clean">Limpeza de mato</string>
     <string name="occurrence_type_zone">Zona de mau acesso</string>
     <string name="occurrence_type_other">Outro</string>
+    <string-array name="visibility_types">
+        <item name="occurrence_public">Público</item>
+        <item name="occurrence_private">Privado</item>
+    </string-array>
 
 
     <string name="map">Mapa</string>
@@ -80,4 +84,7 @@
     <string name="comments">Comentários</string>
     <string name="insert_comment">Insira o seu comentário</string>
     <string name="send_comment">Enviar</string>
+
+    <string name="edit">Editar</string>
+
 </resources>
