@@ -95,3 +95,7 @@ img.avatar {
 .pac-container:empty{
     display: none !important;
 }
+
+justcenter{
+    margin: auto
+}

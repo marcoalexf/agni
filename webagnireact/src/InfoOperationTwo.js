@@ -20,6 +20,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import {skyBlue, lightGrey, white, lightBlue} from "./Colors";
 import LikeIcon from '@material-ui/icons/Favorite';
 import NonLikeIcon from '@material-ui/icons/FavoriteBorder';
+import CommentIcon from '@material-ui/icons/ModeComment';
 import Checkbox from 'material-ui/Checkbox';
 import { FormLabel, FormControlLabel } from 'material-ui/Form';
 import TextField from "material-ui/TextField";
@@ -29,13 +30,34 @@ import CardHeader from '@material-ui/core/CardHeader';
 import CardMedia from '@material-ui/core/CardMedia';
 import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
+import IconButton from 'material-ui/IconButton';
 
 const AnyReactComponent = ({ text }) => <div>{text}</div>;
 
 const styles = theme => ({
     root: {
         width: 700,
-        flexGrow: 1,
+        //flexGrow: 1,
+        marginRight: 20,
+        marginLeft: 20,
+        //marginBottom: 20,
+        display: 'inline-block',
+        verticalAlign:'top',
+    },
+    rightRoot: {
+        width: 400,
+        //flexGrow: 1,
+        //margin: 20,
+        //flex: 1,
+        marginRight: 20,
+        marginLeft: 20,
+        display: 'inline-block',
+        verticalAlign:'top',
+    },
+    commentsRoot:{
+        height: '51vh',
+        overflowY: 'auto',
+        //overflowY: 'scroll',
     },
     header: {
         display: 'flex',
@@ -80,7 +102,9 @@ const styles = theme => ({
         marginBottom: 20,
     },
     likeButton:{
-        color: skyBlue,
+        //color: skyBlue,
+        margin: 10,
+        fontSize: '24px',
     },
     bootstrapRoot: {
         padding: 0,
@@ -94,7 +118,7 @@ const styles = theme => ({
         border: "1px solid #ced4da",
         fontSize: 16,
         padding: "10px 12px",
-        width: 630,
+        width: 250,
         transition: theme.transitions.create(["border-color", "box-shadow"]),
         fontFamily: [
             "-apple-system",
@@ -117,13 +141,15 @@ const styles = theme => ({
         backgroundColor: lightBlue,
         color: white,
         marginTop: 10,
-        marginLeft: 550,
+        //marginLeft: 550,
     },
     comments:{
         marginBottom: 20,
         borderRadius: 4,
-        backgroundColor: theme.palette.common.white,
-        border: "1px solid #ced4da",
+        backgroundColor: lightGrey,
+        //backgroundColor: skyBlue,
+        //backgroundColor: theme.palette.common.white,
+        //border: "1px solid #ced4da",
         fontSize: 16,
         padding: "10px 12px",
         //width: 500,
@@ -473,6 +499,8 @@ class SwipeableTextMobileStepper extends React.Component {
                     if (xmlHttp.readyState === XMLHttpRequest.DONE) {
 
                         if (xmlHttp.status === 200) {
+                            this.setState({comment: ''});
+                            this.updateComments();
                             console.log("Sucesso");
                         }
 
@@ -480,7 +508,7 @@ class SwipeableTextMobileStepper extends React.Component {
                             console.log("Ocorreu um erro - Nao foi possivel registar o problema");
                         }
                     }
-                }
+                }.bind(this);
             }
         }
 
@@ -490,9 +518,19 @@ class SwipeableTextMobileStepper extends React.Component {
 
     };
 
+    async updateComments(){
+        let c = await getComments(this.state.object, this.state.activeStep);
+        this.setState({comments: c});
+    }
+
     handleCommentChange = event =>{
         this.setState({comment: event.target.value});
     };
+
+    handleClickCommentIcon = () =>{
+        console.log("evento de mousedown");
+        document.getElementById("addComment").focus();
+    }
 
     render() {
         const { classes, theme } = this.props;
@@ -507,7 +545,8 @@ class SwipeableTextMobileStepper extends React.Component {
                 {loading && <div className={"imgcontainer"}><CircularProgress /></div>}
 
                 {!loading &&
-                <div className={classes.root} style={{margin: '0 auto'}}>
+                <div>
+                    <div className={classes.root}>
                 <Card>
                     <CardHeader
                         title={object[activeStep].user_occurrence_title}
@@ -526,14 +565,16 @@ class SwipeableTextMobileStepper extends React.Component {
                                 {/*<div className={classes.opName}>{object[activeStep].user_occurrence_title}</div>*/}
                             {/*</Paper>*/}
                             {/*<Paper square elevation={0} className={classes.headerTwo}>*/}
-                                <p>Tipo: <Typography>{object[activeStep].user_occurrence_type}</Typography></p>
+                                <p>Tipo:</p> <Typography>{object[activeStep].user_occurrence_type}</Typography>
                             {/*</Paper>*/}
                             {/*<Paper square elevation={0} className={classes.headerTwo}>*/}
-                                <p>Grau de urgencia: <Typography> {object[activeStep].user_occurrence_level}</Typography></p>
+                                <p>Grau de urgencia:</p> <Typography> {object[activeStep].user_occurrence_level}</Typography>
                             {/*</Paper>*/}
                             {/*<Paper square elevation={0} className={classes.headerTwo}>*/}
                                 {/*<p>Data: </p><Typography> {object[activeStep].user_occurrence_date}</Typography>*/}
                             {/*</Paper>*/}
+                                <p>Estado:</p>
+                                <p>Data de previsão da limpeza:</p>
                             </div>
                             <div className={"w3-twothird"} style={{marginBottom: 10}}>
                                 <p>Localização: </p>
@@ -548,7 +589,7 @@ class SwipeableTextMobileStepper extends React.Component {
                                 {/*</GoogleMapReact>*/}
                                 {/*</div>*/}
 
-                                <Map id={"map"} center={position} zoom={this.state.zoom} style={{width: 350, height: 190}}>
+                                <Map id={"map"} center={position} zoom={this.state.zoom} scrollWheelZoom={false} style={{width: 350, height: 190}}>
                                     <TileLayer
                                         attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
                                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -564,47 +605,91 @@ class SwipeableTextMobileStepper extends React.Component {
                             </div>
                         </div>
 
-                        <div>
-                    <FormControlLabel
-                        control={
-                            <Checkbox icon={<NonLikeIcon />} checkedIcon={<LikeIcon />} color={"primary"} />
-                        }
-                        onChange={this.handleLikeChange}
-
-                    />Apoiar
-                </div>
-
-                <div>
-                    <p>Comentários</p>
-                    {comments.map(c =>{
-                        return(
-                        <div className={classes.comments}>
-                            <b>{c.comment_userID} </b>{c.comment_text}
-                            <Typography>{c.comment_date}</Typography>
-                        </div>
-                        )})}
-                </div>
-
-                <div>
-                    <TextField
-                        placeholder="(Escreva aqui o seu comentário)"
-                        id={"bootstrap-input" + object[activeStep].user_occurrence_title}
-                        InputProps={{
-                            disableUnderline: true,
-                            classes: {
-                                root: classes.bootstrapRoot,
-                                input: classes.bootstrapInput
-                            }
-                        }}
-                        multiline
-                        rows="4"
-                        value={this.state.comment}
-                        onChange={this.handleCommentChange}
-                    />
-                </div>
-                <Button variant={"raised"} color={"primary"} className={classes.commentButton} onClick={this.handleComment}>Comentar</Button>
                     </CardContent>
-                    {/*<div>{this.props.occurrences.map(n => <p>n.user_occurrence_title</p>)}</div>*/}
+                </Card>
+                    </div>
+
+                    <div className={classes.rightRoot}>
+                <Card>
+                    <CardHeader title={"Comentários"}/>
+                    <CardContent className={classes.commentsRoot}>
+                        <div>
+                            {/*<p>Comentários</p>*/}
+
+                            {comments.map(c =>{
+                                return(
+                                    <div key={c.comment_date + c.comment_userID}>
+                                        <Typography variant={"caption"} gutterBottom align={"right"}>{c.comment_date}</Typography>
+                                        <div className={classes.comments}>
+                                            <b>{c.comment_userID} </b>{c.comment_text}
+                                        </div>
+
+                                    </div>
+                                )})}
+
+                            {comments.length == 0 ?
+                                <Typography variant="caption" gutterBottom align="center">Sem comentários de momento</Typography> : null
+                            }
+
+                        </div>
+
+                    </CardContent>
+
+                    <CardActions>
+
+                        <div>
+                            <div>
+                                <FormControlLabel
+                                    key={object[activeStep].occurrenceID}
+                                    control={
+                                        <Checkbox icon={<NonLikeIcon className={classes.likeButton} />}
+                                                  checkedIcon={<LikeIcon className={classes.likeButton} />} color={"primary"} />
+                                    }
+                                    onChange={this.handleLikeChange}
+                                    //label={"Apoiar"}
+
+                                /><div style={{display: 'inline'}}>? apoios</div>
+                                {/*Apoiar*/}
+                                {/*<FormControlLabel*/}
+                                    {/*control={*/}
+                                        {/*<Checkbox icon={<CommentIcon className={classes.likeButton} />}*/}
+                                                  {/*checkedIcon={<CommentIcon className={classes.likeButton} />} color={"primary"}*/}
+                                        {/*/>*/}
+                                    {/*}*/}
+                                    {/*onChange={this.handleClickCommentIcon}*/}
+                                    {/*//onChange={this.handleLikeChange}*/}
+                                    {/*label={"Comentar"}*/}
+
+                                {/*/>*/}
+                                <IconButton>
+                                    <CommentIcon className={classes.likeButton} onClick={this.handleClickCommentIcon}/>
+                                </IconButton>
+                                <div style={{display: 'inline'}}>{comments.length}</div>
+                                <div style={{display: 'inline'}}> {"comentários"}</div>
+                            </div>
+
+                            <TextField
+                                key={object[activeStep].occurrenceID}
+                                placeholder="(Escreva aqui o seu comentário)"
+                                id={"addComment"}
+                                InputProps={{
+                                    disableUnderline: true,
+                                    classes: {
+                                        root: classes.bootstrapRoot,
+                                        input: classes.bootstrapInput
+                                    }
+                                }}
+                                multiline
+                                rows="4"
+                                value={this.state.comment}
+                                onChange={this.handleCommentChange}
+                            />
+                        </div>
+                        <Button variant={"raised"} color={"primary"} className={classes.commentButton} onClick={this.handleComment}>Comentar</Button>
+                    </CardActions>
+                </Card>
+                    </div>
+                        {/*<div>{this.props.occurrences.map(n => <p>n.user_occurrence_title</p>)}</div>*/}
 
                 {/*<SwipeableViews*/}
                     {/*axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}*/}
@@ -714,7 +799,7 @@ class SwipeableTextMobileStepper extends React.Component {
                     {/*</div>*/}
                 {/*</div>*/}
 
-                </Card>
+
                 <MobileStepper
                     variant="text"
                     steps={maxSteps}
