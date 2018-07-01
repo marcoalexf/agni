@@ -204,14 +204,26 @@ function xmlRequest(){
         // var t = true;
         var token = window.localStorage.getItem('token');
         var tokenObj = JSON.parse(token);
+        var d = new Date();
+        var t = d.getTime();
+
         if(token != null){
+            var expirationData = JSON.parse(token).expirationData;
+
+            if(expirationData <= t){
+                console.log("tempo expirado");
+                window.localStorage.removeItem('token');
+                document.getElementById("tologin").click();
+            }
+
             var uname = JSON.parse(token).username;
             var map;
 
             var user = {
                 "username": uname,
                 "token": tokenObj,
-                "showPrivate": true //MUDAR ISTO DEPOIS
+                "showPrivate": true,
+                "cursor": null,
             };
 
             console.log("pedido");
@@ -239,14 +251,23 @@ function xmlRequest(){
                         resolve(obj.mapList);
                     }
                     else {
-                        console.log("tempo expirado");
-                        window.localStorage.removeItem('token');
+                        if(expirationData <= t){
+                            console.log("tempo expirado");
+                            window.localStorage.removeItem('token');
+                            document.getElementById("tologin").click();
+                        }
+
+                        else{
+                            console.log("erro");
+                        }
+
                     }
                 }
             }.bind(this)
         }
         else{
             console.log("Sem sessao iniciada");
+            document.getElementById("tologin").click();
         }
     });
 }

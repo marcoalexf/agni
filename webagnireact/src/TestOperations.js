@@ -21,6 +21,8 @@ import {withStyles} from "material-ui/styles/index";
 import {Link} from "react-router-dom";
 import CircularProgress from '@material-ui/core/CircularProgress';
 import InfoOperationTwo from './InfoOperationTwo';
+import Visibility from '@material-ui/icons/Visibility';
+import Button from 'material-ui/Button';
 
 const CustomTableCell = withStyles(theme => ({
     head: {
@@ -128,7 +130,7 @@ let EnhancedTableToolbar = props => {
             <div className={classes.toolbartitle}>
                 {(
                     <Typography variant="title" id="tableTitle">
-                        Tabela de Ocorrências
+                        Tabela de Ocorrências Públicas
                     </Typography>
                 )}
             </div>
@@ -318,14 +320,14 @@ class TestOperations extends React.Component {
                             <CustomTableCell>Data</CustomTableCell>
                             <CustomTableCell>Estado</CustomTableCell>
                             <CustomTableCell numeric>Grau de urgência</CustomTableCell>
-                            <CustomTableCell>Visibilidade</CustomTableCell>
+                            {/*<CustomTableCell>Visibilidade</CustomTableCell>*/}
                         </TableRow>
                     </TableHead>
 
                     <TableBody>
                         {object.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(n => {
                             return (
-                                <TableRow key={n.user_occurrence_data}>
+                                <TableRow key={n.occurrenceID + n.userID}>
                                     <TableCell>
                                         <IconButton onClick={isLogin() ? this.seeInformations : this.showErrorMessage}>
                                             <Link id={"toinfo"} to={"/operacao"}/>
@@ -345,7 +347,7 @@ class TestOperations extends React.Component {
                                             //color={this.colorByLevel(n.user_occurrence_level)}
                                         />
                                         {n.user_occurrence_level}</TableCell>
-                                    <TableCell>{n.user_occurrence_visibility ? 'publico' : 'privado'}</TableCell>
+                                    {/*<TableCell>{n.user_occurrence_visibility ? 'publico' : 'privado'}</TableCell>*/}
                                 </TableRow>
                             );
                         })}
@@ -365,6 +367,12 @@ class TestOperations extends React.Component {
                     onChangePage={this.handleChangePage}
                     onChangeRowsPerPage={this.handleChangeRowsPerPage}
                 />
+
+                    <Button variant={"raised"} onClick={isLogin() ? this.seeInformations : this.showErrorMessage}
+                            color={"default"}>
+                        {/*<Visibility/> */}
+                        Ver informações detalhadas das ocorrências públicas
+                    </Button>
                 </div>}
             </div>
         )
