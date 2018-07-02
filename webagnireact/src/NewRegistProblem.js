@@ -33,6 +33,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import PlacesAutocomplete from 'react-places-autocomplete';
 import { geocodeByAddress, geocodeByPlaceId, getLatLng } from 'react-places-autocomplete';
 import {SearchBox, Marker} from 'react-google-maps';
+import './Maps.css';
 
 const AnyReactComponent = ({ text }) => <div>{text}</div>;
 
@@ -438,47 +439,19 @@ class NewRegistProblem extends React.Component {
                             <TableCell>
                                 {loading && <CircularProgress/>}
                                 {!loading && <div>
-                                    <TextField
-                                        id="location"
-                                        label="Localizacao"
-                                        onChange={this.handleChange('location')}
-                                        className={classes.textField}
-                                    />
+                                    {/*<TextField*/}
+                                        {/*id="location"*/}
+                                        {/*label="Localizacao"*/}
+                                        {/*onChange={this.handleChange('location')}*/}
+                                        {/*className={classes.textField}*/}
+                                    {/*/>*/}
 
-                                    {/*<PlacesAutocomplete*/}
-                                        {/*value={this.state.address}*/}
-                                        {/*onChange={this.handleAddressChange}*/}
-                                        {/*onSelect={this.handleAddressSelect}*/}
-                                    {/*>*/}
-                                        {/*{({ getInputProps, suggestions, getSuggestionItemProps }) => (*/}
-                                            {/*<div>*/}
-                                                {/*<input*/}
-                                                    {/*{...getInputProps({*/}
-                                                        {/*placeholder: 'Search Places ...',*/}
-                                                        {/*className: 'location-search-input'*/}
-                                                    {/*})}*/}
-                                                {/*/>*/}
-                                                {/*<div className="autocomplete-dropdown-container">*/}
-                                                    {/*{suggestions.map(suggestion => {*/}
-                                                        {/*const className = suggestion.active ? 'suggestion-item--active' : 'suggestion-item';*/}
-                                                        {/*// inline style for demonstration purpose*/}
-                                                        {/*const style = suggestion.active*/}
-                                                            {/*? { backgroundColor: '#fafafa', cursor: 'pointer' }*/}
-                                                            {/*: { backgroundColor: '#ffffff', cursor: 'pointer' };*/}
-                                                        {/*return (*/}
-                                                            {/*<div {...getSuggestionItemProps(suggestion, { className, style })}>*/}
-                                                                {/*<span>{suggestion.description}</span>*/}
-                                                            {/*</div>*/}
-                                                        {/*)*/}
-                                                    {/*})}*/}
-                                                {/*</div>*/}
-                                            {/*</div>*/}
-                                        {/*)}*/}
-                                    {/*</PlacesAutocomplete>*/}
+                                    
 
-
-                                    <Button variant="fab" mini className={classes.searchButton}
-                                            onClick={this.getLocation}> <SearchIcon/> </Button>
+                                    <IconButton
+                                        //variant="fab" mini
+                                        className={classes.searchButton}
+                                        onClick={this.getLocation}> <SearchIcon/> </IconButton>
                                 </div>
                                 }
 

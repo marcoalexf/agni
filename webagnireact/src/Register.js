@@ -17,6 +17,8 @@ import CheckIcon from '@material-ui/icons/CheckCircle';
 import CloseIcon from '@material-ui/icons/Close';
 import PlacesAutocomplete from 'react-places-autocomplete';
 import { geocodeByAddress, geocodeByPlaceId, getLatLng } from 'react-places-autocomplete';
+import './Maps.css';
+import classNames from 'classnames';
 
 const styles = theme => ({
     textField: {
@@ -461,9 +463,8 @@ class Register extends Component {
 
     render() {
         const { loggingIn } = this.props;
-        const { username, email, password, locality, confirmPass, submitted, validUsername, startedUsername,
-            startedEmail, startedName, startedPassword, startedConfPass, validEmail, validName, validPassword,
-        validConfPass, startedLocation, validLocation} = this.state;
+        const { username, name, email, password, locality, confirmPass, submitted,
+            validUsername, validEmail, validName, validPassword, validConfPass, validLocation} = this.state;
         const { classes } = this.props;
         let {imagePreviewUrl} = this.state;
         let $imagePreview = (<img src={require('./img/registUser2.png')} alt="Avatar2" width={100} style={{marginBottom: '20'}} />);
@@ -528,7 +529,8 @@ class Register extends Component {
                             <TextField required id="username" label="Nome de utilizador" className={classes.textField} value={this.state.username}
                                        onChange={this.handleUsernameChange('username')}/>
                             <div id={"showvalidation"} className={classes.showValidation}></div>
-                            {!startedUsername && (validUsername ? <CheckIcon className={classes.validIcon}/> : <CloseIcon className={classes.nonValidIcon}/> )}
+                            {username.length != 0 &&
+                            (validUsername ? <CheckIcon className={classes.validIcon}/> : <CloseIcon className={classes.nonValidIcon}/> )}
                             {/*{!started && !valid && <div style={{margin: '0 auto'}}>O username nao pode ser vazio e apenas pode conter letras minusculas</div>}*/}
                             {/*{!this.isValid('username') && <div>Deu</div>}*/}
                             <div id="helperMessageUser" className={classes.helperMessage}></div>
@@ -542,7 +544,7 @@ class Register extends Component {
                         <div className={'form-group' + (submitted && !username ? ' has-error' : '')}>
                             <TextField required id="name" label="Name" className={classes.textField} value={this.state.name}
                                        onChange={this.handleNameChange('name')}/>
-                            {!startedName &&
+                            {name.length != 0 &&
                             (validName ? <CheckIcon className={classes.validIcon}/> : <CloseIcon className={classes.nonValidIcon}/> )}
                             {submitted && !username &&
                             <div className="help-block">Name is required</div>
@@ -554,7 +556,7 @@ class Register extends Component {
                         <div className={'form-group' + (submitted && !email ? ' has-error' : '')}>
                             <TextField required id="email" label="Email" type="email" className={classes.textField} value={this.state.email}
                                        onChange={this.handleEmailChange('email')}/>
-                            {!startedEmail &&
+                            {email.length != 0 &&
                             (validEmail ? <CheckIcon className={classes.validIcon}/> : <CloseIcon className={classes.nonValidIcon}/> )}
                             {submitted && !email &&
                             <div className="help-block">Email is required</div>
@@ -571,7 +573,7 @@ class Register extends Component {
                         </SelectField>
                     </div>
 
-                    <div className="input-group">
+                    <div>
                         {/*<div className={'form-group' + (submitted && !locality ? ' has-error' : '')}>*/}
                             {/*<TextField required id="locality" label="Localidade" className={classes.textField} value={this.state.locality}*/}
                                        {/*onChange={this.handleLocalityChange('locality')}/>*/}
@@ -586,36 +588,64 @@ class Register extends Component {
                             value={this.state.address}
                             onChange={this.handleAddressChange}
                             onSelect={this.handleAddressSelect}
-                            className="pac-container"
+                            //className="pac-container"
                         >
-                            {({ getInputProps, suggestions, getSuggestionItemProps }) => (
-                                <div>
-                                    <TextField label={'Localidade'}
-                                        {...getInputProps({
-                                            // placeholder: 'Localidade',
-                                            className: classes.textField
-                                        })}
-                                    />
-                                    {!startedLocation &&
-                                    (validLocation ? <CheckIcon className={classes.validIcon}/> : <CloseIcon className={classes.nonValidIcon}/> )}
-                                    <div className="pac-item">
-                                        {suggestions.map(suggestion => {
-                                            const className = suggestion.active ? 'suggestion-item--active' : 'suggestion-item';
-                                            // inline style for demonstration purpose
-                                            const style = suggestion.active
-                                                ? { backgroundColor: '#D3D3D3', cursor: 'pointer' }
-                                                : { backgroundColor: '#ffffff', cursor: 'pointer' };
-                                            return (
-                                                <div {...getSuggestionItemProps(suggestion, { className, style })}>
-                                                    <span className={classes.geosuggestions}>{suggestion.description}</span>
+                            {({ getInputProps, suggestions, getSuggestionItemProps }) => {
+                                return(
+                                    <div>
+                                        <div className={"search-input-container"}>
+                                            <TextField label={'Localidade'}
+                                                       {...getInputProps({
+                                                           //placeholder: 'Localidade',
+                                                           //className: 'search-input'
+                                                       })}
+                                                className={classes.textField}
+                                            />
+                                            {this.state.address.length != 0 &&
+                                            (validLocation ? <CheckIcon className={classes.validIcon}/> : <CloseIcon className={classes.nonValidIcon}/> )}
+                                        </div>
+
+                                        {suggestions.length> 0 &&
+
+                                        (<div className='autocomplete-container'>
+                                                {suggestions.map(suggestion => {
+                                                    const className = classNames(
+                                                        'suggestion-item'
+                                                        , {
+                                                        'suggestion-item--active': suggestion.active,
+                                                    })
+                                                    ;
+                                                    //suggestion.active ? 'suggestion-item--active' : 'suggestion-item';
+                                                    // inline style for demonstration purpose
+                                                    // const style = suggestion.active
+                                                    //     ? { backgroundColor: '#d3d3d3', cursor: 'pointer' }
+                                                    //     : { backgroundColor: '#ffffff', cursor: 'pointer' };
+                                                    return (
+                                                        <div {...getSuggestionItemProps(suggestion, { className })}>
+                                                            <strong>
+                                                                {suggestion.formattedSuggestion.mainText}
+                                                            </strong>{' '}
+                                                            <small>
+                                                                {suggestion.formattedSuggestion.secondaryText}
+                                                            </small>
+                                                        </div>
+                                                    );
+                                                })}
+                                                <div className="dropdown-footer">
+                                                    <div>
+                                                        <img
+                                                            src={require('./img/powered_by_google_default.png')}
+                                                            className="dropdown-footer-image"
+                                                        />
+                                                    </div>
                                                 </div>
-                                            )
-                                        })}
+                                            </div>
+                                        )}
+                                        <div id="helperMessageLocation" className={classes.helperMessage}></div>
                                     </div>
-                                    <div id="helperMessageLocation" className={classes.helperMessage}></div>
-                                </div>
-                            )}
-                        </PlacesAutocomplete>
+                                    );
+                                    }}
+                    </PlacesAutocomplete>
 
                         {/*<div className="pac-container pac-logo"*/}
                              {/*style={{width: 557, position: 'absolute', left: 66, top: 106, display: 'none',}}>*/}
@@ -632,7 +662,7 @@ class Register extends Component {
                         <div className={'form-group' + (submitted && !password ? ' has-error' : '')}>
                             <TextField required id="password" label="Password" type="password" className={classes.textField} value={this.state.password}
                                        onChange={this.handlePasswordChange('password')}/>
-                            {!startedPassword &&
+                            {password.length != 0 &&
                             (validPassword ? <CheckIcon className={classes.validIcon}/> : <CloseIcon className={classes.nonValidIcon}/> )}
                             <div id="helperMessagePass" className={classes.helperMessage}></div>
                             {submitted && !password &&
@@ -645,7 +675,7 @@ class Register extends Component {
                         <div className={'form-group' + (submitted && !confirmPass ? ' has-error' : '')}>
                             <TextField required id="confirmpassword" label="Confirmar Password" type="password" className={classes.textField} value={this.state.confirmPass}
                                        onKeyUp={this.handleKeyUp} onChange={this.handleConfirmPassChange('confirmPass')}/>
-                            {!startedConfPass &&
+                            {confirmPass.length != 0 &&
                             (validConfPass ? <CheckIcon className={classes.validIcon}/> : <CloseIcon className={classes.nonValidIcon}/> )}
                             {submitted && !confirmPass &&
                             <div className="help-block">Confirmation of password is required</div>

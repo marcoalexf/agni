@@ -361,7 +361,7 @@ class SwipeableTextMobileStepper extends React.Component {
         // getComments.bind(this);
         let c = await getComments(o, 0);
         this.setState({comments: c});
-        console.log("comments: " + c[0].comment_text);
+        //console.log("comments: " + c[0].comment_text);
         this.setState({loading: false});
     }
 
