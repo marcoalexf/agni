@@ -70,6 +70,7 @@ public class OccurrenceCommentResource {
 			commentEntity.setProperty("comment_text", data.comment);
 			commentEntity.setProperty("comment_date", new Date());
 			commentEntity.setProperty("comment_userID", data.token.userID);
+			datastore.put(txn, commentEntity);
 			
 			txn.commit();
 			LOG.info("User " + data.token.username + " commented occurrence with id: " + data.occurrenceID);
@@ -111,6 +112,7 @@ public class OccurrenceCommentResource {
 			commentMap = new HashMap<String, Object>();
 			commentMap.putAll(commentEntity.getProperties());
 			commentMap.put("commentID", String.valueOf(commentEntity.getKey().getId()));
+			comments.add(commentMap);
 		}
 		
 		CursorList cursorList = new CursorList(results.getCursor().toWebSafeString(), comments);

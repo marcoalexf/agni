@@ -150,7 +150,7 @@ public class OccurrenceResource {
 			LOG.warning("Failed to send list of occurrences, token for user: " + data.token.username + "is invalid");
 			return Response.status(Status.FORBIDDEN).build();
 		}
-		List<Map<String, Object>> occurrences = new LinkedList<Map<String, Object>>();
+		
 		Query ctrQuery = new Query("UserOccurrence");
 		if(data.username != null) {
 			FilterPredicate filter = new FilterPredicate("user_username", FilterOperator.EQUAL, data.username);
@@ -193,14 +193,19 @@ public class OccurrenceResource {
 			}
 			ctrQuery.setFilter(compositeFilter);
 		}
-		Map<String, Object> occurrenceMap;
+		else {
+			ctrQuery.addSort("user_occurrence_date", SortDirection.DESCENDING);
+		}
+		
 		FetchOptions fetchOptions = FetchOptions.Builder.withLimit(QUERY_LIMIT);
 		if(data.cursor != null) {
 			fetchOptions.startCursor(Cursor.fromWebSafeString(data.cursor));
 		}
-		ctrQuery.addSort("user_occurrence_date", SortDirection.DESCENDING);
 		QueryResultList<Entity> results = datastore.prepare(ctrQuery).asQueryResultList(fetchOptions);
+		
+		List<Map<String, Object>> occurrences = new LinkedList<Map<String, Object>>();
 		Query ctrQueryMedia;
+		Map<String, Object> occurrenceMap;
 		List<Entity> mediaResults;
 		List<String> mediaIDs;
 		for(Entity occurrenceEntity: results) {
@@ -224,7 +229,7 @@ public class OccurrenceResource {
 			occurrences.add(occurrenceMap);
 		}
 		CursorList cursorList = new CursorList(results.getCursor().toWebSafeString(), occurrences);
-		LOG.info("List of occurrences sent");
+		LOG.info("List of occurrences sent to user: " + data.token.username);
 		return Response.ok(g.toJson(cursorList)).build();
 	}
 	

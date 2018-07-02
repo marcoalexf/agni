@@ -29,11 +29,9 @@ import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.datastore.QueryResultList;
 import com.google.gson.Gson;
 
-import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.ListOccurrenceCommentData;
-import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceCommentData;
-import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceCommentDeleteData;
-import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceCommentEditData;
+import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.ListOccurrenceLikeData;
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceDeleteData;
+import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceLikeCountData;
 import pt.unl.fct.di.apdc.firstwebapp.util.CursorList;
 import pt.unl.fct.di.apdc.firstwebapp.util.SecurityManager;
 
@@ -68,13 +66,18 @@ public class OccurrenceLikeResource {
 			datastore.get(txn, occurrenceKey);
 			
 			Key userKey = KeyFactory.createKey("User", data.token.userID);
-			Entity commentEntity = new Entity("UserOccurrenceLike", userKey);
-			commentEntity.setProperty("comment_text", data.comment);
-			commentEntity.setProperty("comment_date", new Date());
-			commentEntity.setProperty("comment_userID", data.token.userID);
+			Key likeKey = KeyFactory.createKey(userKey, "UserOccurrenceLike", KeyFactory.keyToString(occurrenceKey));
+			try {
+				datastore.get(likeKey);
+				datastore.delete(likeKey);
+			} catch (EntityNotFoundException e) {
+				Entity likeEntity = new Entity(likeKey);
+				likeEntity.setProperty("like_date", new Date());
+				datastore.put(likeEntity);
+			}
 			
 			txn.commit();
-			LOG.info("User " + data.token.username + " commented occurrence with id: " + data.occurrenceID);
+			LOG.info("User " + data.token.username + " liked occurrence with id: " + data.occurrenceID);
 			return Response.ok().build();
 		} catch (EntityNotFoundException e) {
 			return Response.status(Status.BAD_REQUEST).entity("Occurrence does not exist.").build();
@@ -88,115 +91,83 @@ public class OccurrenceLikeResource {
 	@POST
 	@Path("/list")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response ListOccurrenceComments(ListOccurrenceCommentData data) {
-		LOG.fine("Attempt to list comments from occurrence: " + data.occurrenceID + " by user: " + data.token.username);
+	public Response ListOccurrenceComments(ListOccurrenceLikeData data) {
+		LOG.fine("Attempt to list likes from user: " + data.userID + " by user: " + data.token.username);
 		if(!data.valid()) {
 			return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
 		}
 		if(!data.token.isTokenValid()) {
-			LOG.warning("Failed to list comments from occurrence, token for user: " + data.token.username + " is invalid");
+			LOG.warning("Failed to list likes from user, token for user: " + data.token.username + " is invalid");
 			return Response.status(Status.FORBIDDEN).build();
 		}
+		if(!(data.token.userID == data.userID) && !SecurityManager.userHasAccess("see_liked_occurrences", data.token.userID)) {
+			return Response.status(Status.FORBIDDEN).build();
+		}
+		
 		Key userKey = KeyFactory.createKey("User", data.userID);
-		Key occurrenceKey = KeyFactory.createKey(userKey, "UserOccurrence", data.occurrenceID);
 		
 		FetchOptions fetchOptions = FetchOptions.Builder.withLimit(QUERY_LIMIT);
 		if(data.cursor != null) {
 			fetchOptions.startCursor(Cursor.fromWebSafeString(data.cursor));
 		}
-		Query ctrQuery = new Query("UserOccurrenceComment").setAncestor(occurrenceKey).addSort("comment_date", SortDirection.DESCENDING);
+		Query ctrQuery = new Query("UserOccurrenceLike").setAncestor(userKey).addSort("like_date", SortDirection.DESCENDING);
 		QueryResultList<Entity> results = datastore.prepare(ctrQuery).asQueryResultList(fetchOptions);
 		
-		List<Map<String, Object>> comments = new LinkedList<Map<String, Object>>();
-		Map<String, Object> commentMap;
-		for(Entity commentEntity: results) {
-			commentMap = new HashMap<String, Object>();
-			commentMap.putAll(commentEntity.getProperties());
-			commentMap.put("commentID", String.valueOf(commentEntity.getKey().getId()));
+		List<Map<String, Object>> occurrences = new LinkedList<Map<String, Object>>();
+		Query ctrQueryMedia;
+		Map<String, Object> occurrenceMap;
+		List<Entity> mediaResults;
+		List<String> mediaIDs;
+		Entity occurrenceEntity;
+		for(Entity likeEntity: results) {
+			try {
+				occurrenceEntity = datastore.get(KeyFactory.stringToKey(likeEntity.getKey().getName()));
+				occurrenceMap = new HashMap<String, Object>();
+				occurrenceMap.putAll(occurrenceEntity.getProperties());
+				occurrenceMap.put("username", occurrenceEntity.getParent().getName());
+				occurrenceMap.put("occurrenceID", String.valueOf(occurrenceEntity.getKey().getId()));
+				occurrenceMap.put("userID", String.valueOf(occurrenceEntity.getParent().getId()));
+				ctrQueryMedia = new Query("UserOccurrenceMedia").setAncestor(occurrenceEntity.getKey());
+				mediaResults = datastore.prepare(ctrQueryMedia).asList(FetchOptions.Builder.withDefaults());
+				mediaIDs = new LinkedList<String>();
+				for(Entity occurrenceMediaEntity: mediaResults) {
+					mediaIDs.add(String.valueOf(occurrenceMediaEntity.getKey().getId()));
+				}
+				occurrenceMap.put("mediaIDs", mediaIDs);
+				occurrences.add(occurrenceMap);
+			} catch (EntityNotFoundException e) {
+				//continue
+			}
 		}
 		
-		CursorList cursorList = new CursorList(results.getCursor().toWebSafeString(), comments);
-		LOG.info("User " + data.token.username + " listed comments from occurrence with id: " + data.occurrenceID);
+		CursorList cursorList = new CursorList(results.getCursor().toWebSafeString(), occurrences);
+		LOG.info("User " + data.token.username + " listed occurrences with likes from user with id: " + data.userID);
 		return Response.ok(g.toJson(cursorList)).build();
 	}
 	
+	@SuppressWarnings("deprecation")
 	@POST
-	@Path("/edit")
+	@Path("/count")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response editCommentOccurrence(OccurrenceCommentEditData data) {
-		LOG.fine("Attempt to edit comment with id: " + data.commentID + " from ocurrence with id: " + data.occurrenceID + " by user: " + data.token.username);
+	public Response editCommentOccurrence(OccurrenceLikeCountData data) {
+		LOG.fine("Attempt to count likes from occurrence with id: " + data.occurrenceID);
 		if(!data.valid()) {
 			return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
 		}
-		if(!data.token.isTokenValid()) {
-			LOG.warning("Failed to edit comment, token for user: " + data.token.username + " is invalid");
-			return Response.status(Status.FORBIDDEN).build();
-		}
-		Transaction txn = datastore.beginTransaction();
 		try {
 			Key userKey = KeyFactory.createKey("User", data.userID);
 			Key occurrenceKey = KeyFactory.createKey(userKey, "UserOccurrence", data.occurrenceID);
-			Key commentKey = KeyFactory.createKey(occurrenceKey, "UserOccurrenceComment", data.commentID);
 			
-			// Check comment existence
-			Entity commentEntity = datastore.get(txn, commentKey);
+			// Check occurrence existence
+			datastore.get(occurrenceKey);
 			
-			if(!(data.token.userID == ((Long)(commentEntity.getProperty("comment_userID")))) && !SecurityManager.userHasAccess("edit_user_occurrence_comment", data.token.userID)) {
-				LOG.warning("Failed to edit comment, user: " + data.token.username + " does not have the rights to do it");
-				return Response.status(Status.FORBIDDEN).build();
-			}
+			Query ctrQuery = new Query("UserOccurrenceLike").setKeysOnly();
+			int count = datastore.prepare(ctrQuery).countEntities();
 			
-			commentEntity.setProperty("comment_text", data.comment);
-			
-			txn.commit();
-			LOG.info("User " + data.token.username + " edited comment with id: " + data.commentID);
-			return Response.ok().build();
+			LOG.info("Like count from occurrence with id " + data.occurrenceID + " sent");
+			return Response.ok(g.toJson(count)).build();
 		} catch (EntityNotFoundException e) {
-			return Response.status(Status.BAD_REQUEST).entity("Comment does not exist.").build();
-		} finally {
-			if (txn.isActive() ) {
-				txn.rollback();
-			}
-		}
-	}
-	
-	@POST
-	@Path("/delete")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response deleteCommentOccurrence(OccurrenceCommentDeleteData data) {
-		LOG.fine("Attempt to delete comment with id: " + data.commentID + " from ocurrence with id: " + data.occurrenceID + " by user: " + data.token.username);
-		if(!data.valid()) {
-			return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
-		}
-		if(!data.token.isTokenValid()) {
-			LOG.warning("Failed to delete comment, token for user: " + data.token.username + " is invalid");
-			return Response.status(Status.FORBIDDEN).build();
-		}
-		Transaction txn = datastore.beginTransaction();
-		try {
-			Key userKey = KeyFactory.createKey("User", data.userID);
-			Key occurrenceKey = KeyFactory.createKey(userKey, "UserOccurrence", data.occurrenceID);
-			Key commentKey = KeyFactory.createKey(occurrenceKey, "UserOccurrenceComment", data.commentID);
-			
-			// Check comment existence
-			Entity commentEntity = datastore.get(txn, commentKey);
-			
-			if(!(data.token.userID == ((Long)(commentEntity.getProperty("comment_userID")))) && !SecurityManager.userHasAccess("edit_user_occurrence_comment", data.token.userID)) {
-				LOG.warning("Failed to delete comment, user: " + data.token.username + " does not have the rights to do it");
-				return Response.status(Status.FORBIDDEN).build();
-			}
-			
-			datastore.delete(txn, commentKey);
-			
-			txn.commit();
-			LOG.info("User " + data.token.username + " deleted comment with id: " + data.commentID);
-			return Response.ok().build();
-		} catch (EntityNotFoundException e) {
-			return Response.status(Status.BAD_REQUEST).entity("Comment does not exist.").build();
-		} finally {
-			if (txn.isActive() ) {
-				txn.rollback();
-			}
+			return Response.status(Status.BAD_REQUEST).entity("Occurrence does not exist.").build();
 		}
 	}
 
