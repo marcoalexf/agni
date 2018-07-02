@@ -41,13 +41,16 @@ public class ListOccurrences extends Fragment implements AbsListView.OnScrollLis
     private static final String VISIBILITY = "visibility";
     private static final String ID = "occurrence_id";
     private static final String LEVEL = "level";
+    private static final String TOKEN = "token";
+    private static final String USERNAME = "username";
 
     private Retrofit retrofit;
 
     @BindView(R.id.list_occurrences) ListView lv;
 
     private List<Map<String, Object>> map_list;
-    private String cursor;
+    private String cursor, username;
+    private LoginResponse token;
 
     public ListOccurrences() { }
 
@@ -55,9 +58,18 @@ public class ListOccurrences extends Fragment implements AbsListView.OnScrollLis
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_list_ocurrences, container, false);
         ButterKnife.bind(this, v);
+
+        Bundle b = this.getArguments();
+        if (b != null) {
+            this.token = (LoginResponse) b.getSerializable(TOKEN);
+            this.username = (String)b.getSerializable(USERNAME);
+        }
+
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener()
         {
             @Override
@@ -73,6 +85,7 @@ public class ListOccurrences extends Fragment implements AbsListView.OnScrollLis
         map_list = new LinkedList<Map<String, Object>>();
         getMoreOccurrences();
         lv.setOnScrollListener(this);
+
         return v;
     }
 
@@ -87,9 +100,10 @@ public class ListOccurrences extends Fragment implements AbsListView.OnScrollLis
         args.putSerializable(VISIBILITY, (boolean) map_list.get(position).get("user_occurrence_visibility"));
         args.putSerializable(LATITUDE, (double) map_list.get(position).get("user_occurrence_lat"));
         args.putSerializable(LONGITUDE, (double) map_list.get(position).get("user_occurrence_lon"));
-        args.putSerializable(ID, (String) map_list.get(position).get("occurrenceID"));
-        args.putSerializable("userID", (String) map_list.get(position).get("userID"));
+        args.putSerializable(ID, Long.parseLong((String) map_list.get(position).get("occurrenceID")));
+        args.putSerializable("userID", Long.parseLong((String)map_list.get(position).get("userID")) );
         args.putSerializable("mediaIDs", (ArrayList) map_list.get(position).get("mediaIDs"));
+        args.putSerializable(TOKEN, token);
 
         od.setArguments(args);
         fman.beginTransaction().replace(R.id.fragment, od).commit();
@@ -102,15 +116,16 @@ public class ListOccurrences extends Fragment implements AbsListView.OnScrollLis
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }
-
         AgniAPI agniAPI = retrofit.create(AgniAPI.class);
-
-        Call<CursorList> call = agniAPI.getMoreOccurrences(new ListOccurrenceData(null, false, null, cursor, null, null, null));
+        Call<CursorList> call;
+        if(username == null)
+            call = agniAPI.getMoreOccurrences(new ListOccurrenceData(null, false, null, cursor, null, null, null));
+        else
+            call = agniAPI.getMoreOccurrences(new ListOccurrenceData(token, true, username, cursor, null, null, null));
 
         call.enqueue(new Callback<CursorList>() {
             public void onResponse(Call<CursorList> call, Response<CursorList> response) {
                 if (response.code() == 200) {
-                    Log.d("GET_PUBLIC_OCCURRENCES", response.toString());
                     CursorList c = response.body();
                     cursor = c.getCursor();
                     if(!c.getMapList().isEmpty()){
@@ -120,7 +135,7 @@ public class ListOccurrences extends Fragment implements AbsListView.OnScrollLis
                     }
                 }
                 else {
-                    Toast toast = Toast.makeText(getActivity(), "Failed to get public occurrences" + response.code(), Toast.LENGTH_SHORT);
+                    Toast toast = Toast.makeText(getActivity(), "Failed to get occurrences" + response.code(), Toast.LENGTH_SHORT);
                     toast.show();
                 }
             }

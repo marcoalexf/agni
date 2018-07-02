@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table';
 import operationsData from './operationsData';
 import Typography from 'material-ui/Typography';
-import InfoIcon from '@material-ui/icons/EventNote';
+import InfoIcon from '@material-ui/icons/Info';
 import IconButton from 'material-ui/IconButton';
 import PropTypes from 'prop-types';
 import {withStyles} from "material-ui/styles/index";
@@ -258,7 +258,7 @@ class Operations extends React.Component {
                                                                 to="/operacao"> <InfoIcon/> </IconButton></TableCell>
                                         <TableCell>{occ.user_occurrence_title}</TableCell>
                                         <TableCell>{occ.user_occurrence_type}</TableCell>
-                                        <TableCell>{occ.user_occurrence_data}</TableCell>
+                                        <TableCell>{occ.user_occurrence_date}</TableCell>
                                         <TableCell>{'nao tratado'}</TableCell>
                                         <TableCell numeric> {occ.user_occurrence_level}</TableCell>
                                         <TableCell>{occ.user_occurrence_visibility}</TableCell>

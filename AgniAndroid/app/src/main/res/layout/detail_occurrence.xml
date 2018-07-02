@@ -1,38 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary"
-    android:orientation="vertical"
-    tools:context=".ProfileFragment">
+    android:id="@+id/scroll_view">
 
-        <TextView
-            android:id="@+id/detail_title"
-            android:layout_width="343dp"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="#000000"
-            android:textSize="30dp" />
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:orientation="vertical"
+        tools:context=".OccurrenceDetails">
 
+        <RelativeLayout
+            android:id="@+id/relativeLayout1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/detail_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxWidth="270dp"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="#000000"
+                android:textSize="25sp"
+                android:background="@android:color/transparent"
+                android:layout_alignParentStart="true"
+                android:inputType="textMultiLine"/>
+            <Button
+                android:id="@+id/edit_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:background="@drawable/bg_button"
+                android:drawableEnd="@drawable/edit_profile_icon"
+                android:text="@string/edit"
+                android:textColor="#000000"
+                android:layout_alignParentEnd="true"/>
+        </RelativeLayout>
 
     <ImageView
         android:id="@+id/occurrence_image"
-        android:layout_width="fill_parent"
-        android:layout_height="200dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:adjustViewBounds="true"
         android:scaleType="fitCenter" />
 
-        <TextView
-            android:id="@+id/detail_description"
-            android:layout_width="370dp"
-            android:layout_height="wrap_content"
-            android:textColor="#000000"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+    <EditText
+        android:id="@+id/detail_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#000000"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:background="@android:color/transparent"
+        android:inputType="textMultiLine"/>
+
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
 
@@ -42,19 +72,18 @@
             android:layout_height="wrap_content"
             android:text="@string/occurrence_severity"
             android:textColor="#000000"
-            android:textSize="20dp" />
+            android:textSize="20sp" />
 
 
-        <TextView
+        <EditText
             android:id="@+id/detail_level"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/occurrence_severity"
             android:textColor="#000000"
-            android:textSize="20dp"
-            />
-    </LinearLayout>
+            android:textSize="20sp"
+            android:background="@android:color/transparent"/>
 
+        </LinearLayout>
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -66,17 +95,12 @@
             android:layout_height="wrap_content"
             android:text="@string/occurrence_area"
             android:textColor="#000000"
-            android:textSize="20dp"
-            android:layout_alignLeft="@+id/level_text"
-            />
+            android:textSize="20sp"/>
 
-        <TextView
-            android:id="@+id/detail_visibility"
+        <Spinner
+            android:id="@+id/spinner_visibility"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:textColor="#000000"
-            android:textSize="20dp" />
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 
@@ -86,5 +110,73 @@
             android:layout_height="214dp"
             android:layout_marginStart="4dp"
             android:layout_marginTop="8dp" />
+        <ImageButton
+            android:id="@+id/likeBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_gravity="start"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/ic_baseline_favorite_24px"
+            android:background="@android:color/white"/>
 
-</LinearLayout>
+    <LinearLayout
+        android:id="@+id/LinearLayout02"
+        android:layout_height="wrap_content"
+        android:layout_width="200dp">
+
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/save"
+            android:background="@drawable/filter_button">
+        </Button>
+
+        <Button
+            android:id="@+id/btnCancelSave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/cancel"
+            android:background="@drawable/filter_button">
+        </Button>
+    </LinearLayout>
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/comments"
+                android:textSize="30sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"/>
+
+            <EditText
+                android:id="@+id/new_comment_text"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/insert_comment"
+                android:inputType="textMultiLine">
+            </EditText>
+
+            <Button
+                android:id="@+id/comment_btn"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/send_comment" >
+            </Button>
+
+        <ListView
+            android:id="@+id/comment_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

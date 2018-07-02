@@ -2,6 +2,7 @@ package com.example.marisco.myapplication;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import butterknife.BindView;
@@ -26,6 +28,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ProfileFragment extends Fragment {
 
     private static final String TOKEN = "token";
+    private static final String USERNAME = "username";
     public static final String RESPONSE = "com.example.marisco.myapplication.RESPONSE";
     public static final String ENDPOINT = "https://custom-tine-204615.appspot.com/rest/";
     private String username, email, name, locality, county, district;
@@ -44,7 +47,7 @@ public class ProfileFragment extends Fragment {
     @BindView(R.id.edit_button) Button edit_button;
     @BindView(R.id.btnSave) Button save_button;
     @BindView(R.id.btnCancelSave) Button cancel_button;
-
+    @BindView(R.id.occurrences_img)ImageView occurrences_img;
 
     public ProfileFragment() {
 
@@ -81,6 +84,18 @@ public class ProfileFragment extends Fragment {
             public void onClick(View v) {
                 fieldsSetup();
                 restoreInitialValues();
+            }
+        });
+        occurrences_img.setClickable(true);
+        occurrences_img.setOnClickListener( new View.OnClickListener(){
+            public void onClick(View v) {
+                ListOccurrences od = new ListOccurrences();
+                FragmentManager fman = getFragmentManager();
+                Bundle args = new Bundle();
+                args.putSerializable(TOKEN, token);
+                args.putSerializable(USERNAME, token.username);
+                od.setArguments(args);
+                fman.beginTransaction().replace(R.id.fragment, od).commit();
             }
         });
         return v;

@@ -4,7 +4,7 @@ import Table, { TableBody, TableCell, TablePagination, TableHead, TableRow } fro
 import Async from 'react-promise';
 import operationsData from './operationsData';
 import Radio, { RadioGroup } from 'material-ui/Radio';
-import InfoIcon from '@material-ui/icons/EventNote';
+import InfoIcon from '@material-ui/icons/Info';
 import WarningIcon from '@material-ui/icons/Error';
 import IconButton from 'material-ui/IconButton';
 import UpdateListIcon from '@material-ui/icons/Cached';
@@ -20,6 +20,9 @@ import yellow from 'material-ui/colors/yellow';
 import {withStyles} from "material-ui/styles/index";
 import {Link} from "react-router-dom";
 import CircularProgress from '@material-ui/core/CircularProgress';
+import InfoOperationTwo from './InfoOperationTwo';
+import Visibility from '@material-ui/icons/Visibility';
+import Button from 'material-ui/Button';
 
 const CustomTableCell = withStyles(theme => ({
     head: {
@@ -127,7 +130,7 @@ let EnhancedTableToolbar = props => {
             <div className={classes.toolbartitle}>
                 {(
                     <Typography variant="title" id="tableTitle">
-                        Tabela de Ocorrências
+                        Tabela de Ocorrências Públicas
                     </Typography>
                 )}
             </div>
@@ -216,6 +219,34 @@ function xmlRequest(){
     });
 }
 
+function isLogin () {
+    var token = window.localStorage.getItem('token');
+    var d = new Date();
+    var t = d.getTime();
+
+    if(token == null){
+        console.log("token diferente de null");
+        return false;
+    }
+    else{
+        console.log("nop");
+        var expirationData = JSON.parse(token).expirationData;
+        console.log("tempo atual: " + t);
+        console.log("data de expiracao: " + expirationData);
+
+        if(expirationData <= t){
+            console.log("tempo expirado");
+            window.localStorage.removeItem('token');
+            return false;
+        }
+
+        else{
+            return true;
+        }
+    }
+
+};
+
 class TestOperations extends React.Component {
     state={
         object: [
@@ -254,6 +285,23 @@ class TestOperations extends React.Component {
             return red[600];
     };
 
+    // goToInformations = () => {
+    //     return(
+    //         <Link to={'/operacao'} params={{occurrences: this.state.object}}/>
+    //     )
+    // }
+
+    seeInformations = () =>{
+        console.log("ver informacao de uma operacao");
+        var token = window.localStorage.getItem('token');
+        if(token != null)
+            document.getElementById("toinfo").click();
+    };
+
+    showErrorMessage = () =>{
+        console.log("Nao está autorizado a ver as informacoes - primeiro faca login");
+    };
+
     render () {
         const {classes} = this.props;
         const { object, rowsPerPage, page, loading } = this.state;
@@ -272,25 +320,34 @@ class TestOperations extends React.Component {
                             <CustomTableCell>Data</CustomTableCell>
                             <CustomTableCell>Estado</CustomTableCell>
                             <CustomTableCell numeric>Grau de urgência</CustomTableCell>
-                            <CustomTableCell>Visibilidade</CustomTableCell>
+                            {/*<CustomTableCell>Visibilidade</CustomTableCell>*/}
                         </TableRow>
                     </TableHead>
 
                     <TableBody>
                         {object.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(n => {
                             return (
-                                <TableRow key={n.user_occurrence_data}>
-                                    <TableCell> <IconButton component={Link}
-                                                            to="/operacao"> <InfoIcon/> </IconButton></TableCell>
+                                <TableRow key={n.occurrenceID + n.userID}>
+                                    <TableCell>
+                                        <IconButton onClick={isLogin() ? this.seeInformations : this.showErrorMessage}>
+                                            <Link id={"toinfo"} to={"/operacao"}/>
+                                            {/*// to={{pathname:"/operacao", occurrences: object}}>*/}
+                                            {/*// onClick={this.goToInformations}>*/}
+                                            <InfoIcon/>
+                                        </IconButton>
+                                    </TableCell>
                                     <TableCell>{n.user_occurrence_title}</TableCell>
                                     <TableCell>{n.user_occurrence_type}</TableCell>
-                                    <TableCell>{n.user_occurrence_data}</TableCell>
+                                    <TableCell>{n.user_occurrence_date}</TableCell>
                                     <TableCell>nao tratado</TableCell>
                                     <TableCell numeric
-                                               style={{color: this.colorByLevel(n.user_occurrence_level)}}>
-                                        <WarningIcon color={this.colorByLevel(n.user_occurrence_level)}/>
+                                               style={{color: this.colorByLevel(n.user_occurrence_level)}}
+                                    >
+                                        <WarningIcon
+                                            //color={this.colorByLevel(n.user_occurrence_level)}
+                                        />
                                         {n.user_occurrence_level}</TableCell>
-                                    <TableCell>{n.user_occurrence_visibility ? 'publico' : 'privado'}</TableCell>
+                                    {/*<TableCell>{n.user_occurrence_visibility ? 'publico' : 'privado'}</TableCell>*/}
                                 </TableRow>
                             );
                         })}
@@ -310,6 +367,12 @@ class TestOperations extends React.Component {
                     onChangePage={this.handleChangePage}
                     onChangeRowsPerPage={this.handleChangeRowsPerPage}
                 />
+
+                    <Button variant={"raised"} onClick={isLogin() ? this.seeInformations : this.showErrorMessage}
+                            color={"default"}>
+                        {/*<Visibility/> */}
+                        Ver informações detalhadas das ocorrências públicas
+                    </Button>
                 </div>}
             </div>
         )
