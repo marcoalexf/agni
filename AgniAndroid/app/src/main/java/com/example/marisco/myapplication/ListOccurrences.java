@@ -42,14 +42,14 @@ public class ListOccurrences extends Fragment implements AbsListView.OnScrollLis
     private static final String ID = "occurrence_id";
     private static final String LEVEL = "level";
     private static final String TOKEN = "token";
-
+    private static final String USERNAME = "username";
 
     private Retrofit retrofit;
 
     @BindView(R.id.list_occurrences) ListView lv;
 
     private List<Map<String, Object>> map_list;
-    private String cursor;
+    private String cursor, username;
     private LoginResponse token;
 
     public ListOccurrences() { }
@@ -58,9 +58,18 @@ public class ListOccurrences extends Fragment implements AbsListView.OnScrollLis
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_list_ocurrences, container, false);
         ButterKnife.bind(this, v);
+
+        Bundle b = this.getArguments();
+        if (b != null) {
+            this.token = (LoginResponse) b.getSerializable(TOKEN);
+            this.username = (String)b.getSerializable(USERNAME);
+        }
+
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener()
         {
             @Override
@@ -76,10 +85,7 @@ public class ListOccurrences extends Fragment implements AbsListView.OnScrollLis
         map_list = new LinkedList<Map<String, Object>>();
         getMoreOccurrences();
         lv.setOnScrollListener(this);
-        Bundle b = this.getArguments();
-        if (b != null) {
-            this.token = (LoginResponse) b.getSerializable(TOKEN);
-        }
+
         return v;
     }
 
@@ -110,15 +116,16 @@ public class ListOccurrences extends Fragment implements AbsListView.OnScrollLis
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }
-
         AgniAPI agniAPI = retrofit.create(AgniAPI.class);
-
-        Call<CursorList> call = agniAPI.getMoreOccurrences(new ListOccurrenceData(null, false, null, cursor, null, null, null));
+        Call<CursorList> call;
+        if(username == null)
+            call = agniAPI.getMoreOccurrences(new ListOccurrenceData(null, false, null, cursor, null, null, null));
+        else
+            call = agniAPI.getMoreOccurrences(new ListOccurrenceData(token, true, username, cursor, null, null, null));
 
         call.enqueue(new Callback<CursorList>() {
             public void onResponse(Call<CursorList> call, Response<CursorList> response) {
                 if (response.code() == 200) {
-                    Log.d("GET_PUBLIC_OCCURRENCES", response.toString());
                     CursorList c = response.body();
                     cursor = c.getCursor();
                     if(!c.getMapList().isEmpty()){
@@ -128,7 +135,7 @@ public class ListOccurrences extends Fragment implements AbsListView.OnScrollLis
                     }
                 }
                 else {
-                    Toast toast = Toast.makeText(getActivity(), "Failed to get public occurrences" + response.code(), Toast.LENGTH_SHORT);
+                    Toast toast = Toast.makeText(getActivity(), "Failed to get occurrences" + response.code(), Toast.LENGTH_SHORT);
                     toast.show();
                 }
             }

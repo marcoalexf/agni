@@ -150,7 +150,7 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
         save_btn.setVisibility(View.GONE);
         cancel_btn.setVisibility(View.GONE);
         fieldsSetup();
-        if(userID != Long.parseLong(token.userID)){
+         if(userID != Long.parseLong(token.userID)){
             edit_btn.setVisibility(View.GONE);
         }
         edit_btn.setOnClickListener(new View.OnClickListener() {

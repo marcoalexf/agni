@@ -11,10 +11,10 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
         android:orientation="vertical"
-        tools:context=".ProfileFragment">
+        tools:context=".OccurrenceDetails">
 
         <RelativeLayout
             android:id="@+id/relativeLayout1"
@@ -25,11 +25,13 @@
                 android:id="@+id/detail_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:maxWidth="270dp"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="#000000"
-                android:textSize="30sp"
+                android:textSize="25sp"
                 android:background="@android:color/transparent"
-                android:layout_alignParentStart="true" />
+                android:layout_alignParentStart="true"
+                android:inputType="textMultiLine"/>
             <Button
                 android:id="@+id/edit_button"
                 android:layout_width="wrap_content"
@@ -49,13 +51,15 @@
         android:adjustViewBounds="true"
         android:scaleType="fitCenter" />
 
-        <EditText
-            android:id="@+id/detail_description"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#000000"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:background="@android:color/transparent"/>
+    <EditText
+        android:id="@+id/detail_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#000000"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:background="@android:color/transparent"
+        android:inputType="textMultiLine"/>
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -79,8 +83,7 @@
             android:textSize="20sp"
             android:background="@android:color/transparent"/>
 
-    </LinearLayout>
-
+        </LinearLayout>
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -158,7 +161,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="@string/insert_comment"
-                android:inputType="text">
+                android:inputType="textMultiLine">
             </EditText>
 
             <Button

@@ -2,6 +2,7 @@ package com.example.marisco.myapplication;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,6 +28,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ProfileFragment extends Fragment {
 
     private static final String TOKEN = "token";
+    private static final String USERNAME = "username";
     public static final String RESPONSE = "com.example.marisco.myapplication.RESPONSE";
     public static final String ENDPOINT = "https://custom-tine-204615.appspot.com/rest/";
     private String username, email, name, locality, county, district;
@@ -87,8 +89,13 @@ public class ProfileFragment extends Fragment {
         occurrences_img.setClickable(true);
         occurrences_img.setOnClickListener( new View.OnClickListener(){
             public void onClick(View v) {
-                Toast toast = Toast.makeText(getActivity(), "Teste", Toast.LENGTH_SHORT);
-                toast.show();
+                ListOccurrences od = new ListOccurrences();
+                FragmentManager fman = getFragmentManager();
+                Bundle args = new Bundle();
+                args.putSerializable(TOKEN, token);
+                args.putSerializable(USERNAME, token.username);
+                od.setArguments(args);
+                fman.beginTransaction().replace(R.id.fragment, od).commit();
             }
         });
         return v;
