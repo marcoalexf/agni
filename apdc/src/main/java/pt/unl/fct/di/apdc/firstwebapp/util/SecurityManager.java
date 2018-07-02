@@ -45,6 +45,7 @@ public class SecurityManager {
 		modSet.add("see_user_profile");
 		modSet.add("edit_user_occurrence");
 		modSet.add("delete_user_occurrence");
+		modSet.add("see_liked_occurrences");
 		////////////////////////////////////////////
 		
 		//////////////// ADMIN /////////////////////

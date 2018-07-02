@@ -12,4 +12,15 @@
         <property name="user_occurrence_visibility" direction="asc"/>
         <property name="user_occurrence_lat" direction="asc"/>
     </datastore-index>
+    <datastore-index kind="UserOccurrence" ancestor="false" source="manual">
+        <property name="user_occurrence_visibility" direction="asc"/>
+        <property name="user_occurrence_date" direction="desc"/>
+    </datastore-index>
+    <datastore-index kind="UserOccurrence" ancestor="true" source="manual">
+        <property name="user_occurrence_visibility" direction="asc"/>
+        <property name="user_occurrence_date" direction="desc"/>
+    </datastore-index>
+    <datastore-index kind="UserOccurrenceComment" ancestor="true" source="manual">
+        <property name="comment_date" direction="desc"/>
+    </datastore-index>
 </datastore-indexes>
