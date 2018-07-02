@@ -70,6 +70,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private static final String MEDIA_IDS = "mediaIDs";
     private static final String ID = "occurrence_id";
     private static final String USER_ID = "userID";
+    private static final int QUERY_LIMIT = 100;
 
     private GoogleMap map;
     @BindView(R.id.mapView) MapView mapView;
@@ -219,7 +220,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         if(!c.getMapList().isEmpty()) {
                             //Toast toast = Toast.makeText(getActivity(), "Ocorrências recebidas: " + map_list.size(), Toast.LENGTH_SHORT);
                             //toast.show();
-                            putAllMarkers();
+                            putNewMarkers(c.getMapList());
                         }
                     }
                     else {
@@ -279,7 +280,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             if(isNotFiltered(entry))
                 putMarker(entry);
         }
-        getOccurrences();
+    }
+
+    private void putNewMarkers(List<Map<String, Object>> newMarkers){
+        for(Map<String, Object> entry: newMarkers){
+            if(isNotFiltered(entry))
+                putMarker(entry);
+        }
+        if(newMarkers.size() == QUERY_LIMIT )
+            getOccurrences();
     }
 
     private boolean isNotFiltered(Map<String, Object> entry){
