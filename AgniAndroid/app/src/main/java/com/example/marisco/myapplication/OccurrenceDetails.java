@@ -17,6 +17,7 @@ import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -95,6 +96,8 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
     Button save_btn;
     @BindView(R.id.btnCancelSave)
     Button cancel_btn;
+    @BindView(R.id.likeBtn)
+    ToggleButton like_btn;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -182,6 +185,13 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
         o_visibility.setAdapter(adapter);
+
+        like_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleLike();
+            }
+        });
         return v;
     }
 
@@ -413,6 +423,34 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
                 Log.e("ERROR", t.toString());
             }
         });
+    }
 
+    private void toggleLike(){
+        if (retrofit == null) {
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(ENDPOINT)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+        }
+
+        AgniAPI agniAPI = retrofit.create(AgniAPI.class);
+
+        Call<ResponseBody> call = agniAPI.toggleLike(new OccurrenceDeleteData(token, userID, occurrence_id));
+
+        call.enqueue(new Callback<ResponseBody>() {
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.code() == 200) {
+                    Toast toast = Toast.makeText(getActivity(), "like/dislike efetuado", Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+                else {
+                    Toast toast = Toast.makeText(getActivity(), "Failed like/dislike: " + response.code(), Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+            }
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.e("ERROR", t.toString());
+            }
+        });
     }
 }

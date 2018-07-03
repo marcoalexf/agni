@@ -32,10 +32,11 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 
 
-    compile 'com.squareup.retrofit2:retrofit:2.1.0'
-    compile 'com.squareup.retrofit2:converter-gson:2.1.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.1.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.1.0'
     implementation 'com.google.android.gms:play-services-maps:15.0.1'
-    compile 'com.android.support:cardview-v7:26.1.0'
-    compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.1'
+    implementation 'com.android.support:cardview-v7:26.1.0'
+    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.1'
     implementation 'com.squareup.picasso:picasso:2.71828'
+    implementation 'com.google.maps.android:android-maps-utils:0.5+'
 }

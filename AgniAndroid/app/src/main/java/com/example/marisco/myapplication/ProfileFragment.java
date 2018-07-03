@@ -11,7 +11,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -28,12 +33,17 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ProfileFragment extends Fragment {
 
     private static final String TOKEN = "token";
-    private static final String USERNAME = "username";
+    private static final String MODE = "mode";
+    private static final String LIKED_OCCURRENCES = "liked_occurrences";
+    private static final String REGISTERED_OCCURRENCES = "registered_occurrences";
     public static final String RESPONSE = "com.example.marisco.myapplication.RESPONSE";
     public static final String ENDPOINT = "https://custom-tine-204615.appspot.com/rest/";
-    private String username, email, name, locality, county, district;
+    private String username, email, name, locality, county, district, cursor;
     private Retrofit retrofit;
     private LoginResponse token;
+    private List<Map<String, Object>> list;
+
+    private static final int QUERY_LIMIT = 100;
 
     //@BindView(R.id.profile_edit_avatar) ImageView profile_edit_avatar;
 
@@ -48,9 +58,12 @@ public class ProfileFragment extends Fragment {
     @BindView(R.id.btnSave) Button save_button;
     @BindView(R.id.btnCancelSave) Button cancel_button;
     @BindView(R.id.occurrences_img)ImageView occurrences_img;
+    @BindView(R.id.liked_occurrences_img)ImageView liked_occurrences_img;
+    @BindView(R.id.liked_occurrences_number)TextView liked_occurrences_number;
+    @BindView(R.id.registered_occurrences_number)TextView registered_occurrences_number;
 
     public ProfileFragment() {
-
+        list = new LinkedList<Map<String, Object>>();
     }
 
     @Override
@@ -65,6 +78,8 @@ public class ProfileFragment extends Fragment {
         }
 
         getProfile();
+        getLikedOccurrences();
+        getRegisteredOccurrences();
         fieldsSetup();
 
         edit_button.setOnClickListener( new View.OnClickListener(){
@@ -93,7 +108,20 @@ public class ProfileFragment extends Fragment {
                 FragmentManager fman = getFragmentManager();
                 Bundle args = new Bundle();
                 args.putSerializable(TOKEN, token);
-                args.putSerializable(USERNAME, token.username);
+                args.putSerializable(MODE, REGISTERED_OCCURRENCES);
+                od.setArguments(args);
+                fman.beginTransaction().replace(R.id.fragment, od).commit();
+            }
+        });
+
+        liked_occurrences_img.setClickable(true);
+        liked_occurrences_img.setOnClickListener( new View.OnClickListener(){
+            public void onClick(View v) {
+                ListOccurrences od = new ListOccurrences();
+                FragmentManager fman = getFragmentManager();
+                Bundle args = new Bundle();
+                args.putSerializable(TOKEN, token);
+                args.putSerializable(MODE, LIKED_OCCURRENCES);
                 od.setArguments(args);
                 fman.beginTransaction().replace(R.id.fragment, od).commit();
             }
@@ -256,5 +284,80 @@ public class ProfileFragment extends Fragment {
         profile_locality.setText(response.getLocality());
         profile_county.setText(response.getCounty());
         profile_district.setText(response.getDistrict());
+    }
+
+    private void getLikedOccurrences(){
+        if (retrofit == null) {
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(ENDPOINT)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+        }
+        AgniAPI agniAPI = retrofit.create(AgniAPI.class);
+        Call<CursorList> call;
+
+        call = agniAPI.getLikedOccurrences(new ListOccurrenceLikeData(token, Long.parseLong(token.userID), null));
+
+        call.enqueue(new Callback<CursorList>() {
+            public void onResponse(Call<CursorList> call, Response<CursorList> response) {
+                if (response.code() == 200) {
+                    CursorList c = response.body();
+                    cursor = c.getCursor();
+                    if(!c.getMapList().isEmpty()){
+                        list.addAll( c.getMapList());
+                        if(c.getMapList().size() == QUERY_LIMIT)
+                            liked_occurrences_number.setText("99+");
+                        else
+                            liked_occurrences_number.setText(c.getMapList().size()+"");
+
+                    }
+                    else liked_occurrences_number.setText("0");
+                }
+                else {
+                    Toast toast = Toast.makeText(getActivity(), "Failed to get occurrences" + response.code(), Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+            }
+            public void onFailure(Call<CursorList> call, Throwable t) {
+                Log.e("ERROR", t.toString());
+            }
+        });
+    }
+
+    private void getRegisteredOccurrences(){
+
+        if (retrofit == null) {
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(ENDPOINT)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+        }
+        AgniAPI agniAPI = retrofit.create(AgniAPI.class);
+        Call<CursorList> call = agniAPI.getMoreOccurrences(new ListOccurrenceData(token, true,
+                token.username, cursor, null, null, null));
+
+        call.enqueue(new Callback<CursorList>() {
+            public void onResponse(Call<CursorList> call, Response<CursorList> response) {
+                if (response.code() == 200) {
+                    CursorList c = response.body();
+                    cursor = c.getCursor();
+                    if(!c.getMapList().isEmpty()){
+                        list.addAll( c.getMapList());
+                        if(c.getMapList().size() == QUERY_LIMIT)
+                            registered_occurrences_number.setText("99+");
+                        else
+                            registered_occurrences_number.setText(c.getMapList().size()+"");
+                    }
+                    else registered_occurrences_number.setText("0");
+                }
+                else {
+                    Toast toast = Toast.makeText(getActivity(), "Failed to get occurrences" + response.code(), Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+            }
+            public void onFailure(Call<CursorList> call, Throwable t) {
+                Log.e("ERROR", t.toString());
+            }
+        });
     }
 }

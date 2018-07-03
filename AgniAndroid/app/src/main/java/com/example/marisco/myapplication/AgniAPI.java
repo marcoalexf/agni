@@ -1,9 +1,5 @@
 package com.example.marisco.myapplication;
 
-import java.io.File;
-import java.util.List;
-import java.util.Map;
-
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -56,4 +52,10 @@ public interface AgniAPI {
 
     @POST("occurrence/comment/list")
     Call<CursorList> getMoreComments(@Body ListOccurrenceCommentData data);
+
+    @POST("occurrence/like")
+    Call<ResponseBody> toggleLike(@Body OccurrenceDeleteData data);
+
+    @POST("occurrence/like/list")
+    Call<CursorList> getLikedOccurrences(@Body ListOccurrenceLikeData data);
 }

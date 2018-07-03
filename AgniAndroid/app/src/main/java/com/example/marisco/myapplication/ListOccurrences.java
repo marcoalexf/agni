@@ -42,14 +42,15 @@ public class ListOccurrences extends Fragment implements AbsListView.OnScrollLis
     private static final String ID = "occurrence_id";
     private static final String LEVEL = "level";
     private static final String TOKEN = "token";
-    private static final String USERNAME = "username";
-
+    private static final String MODE = "mode";
+    private static final String LIKED_OCCURRENCES = "liked_occurrences";
+    private static final String REGISTERED_OCCURRENCES = "registered_occurrences";
     private Retrofit retrofit;
 
     @BindView(R.id.list_occurrences) ListView lv;
 
     private List<Map<String, Object>> map_list;
-    private String cursor, username;
+    private String cursor, mode;
     private LoginResponse token;
 
     public ListOccurrences() { }
@@ -67,7 +68,7 @@ public class ListOccurrences extends Fragment implements AbsListView.OnScrollLis
         Bundle b = this.getArguments();
         if (b != null) {
             this.token = (LoginResponse) b.getSerializable(TOKEN);
-            this.username = (String)b.getSerializable(USERNAME);
+            this.mode = (String)b.getSerializable(MODE);
         }
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener()
@@ -117,11 +118,13 @@ public class ListOccurrences extends Fragment implements AbsListView.OnScrollLis
                     .build();
         }
         AgniAPI agniAPI = retrofit.create(AgniAPI.class);
-        Call<CursorList> call;
-        if(username == null)
+        Call<CursorList> call = null;
+        if(mode == null)
             call = agniAPI.getMoreOccurrences(new ListOccurrenceData(null, false, null, cursor, null, null, null));
-        else
-            call = agniAPI.getMoreOccurrences(new ListOccurrenceData(token, true, username, cursor, null, null, null));
+        else if (mode.equals(REGISTERED_OCCURRENCES))
+            call = agniAPI.getMoreOccurrences(new ListOccurrenceData(token, true, token.username, cursor, null, null, null));
+        else if(mode.equals(LIKED_OCCURRENCES))
+            call = agniAPI.getLikedOccurrences(new ListOccurrenceLikeData(token, Long.parseLong(token.userID), cursor));
 
         call.enqueue(new Callback<CursorList>() {
             public void onResponse(Call<CursorList> call, Response<CursorList> response) {

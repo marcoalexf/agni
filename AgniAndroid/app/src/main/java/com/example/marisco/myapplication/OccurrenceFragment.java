@@ -69,9 +69,9 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback {
     private LoginResponse token;
     private File photoFile;
 
-    @BindView(R.id.occurence_title)
+    @BindView(R.id.occurrence_title)
     EditText title;
-    @BindView(R.id.occurence_description)
+    @BindView(R.id.occurrence_description)
     EditText description;
     @BindView(R.id.occurrence_type)
     RadioGroup type;

@@ -76,6 +76,7 @@
                     android:layout_weight="1">
 
                     <ImageView
+                        android:id="@+id/liked_occurrences_img"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         android:layout_marginLeft="10dp"
@@ -83,11 +84,11 @@
                         android:src="@drawable/ic_baseline_favorite_24px" />
 
                     <TextView
+                        android:id="@+id/liked_occurrences_number"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="10dp"
                         android:paddingTop="40dp"
-                        android:text="9"
                         android:textColor="@color/colorPrimaryDark"
                         android:textSize="20sp" />
                 </LinearLayout>
@@ -106,6 +107,7 @@
                         android:src="@drawable/ic_baseline_warning_24px" />
 
                     <TextView
+                        android:id="@+id/registered_occurrences_number"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="10dp"
