@@ -33,6 +33,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import PlacesAutocomplete from 'react-places-autocomplete';
 import { geocodeByAddress, geocodeByPlaceId, getLatLng } from 'react-places-autocomplete';
 import {SearchBox, Marker} from 'react-google-maps';
+import classNames from 'classnames';
 import './Maps.css';
 
 const AnyReactComponent = ({ text }) => <div>{text}</div>;
@@ -124,15 +125,15 @@ EnhancedTableToolbar = withStyles(styles)(EnhancedTableToolbar);
 
 class NewRegistProblem extends React.Component {
 
-    constructor(){
-        super();
+    constructor(props) {
+        super(props);
         this.handleSeeIfLoggedIn = this.handleSeeIfLoggedIn.bind(this);
         this.getLocation = this.getLocation.bind(this);
         this._handleImageChange = this._handleImageChange.bind(this);
         this._handleSubmit = this._handleSubmit.bind(this);
         this.handleRegistProblem = this.handleRegistProblem.bind(this);
-    }
-    state = {
+
+    this.state = {
         name: 'Nome do Registo do Problema',
         description: '',
         private: false,
@@ -154,6 +155,7 @@ class NewRegistProblem extends React.Component {
         address: '',
         nUploads: 0,
     };
+}
 
     componentDidMount(){
         var token = window.localStorage.getItem('token');
@@ -400,6 +402,19 @@ class NewRegistProblem extends React.Component {
         // console.log("locality: " + this.state.locality);
     };
 
+    handleFormSubmit = (event) => {
+        event.preventDefault()
+        const { address } = this.state
+
+        geocodeByAddress(address,  (err, { lat, lng }) => {
+            if (err) { console.log('Oh no!', err) }
+
+            console.log(`Yay! got latitude and longitude for ${address}`, { lat, lng })
+        })
+    }
+
+    onChange = (address) => this.setState({ address });
+
     render(){
         const { classes } = this.props;
         const {loading} = this.state;
@@ -446,12 +461,70 @@ class NewRegistProblem extends React.Component {
                                         {/*className={classes.textField}*/}
                                     {/*/>*/}
 
-                                    
+                                    <PlacesAutocomplete
+                                        value={this.state.address}
+                                        onChange={this.handleAddressChange}
+                                        onSelect={this.handleAddressSelect}
+                                        //className="pac-container"
+                                    >
+                                        {({ getInputProps, suggestions, getSuggestionItemProps }) => {
+                                            return(
+                                                <div>
+                                                    <div className={"search-input-container"}>
+                                                        <TextField label={'Localidade'}
+                                                                   {...getInputProps({
+                                                                       //placeholder: 'Localidade',
+                                                                       //className: 'search-input'
+                                                                   })}
+                                                                   className={classes.textField}
+                                                        />
 
-                                    <IconButton
-                                        //variant="fab" mini
-                                        className={classes.searchButton}
-                                        onClick={this.getLocation}> <SearchIcon/> </IconButton>
+                                                        <IconButton
+                                                            //variant="fab" mini
+                                                            className={classes.searchButton}
+                                                            onClick={this.getLocation}> <SearchIcon/> </IconButton>
+                                                    </div>
+
+                                                    {suggestions.length> 0 &&
+
+                                                    (<div className='autocomplete-container'>
+                                                            {suggestions.map(suggestion => {
+                                                                const className = classNames(
+                                                                    'suggestion-item'
+                                                                    , {
+                                                                        'suggestion-item--active': suggestion.active,
+                                                                    })
+                                                                ;
+                                                                //suggestion.active ? 'suggestion-item--active' : 'suggestion-item';
+                                                                // inline style for demonstration purpose
+                                                                // const style = suggestion.active
+                                                                //     ? { backgroundColor: '#d3d3d3', cursor: 'pointer' }
+                                                                //     : { backgroundColor: '#ffffff', cursor: 'pointer' };
+                                                                return (
+                                                                    <div {...getSuggestionItemProps(suggestion, { className })}>
+                                                                        <strong>
+                                                                            {suggestion.formattedSuggestion.mainText}
+                                                                        </strong>{' '}
+                                                                        <small>
+                                                                            {suggestion.formattedSuggestion.secondaryText}
+                                                                        </small>
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                            <div className="dropdown-footer">
+                                                                <div>
+                                                                    <img
+                                                                        src={require('./img/powered_by_google_default.png')}
+                                                                        className="dropdown-footer-image"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        }}
+                                    </PlacesAutocomplete>
                                 </div>
                                 }
 
@@ -497,6 +570,14 @@ class NewRegistProblem extends React.Component {
                                 </div>}
                             </TableCell>
                         </TableRow>
+                        {/*<TableRow>*/}
+                            {/*<TableCell>*/}
+                                    {/*<PlacesAutocomplete*/}
+                                        {/*value={this.state.address}*/}
+                                        {/*onChange={this.onChange}*/}
+                                    {/*/>*/}
+                            {/*</TableCell>*/}
+                        {/*</TableRow>*/}
                         <TableRow>
                             <TableCell>
                                 <TextField
