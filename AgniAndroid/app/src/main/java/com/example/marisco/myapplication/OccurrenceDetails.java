@@ -144,6 +144,7 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
         comments = new LinkedList<Map<String, Object>>();
         getMoreComments();
         getLikes();
+        setInitialLikeState();
         scrollView.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
             @Override
             public void onScrollChanged() {
@@ -444,8 +445,6 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
         call.enqueue(new Callback<ResponseBody>() {
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (response.code() == 200) {
-                    Toast toast = Toast.makeText(getActivity(), "like/dislike efetuado", Toast.LENGTH_SHORT);
-                    toast.show();
                     int likesN = Integer.parseInt(likes.getText().toString());
                     if(like_btn.isChecked())
                         likes.setText(likesN + 1 + "");
@@ -490,6 +489,31 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
                 Log.e("ERROR", t.toString());
             }
         });
+    }
 
+    private void setInitialLikeState(){
+        if (retrofit == null) {
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(ENDPOINT)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+        }
+
+        AgniAPI agniAPI = retrofit.create(AgniAPI.class);
+
+        Call<Boolean> call = agniAPI.checkLike(new OccurrenceLikeCheckData(token,  Long.parseLong(token.userID), userID, occurrence_id));
+
+        call.enqueue(new Callback<Boolean>() {
+            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                if (response.code() == 200) {
+                    if(response.body())
+                        like_btn.setChecked(true);
+
+                }
+            }
+            public void onFailure(Call<Boolean> call, Throwable t) {
+                Log.e("ERROR", t.toString());
+            }
+        });
     }
 }

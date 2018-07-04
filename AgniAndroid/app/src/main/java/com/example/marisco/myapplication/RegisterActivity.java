@@ -85,6 +85,9 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
         EditText mUsernameView = (EditText) findViewById(R.id.username);
         EditText mPasswordView = (EditText) findViewById(R.id.password);
         EditText mPasswordConfView = (EditText) findViewById(R.id.passwordConf);
+        EditText mLocalityView = (EditText) findViewById(R.id.locality);
+        EditText mCountyView = (EditText) findViewById(R.id.county);
+        EditText mDistrictView = (EditText) findViewById(R.id.district);
 
         // Reset errors.
         mEmailView.setError(null);
@@ -117,6 +120,17 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
             cancel = true;
         }
 
+        // Check for a valid email address.
+        if (TextUtils.isEmpty(email) && !cancel) {
+            mEmailView.setError(getString(R.string.error_field_required));
+            focusView = mEmailView;
+            cancel = true;
+        } else if (!isEmailValid(email) && !cancel) {
+            mEmailView.setError(getString(R.string.error_invalid_email));
+            focusView = mEmailView;
+            cancel = true;
+        }
+
         // Check for a valid password, if the user entered one.
         if (!TextUtils.isEmpty(password) && !isPasswordValid(password) && !cancel){
             mPasswordView.setError(getString(R.string.error_invalid_password));
@@ -129,14 +143,21 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
             cancel = true;
         }
 
-        // Check for a valid email address.
-        if (TextUtils.isEmpty(email) && !cancel) {
-            mEmailView.setError(getString(R.string.error_field_required));
-            focusView = mEmailView;
+        if(TextUtils.isEmpty(locality)){
+            mLocalityView.setError(getString(R.string.error_field_required));
+            focusView = mLocalityView;
             cancel = true;
-        } else if (!isEmailValid(email) && !cancel) {
-            mEmailView.setError(getString(R.string.error_invalid_email));
-            focusView = mEmailView;
+        }
+
+        if(TextUtils.isEmpty(county)){
+            mCountyView.setError(getString(R.string.error_field_required));
+            focusView = mCountyView;
+            cancel = true;
+        }
+
+        if(TextUtils.isEmpty(district)){
+            mDistrictView.setError(getString(R.string.error_field_required));
+            focusView = mDistrictView;
             cancel = true;
         }
 
@@ -195,9 +216,15 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
     }
 
     private boolean isPasswordValid(String password) {
-        if(password.length() < 6 && password.length() > 30)
+        if(password.length() < 6 || password.length() > 30)
             return false;
-        return password.length() > 4;
+
+        if(password.matches("[a-zA-Z0-9.? ]*"))
+            return false;
+
+        if(password.equals(password.toLowerCase()) )
+            return false;
+        return true;
     }
 
     private void registerUser(){
@@ -209,8 +236,7 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
         String district = district_input.getText().toString();
         String county = county_input.getText().toString();
         String type = spinner_user_type.getSelectedItem().toString();
-        Toast toast = Toast.makeText(getApplicationContext(), "tipo " + type, Toast.LENGTH_SHORT);
-        toast.show();
+
 
         if (retrofit == null) {
             retrofit = new Retrofit.Builder()
@@ -232,6 +258,10 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
                             , Toast.LENGTH_SHORT);
                     toast.show();
                     finish();
+                }
+                else{
+                    Toast toast = Toast.makeText(getApplicationContext(), "Registo falhado", Toast.LENGTH_SHORT);
+                    toast.show();
                 }
             }
 

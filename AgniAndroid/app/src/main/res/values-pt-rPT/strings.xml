@@ -5,7 +5,7 @@
     <string name="prompt_password">Palavra-passe</string>
     <string name="prompt_password_conf">Confirmação da password</string>
     <string name="error_invalid_email">Email inválido</string>
-    <string name="error_invalid_password">A password tem que conter um caracter especial uma letra maiuscula, e ter entre 6 a 30 caracteres</string>
+    <string name="error_invalid_password">A password tem que conter um caracter especial, uma letra maiuscula, e ter entre 6 a 30 caracteres</string>
     <string name="error_incorrect_password">Palavra-passe incorreta</string>
     <string name="error_password_does_not_match">A password não é igual à confirmação da
     password</string>
