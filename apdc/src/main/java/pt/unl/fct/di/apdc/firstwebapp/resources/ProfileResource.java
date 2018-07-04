@@ -49,7 +49,7 @@ public class ProfileResource {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response getProfile(ProfileData data) {
-		LOG.info("Attempt to get user: " + data.username + "profile information requested by user: " + data.token.username);
+		LOG.info("Attempt to get user " + data.username + " profile information requested by user: " + data.token.username);
 		FilterPredicate filter = new FilterPredicate("user_username", FilterOperator.EQUAL, data.username);
 		Query userQuery = new Query("User").setFilter(filter);
 		List<Entity> results = datastore.prepare(userQuery).asList(FetchOptions.Builder.withDefaults());

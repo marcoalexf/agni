@@ -33,6 +33,7 @@ public class SecurityManager {
 		workerSet.addAll(userSet);
 		workerSet.add("see_private_occurrences");
 		workerSet.add("accept_user_occurrence");
+		workerSet.add("resolve_user_occurrence");
 		////////////////////////////////////////////
         
 		//////////////// MOD ///////////////////////
@@ -53,6 +54,7 @@ public class SecurityManager {
 		map.put("ADMIN", adminSet);
 		// Set rights
 		adminSet.addAll(modSet);
+		adminSet.addAll(workerSet);
 		adminSet.add("edit_user_profile");
 		////////////////////////////////////////////
 		
