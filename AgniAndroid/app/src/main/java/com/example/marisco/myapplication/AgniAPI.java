@@ -61,4 +61,7 @@ public interface AgniAPI {
 
     @POST("occurrence/like/count")
     Call<Integer> getLikes(@Body OccurrenceLikeCountData data);
+
+    @POST("occurrence/like/check")
+    Call<Boolean> checkLike(@Body OccurrenceLikeCheckData data);
 }
