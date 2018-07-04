@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/list_selector"
+    android:background="@drawable/commentbubble"
     android:orientation="horizontal"
     android:padding="5dip" >
 
@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="3dip"
-        android:background="@android:color/background_light"
+        android:background="@color/colorPrimary"
         android:orientation="vertical">
 
         <TextView
