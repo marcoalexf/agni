@@ -10,7 +10,7 @@ public class OccurrenceLikeCountData {
 		
 	}
 	
-	public OccurrenceLikeCountData(AuthToken token, Long userID,  Long occurrenceID) {
+	public OccurrenceLikeCountData(Long userID,  Long occurrenceID) {
 		this.userID = userID;
 		this.occurrenceID = occurrenceID;
 	}

@@ -31,6 +31,7 @@ import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.ListOccurrenceLikeData;
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceDeleteData;
+import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceLikeCheckData;
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceLikeCountData;
 import pt.unl.fct.di.apdc.firstwebapp.util.CursorList;
 import pt.unl.fct.di.apdc.firstwebapp.util.SecurityManager;
@@ -48,7 +49,7 @@ public class OccurrenceLikeResource {
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response commentOccurrence(OccurrenceDeleteData data) {
+	public Response likeOccurrence(OccurrenceDeleteData data) {
 		LOG.fine("Attempt to like ocurrence with id: " + data.occurrenceID + " by user: " + data.token.username);
 		if(!data.valid()) {
 			return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
@@ -91,7 +92,7 @@ public class OccurrenceLikeResource {
 	@POST
 	@Path("/list")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response ListOccurrenceComments(ListOccurrenceLikeData data) {
+	public Response ListOccurrenceLikes(ListOccurrenceLikeData data) {
 		LOG.fine("Attempt to list likes from user: " + data.userID + " by user: " + data.token.username);
 		if(!data.valid()) {
 			return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
@@ -136,7 +137,6 @@ public class OccurrenceLikeResource {
 				occurrenceMap.put("mediaIDs", mediaIDs);
 				occurrences.add(occurrenceMap);
 			} catch (EntityNotFoundException e) {
-				//continue
 			}
 		}
 		
@@ -149,7 +149,7 @@ public class OccurrenceLikeResource {
 	@POST
 	@Path("/count")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response editCommentOccurrence(OccurrenceLikeCountData data) {
+	public Response countOccurrenceLikes(OccurrenceLikeCountData data) {
 		LOG.fine("Attempt to count likes from occurrence with id: " + data.occurrenceID);
 		if(!data.valid()) {
 			return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
@@ -168,6 +168,38 @@ public class OccurrenceLikeResource {
 			return Response.ok(g.toJson(count)).build();
 		} catch (EntityNotFoundException e) {
 			return Response.status(Status.BAD_REQUEST).entity("Occurrence does not exist.").build();
+		}
+	}
+	
+	@POST
+	@Path("/check")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response checkOccurrenceLike(OccurrenceLikeCheckData data) {
+		LOG.fine("Attempt to check like at occurrence with id: " + data.occurrenceID + " by user: " + data.token.username);
+		if(!data.valid()) {
+			return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
+		}
+		if(!data.token.isTokenValid()) {
+			LOG.warning("Failed to check like at occurrence, token for user: " + data.token.username + " is invalid");
+			return Response.status(Status.FORBIDDEN).build();
+		}
+		if(!(data.token.userID == data.userID) && !SecurityManager.userHasAccess("see_liked_occurrences", data.token.userID)) {
+			return Response.status(Status.FORBIDDEN).build();
+		}
+		
+		Key userOccurrenceKey = KeyFactory.createKey("User", data.userOccurrenceID);
+		Key occurrenceKey = KeyFactory.createKey(userOccurrenceKey, "UserOccurrence", data.occurrenceID);
+		
+		Key userKey = KeyFactory.createKey("User", data.userID);
+		Key likeKey = KeyFactory.createKey(userKey, "UserOccurrenceLike", KeyFactory.keyToString(occurrenceKey));
+		
+		LOG.info("Check like at occurrence with id " + data.occurrenceID + " sent");
+		try {
+			// Check occurrence existence
+			datastore.get(likeKey);
+			return Response.ok(g.toJson(true)).build();
+		} catch (EntityNotFoundException e) {
+			return Response.ok(g.toJson(false)).build();
 		}
 	}
 

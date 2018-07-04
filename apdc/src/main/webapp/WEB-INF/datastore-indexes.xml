@@ -23,4 +23,10 @@
     <datastore-index kind="UserOccurrenceComment" ancestor="true" source="manual">
         <property name="comment_date" direction="desc"/>
     </datastore-index>
+    <datastore-index kind="UserOccurrence" ancestor="true" source="manual">
+        <property name="user_occurrence_date" direction="desc"/>
+    </datastore-index>
+    <datastore-index kind="UserOccurrenceLike" ancestor="true" source="manual">
+        <property name="like_date" direction="desc"/>
+    </datastore-index>
 </datastore-indexes>

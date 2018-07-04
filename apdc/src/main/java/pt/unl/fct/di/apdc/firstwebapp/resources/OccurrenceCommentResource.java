@@ -112,6 +112,11 @@ public class OccurrenceCommentResource {
 			commentMap = new HashMap<String, Object>();
 			commentMap.putAll(commentEntity.getProperties());
 			commentMap.put("commentID", String.valueOf(commentEntity.getKey().getId()));
+			try {
+				commentMap.put("comment_username", (String)datastore.get(KeyFactory.createKey("User", (long)commentEntity.getProperty("comment_userID"))).getProperty("user_username"));
+			} catch (EntityNotFoundException e) {
+				// hmm should always work :D
+			}
 			comments.add(commentMap);
 		}
 		

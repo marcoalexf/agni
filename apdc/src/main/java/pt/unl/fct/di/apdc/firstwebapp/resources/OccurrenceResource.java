@@ -229,7 +229,7 @@ public class OccurrenceResource {
 			occurrences.add(occurrenceMap);
 		}
 		CursorList cursorList = new CursorList(results.getCursor().toWebSafeString(), occurrences);
-		LOG.info("List of occurrences sent to user: " + data.token.username);
+		LOG.info("List of occurrences sent");
 		return Response.ok(g.toJson(cursorList)).build();
 	}
 	
@@ -357,7 +357,7 @@ public class OccurrenceResource {
 			}
 		}
 		/**TODO
-		 * delete media, comments and likes
+		 * delete media, comments, likes, etc
 		 */
 	}
 	
