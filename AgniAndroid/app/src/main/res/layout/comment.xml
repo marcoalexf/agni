@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@drawable/commentbubble"
     android:orientation="horizontal"
-    android:padding="5dip" >
+    android:padding="10dp" >
 
     <LinearLayout
         android:id="@+id/LinearLayout01"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="3dip"
-        android:background="@color/colorPrimary"
+        android:padding="2dp"
+        android:background="@drawable/commentbubble"
         android:orientation="vertical">
 
         <TextView
@@ -24,12 +23,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
+        <TextView
+            android:id="@+id/comment_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:layout_below="@+id/LinearLayout01"/>
     </LinearLayout>
-    <TextView
-        android:id="@+id/comment_date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="end"
-        android:layout_below="@+id/LinearLayout01"/>
 
 </RelativeLayout>
