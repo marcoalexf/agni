@@ -58,4 +58,7 @@ public interface AgniAPI {
 
     @POST("occurrence/like/list")
     Call<CursorList> getLikedOccurrences(@Body ListOccurrenceLikeData data);
+
+    @POST("occurrence/like/count")
+    Call<Integer> getLikes(@Body OccurrenceLikeCountData data);
 }

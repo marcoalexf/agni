@@ -110,14 +110,36 @@
             android:layout_height="214dp"
             android:layout_marginStart="4dp"
             android:layout_marginTop="8dp" />
+
+    <LinearLayout
+        android:id="@+id/LinearLayout03"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:orientation="horizontal">
         <ToggleButton
             android:id="@+id/likeBtn"
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:background="@drawable/toggle_selector"
             android:padding="6dp"
-            android:textOff=""
-            android:textOn="" />
+            android:textOn=""
+            android:textOff="" />
+
+        <TextView
+            android:id="@+id/number_of_likes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#000000"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/likes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#000000"
+            android:textSize="20sp"
+            android:text="@string/occurrence_likes"/>
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/LinearLayout02"

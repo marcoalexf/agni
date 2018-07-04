@@ -14,8 +14,9 @@
 
     <string name="action_register">Register</string>
     <string name="error_invalid_email">This email address is invalid</string>
-    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_invalid_password">Password must contain a special character, a capital letter and contain between 6 and 30 characters</string>
     <string name="error_incorrect_password">This password is incorrect</string>
+
     <string name="error_password_does_not_match">Password does not match with password
     confirmation</string>
     <string name="error_field_required">This field is required</string>
@@ -77,6 +78,7 @@
     <string name="occurrence_type_clean">Cleaning of woods</string>
     <string name="occurrence_type_zone">Difficult access</string>
     <string name="occurrence_type_other">Other</string>
+    <string name="occurrence_likes">likes</string>
 
     <string name="map">Map</string>
     <string name="new_saved_location">Save location</string>

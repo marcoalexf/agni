@@ -98,6 +98,8 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
     Button cancel_btn;
     @BindView(R.id.likeBtn)
     ToggleButton like_btn;
+    @BindView(R.id.number_of_likes)
+    TextView likes;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -140,6 +142,7 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
         });
         comments = new LinkedList<Map<String, Object>>();
         getMoreComments();
+        getLikes();
         scrollView.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
             @Override
             public void onScrollChanged() {
@@ -442,6 +445,10 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
                 if (response.code() == 200) {
                     Toast toast = Toast.makeText(getActivity(), "like/dislike efetuado", Toast.LENGTH_SHORT);
                     toast.show();
+                    int likesN = Integer.parseInt(likes.getText().toString());
+                    if(like_btn.isChecked())
+                        likes.setText(likesN + 1 + "");
+                    else likes.setText(likesN - 1 + "");
                 }
                 else {
                     Toast toast = Toast.makeText(getActivity(), "Failed like/dislike: " + response.code(), Toast.LENGTH_SHORT);
@@ -452,5 +459,36 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
                 Log.e("ERROR", t.toString());
             }
         });
+    }
+
+    private void getLikes(){
+        if (retrofit == null) {
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(ENDPOINT)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+        }
+
+        AgniAPI agniAPI = retrofit.create(AgniAPI.class);
+
+        Call<Integer> call = agniAPI.getLikes(new OccurrenceLikeCountData(token,  userID, occurrence_id));
+
+        call.enqueue(new Callback<Integer>() {
+            public void onResponse(Call<Integer> call, Response<Integer> response) {
+                if (response.code() == 200) {
+                    if(response.body() != null)
+                        likes.setText(response.body() + "");
+                    else likes.setText("0");
+                }
+                else {
+                    Toast toast = Toast.makeText(getActivity(), "Failed to get likes: " + response.code(), Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+            }
+            public void onFailure(Call<Integer> call, Throwable t) {
+                Log.e("ERROR", t.toString());
+            }
+        });
+
     }
 }
