@@ -1,5 +1,6 @@
 package com.example.marisco.myapplication;
 
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.text.InputType;
@@ -91,7 +92,7 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
     @BindView(R.id.scroll_view)
     ScrollView scrollView;
     @BindView(R.id.edit_button)
-    Button edit_btn;
+    FloatingActionButton edit_btn;
     @BindView(R.id.btnSave)
     Button save_btn;
     @BindView(R.id.btnCancelSave)
