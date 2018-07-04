@@ -208,7 +208,11 @@ public class OccurrenceResource {
 		Map<String, Object> occurrenceMap;
 		List<Entity> mediaResults;
 		List<String> mediaIDs;
+		Key occurrenceKey;
+		Key userOccurrenceKey;
 		for(Entity occurrenceEntity: results) {
+			occurrenceKey = occurrenceEntity.getKey();
+			userOccurrenceKey = occurrenceEntity.getParent();
 			if(data.lat != null && data.lon != null) {
 				if((double)(occurrenceEntity.getProperty("user_occurrence_lon")) < nw.longitude && (double)(occurrenceEntity.getProperty("user_occurrence_lon")) > se.longitude) {
 					continue;
@@ -216,16 +220,23 @@ public class OccurrenceResource {
 			}
 			occurrenceMap = new HashMap<String, Object>();
 			occurrenceMap.putAll(occurrenceEntity.getProperties());
-			occurrenceMap.put("username", occurrenceEntity.getParent().getName());
-			occurrenceMap.put("occurrenceID", String.valueOf(occurrenceEntity.getKey().getId()));
-			occurrenceMap.put("userID", String.valueOf(occurrenceEntity.getParent().getId()));
-			ctrQueryMedia = new Query("UserOccurrenceMedia").setAncestor(occurrenceEntity.getKey());
+			occurrenceMap.put("username", userOccurrenceKey.getName());
+			occurrenceMap.put("occurrenceID", String.valueOf(occurrenceKey.getId()));
+			occurrenceMap.put("userID", String.valueOf(userOccurrenceKey.getId()));
+			ctrQueryMedia = new Query("UserOccurrenceMedia").setAncestor(occurrenceKey);
 			mediaResults = datastore.prepare(ctrQueryMedia).asList(FetchOptions.Builder.withDefaults());
 			mediaIDs = new LinkedList<String>();
 			for(Entity occurrenceMediaEntity: mediaResults) {
 				mediaIDs.add(String.valueOf(occurrenceMediaEntity.getKey().getId()));
 			}
 			occurrenceMap.put("mediaIDs", mediaIDs);
+			ctrQueryMedia = new Query("UserResolvedOccurrenceMedia").setAncestor(occurrenceEntity.getKey());
+			mediaResults = datastore.prepare(ctrQueryMedia).asList(FetchOptions.Builder.withDefaults());
+			mediaIDs = new LinkedList<String>();
+			for(Entity occurrenceMediaEntity: mediaResults) {
+				mediaIDs.add(String.valueOf(occurrenceMediaEntity.getKey().getId()));
+			}
+			occurrenceMap.put("resolvedMediaIDs", mediaIDs);
 			occurrences.add(occurrenceMap);
 		}
 		CursorList cursorList = new CursorList(results.getCursor().toWebSafeString(), occurrences);
@@ -264,6 +275,10 @@ public class OccurrenceResource {
 			
 			// Save occurrence
 			Entity occurrenceEntity = datastore.get(txn, occurrenceKey);
+			if(!((String)occurrenceEntity.getProperty("user_occurrence_status")).equals("OPEN")) {
+				LOG.warning("Failed to edit occurrence, it is being resolved already");
+				return Response.status(Status.FORBIDDEN).build();
+			}
 			if(data.title != null && !data.title.isEmpty()) {
 				occurrenceEntity.setProperty("user_occurrence_title", data.title);
 			}
@@ -297,7 +312,7 @@ public class OccurrenceResource {
 							"user/" + data.token.userID + "/occurrence/" + occurrenceID + "/", 
 							String.valueOf(mediaEntity.getKey().getId()), 
 							"IMAGE&VIDEO",
-							data.visibility,
+							(boolean)occurrenceEntity.getProperty("user_occurrence_visibility"),
 							false
 							);
 					uploadEntities.add(fileUpload);
@@ -382,6 +397,44 @@ public class OccurrenceResource {
 			Key userKey = KeyFactory.createKey("User", data.userID);
 			Key occurrenceKey = KeyFactory.createKey(userKey, "UserOccurrence", data.occurrenceID);
 			Key mediaKey = KeyFactory.createKey(occurrenceKey, "UserOccurrenceMedia", data.mediaID);
+			
+			// Check media existence
+			datastore.get(mediaKey);
+			
+			if(GcsManager.gcsGet(resp, "user/" + data.userID + "/occurrence/" + data.occurrenceID + "/" + data.mediaID)) {
+				LOG.info("User " + data.token.username + " got media with id " + data.mediaID + " for occurrence with id " + data.occurrenceID);
+				return Response.created(null).status(HttpServletResponse.SC_OK).build();
+			}
+			else {
+				LOG.warning("Failed to get occurrence media, couldn't retrieve media from storage");
+				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+			}
+		} catch (EntityNotFoundException e) {
+			return Response.status(Status.BAD_REQUEST).entity("Media not found.").build();
+		}
+	}
+	
+	@POST
+	@Path("/resolve-media")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response occurrenceResolveMedia(@Context HttpServletRequest req, @Context HttpServletResponse resp, OccurrenceMediaData data) {
+		try {
+			LOG.fine("Attempt to get resolve media with id " + data.mediaID + " for ocurrence with id " + data.occurrenceID + " by user: " + data.token.username);
+			if(!data.valid()) {
+				return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
+			}
+			if(!data.token.isTokenValid()) {
+				LOG.warning("Failed to get occurrence media, token for user: " + data.token.username + "is invalid");
+				return Response.status(Status.FORBIDDEN).build();
+			}
+			if(!(data.token.userID == data.userID) && !SecurityManager.userHasAccess("see_private_occurrences", data.token.userID)) {
+				LOG.warning("Failed to get occurrence media, user: " + data.token.username + " does not have the rights to do it");
+				return Response.status(Status.FORBIDDEN).build();
+			}
+		
+			Key userKey = KeyFactory.createKey("User", data.userID);
+			Key occurrenceKey = KeyFactory.createKey(userKey, "UserOccurrence", data.occurrenceID);
+			Key mediaKey = KeyFactory.createKey(occurrenceKey, "UserResolvedOccurrenceMedia", data.mediaID);
 			
 			// Check media existence
 			datastore.get(mediaKey);
