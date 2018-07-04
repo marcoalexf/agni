@@ -1,67 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/list_selector"
-    android:orientation="horizontal"
-    android:padding="5dip" >
+    android:padding="2dp">
 
     <LinearLayout
         android:id="@+id/thumbnail"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_marginRight="5dip"
-        android:padding="3dip" >
+        android:background="@drawable/button_blue_round"
+        android:backgroundTint="@color/accentLight"
+        android:elevation="5dp"
+        android:padding="15dp"
+        android:orientation="horizontal">
 
 
         <ImageView
             android:id="@+id/list_image"
             android:layout_width="60dip"
             android:layout_height="60dip"
-            android:layout_gravity="top"
+            android:padding="10dp"
+            android:src="@drawable/ic_burn_button"
+            android:tint="@android:color/white"
+            android:background="@drawable/fire_severity_background"
             android:contentDescription="@string/app_name" />
 
         <TextView
             android:id="@+id/occurrence_title"
-            android:layout_width="150dip"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/list_image"
-            android:layout_toRightOf="@+id/list_image"
-            android:layout_marginLeft="0dip"
-            android:paddingBottom ="9dip"
-            android:textColor="#040404"
-            android:textSize="15dip"
-            android:textStyle="bold"
-            android:typeface="sans" />
-
-        <TextView
-            android:id="@+id/occurence_level"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="25dip"
-            android:textColor="#343434"
-            android:textSize="25dip"
-            android:layout_alignTop="@+id/occurence_title"/>
-
-
-        <ImageView
-            android:id="@+id/likes_image"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_alignLeft="@+id/occurrence_level"
-            android:layout_alignTop="@+id/occurrence_level"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="5dp"
-            android:src="@drawable/ic_baseline_favorite_24px" />
+            android:textSize="15dp"
+            android:gravity="center"
+            android:padding="10dp"/>
 
         <TextView
             android:id="@+id/occurrence_likes"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/likes_image"
+            android:gravity="right"
             android:text="0"
-            android:textSize="25dip"
-            android:layout_alignTop="@+id/occurrence_level"/>
+            android:padding="5dp"
+            android:textSize="25dp"/>
     </LinearLayout>
 </RelativeLayout>

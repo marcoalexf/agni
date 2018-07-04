@@ -2,12 +2,14 @@ package com.example.marisco.myapplication;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -61,28 +63,27 @@ public class ListAdapterOccurrence extends BaseAdapter {
 
 
         int level = (int) Math.round((double)getItem(i).get("user_occurrence_level"));
-        changeLevelColor(level, (TextView) result.findViewById(R.id.occurence_level));
-        ((TextView) result.findViewById(R.id.occurence_level)).setText(level+"");
+        changeLevelColor(level, (ImageView) result.findViewById(R.id.list_image));
 
         return result;
     }
 
-    private void changeLevelColor(int level, TextView v){
+    private void changeLevelColor(int level, ImageView v){
         switch (level){
             case 1:
-                v.setTextColor(Color.GREEN);
+                v.setBackgroundColor(Color.parseColor("#12CC4A"));
                 break;
             case 2:
-                v.setTextColor(Color.rgb(178,255,102));
+                v.setBackgroundColor(Color.rgb(178,255,102));
                 break;
             case 3:
-                v.setTextColor(Color.YELLOW);
+                v.setBackgroundColor(Color.parseColor("#FFDD00"));
                 break;
             case 4:
-                v.setTextColor(Color.rgb(255, 153, 51));
+                v.setBackgroundColor(Color.rgb(255, 153, 51));
                 break;
             case 5:
-                v.setTextColor(Color.RED);
+                v.setBackgroundColor(Color.parseColor("#DE0000"));
                 break;
         }
 
