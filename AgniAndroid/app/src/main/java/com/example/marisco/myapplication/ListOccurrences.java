@@ -1,6 +1,5 @@
 package com.example.marisco.myapplication;
 
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -11,10 +10,12 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.NumberPicker;
 import android.widget.Toast;
 
-import java.lang.reflect.Array;
+import com.example.marisco.myapplication.constructors.CursorList;
+import com.example.marisco.myapplication.constructors.ListOccurrenceData;
+import com.example.marisco.myapplication.constructors.ListOccurrenceLikeData;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;

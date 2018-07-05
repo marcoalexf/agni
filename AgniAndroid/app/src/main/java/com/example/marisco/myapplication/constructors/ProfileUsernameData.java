@@ -1,4 +1,4 @@
-package com.example.marisco.myapplication;
+package com.example.marisco.myapplication.constructors;
 
 public class ProfileUsernameData {
 

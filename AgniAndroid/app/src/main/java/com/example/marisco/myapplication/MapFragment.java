@@ -25,6 +25,9 @@ import android.widget.PopupWindow;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.example.marisco.myapplication.constructors.CursorList;
+import com.example.marisco.myapplication.constructors.ListOccurrenceData;
+import com.example.marisco.myapplication.constructors.SavedLocation;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;

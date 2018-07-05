@@ -1,4 +1,6 @@
-package com.example.marisco.myapplication;
+package com.example.marisco.myapplication.constructors;
+
+import com.example.marisco.myapplication.LoginResponse;
 
 public class OccurrenceLikeCountData {
 
@@ -10,7 +12,7 @@ public class OccurrenceLikeCountData {
 
     }
 
-    public OccurrenceLikeCountData(LoginResponse token, Long userID,  Long occurrenceID) {
+    public OccurrenceLikeCountData(LoginResponse token, Long userID, Long occurrenceID) {
         this.userID = userID;
         this.occurrenceID = occurrenceID;
     }

@@ -1,10 +1,12 @@
-package com.example.marisco.myapplication;
+package com.example.marisco.myapplication.constructors;
 
+import com.example.marisco.myapplication.LoginResponse;
 import com.google.gson.annotations.SerializedName;
 
 public class OccurrenceData {
 
-	@SerializedName("token") LoginResponse token;
+	@SerializedName("token")
+    LoginResponse token;
 
 	@SerializedName("title") String title;
 

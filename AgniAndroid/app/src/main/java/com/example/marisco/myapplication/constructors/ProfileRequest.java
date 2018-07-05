@@ -1,5 +1,6 @@
-package com.example.marisco.myapplication;
+package com.example.marisco.myapplication.constructors;
 
+import com.example.marisco.myapplication.LoginResponse;
 import com.google.gson.annotations.SerializedName;
 
 public class ProfileRequest {

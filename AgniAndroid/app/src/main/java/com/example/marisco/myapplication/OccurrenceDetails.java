@@ -20,6 +20,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.example.marisco.myapplication.constructors.CursorList;
+import com.example.marisco.myapplication.constructors.ListOccurrenceCommentData;
+import com.example.marisco.myapplication.constructors.OccurrenceCommentData;
+import com.example.marisco.myapplication.constructors.OccurrenceDeleteData;
+import com.example.marisco.myapplication.constructors.OccurrenceEditData;
+import com.example.marisco.myapplication.constructors.OccurrenceLikeCheckData;
+import com.example.marisco.myapplication.constructors.OccurrenceLikeCountData;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;

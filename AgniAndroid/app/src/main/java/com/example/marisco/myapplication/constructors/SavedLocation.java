@@ -1,4 +1,4 @@
-package com.example.marisco.myapplication;
+package com.example.marisco.myapplication.constructors;
 
 import com.google.android.gms.maps.model.LatLng;
 

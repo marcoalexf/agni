@@ -1,22 +1,26 @@
-package com.example.marisco.myapplication;
+package com.example.marisco.myapplication.constructors;
 
-public class ListOccurrenceCommentData {
+import com.example.marisco.myapplication.LoginResponse;
+
+public class OccurrenceDeleteData {
 
     public LoginResponse token;
     public Long userID;
     public Long occurrenceID;
-    public String cursor;
 
 
-    public ListOccurrenceCommentData() {
+    public OccurrenceDeleteData() {
 
     }
 
-    public ListOccurrenceCommentData(LoginResponse token, Long userID,  Long occurrenceID, String cursor) {
+    public OccurrenceDeleteData(LoginResponse token, Long userID,  Long occurrenceID) {
         this.token = token;
         this.userID = userID;
         this.occurrenceID = occurrenceID;
-        this.cursor = cursor;
+    }
+
+    public boolean valid() {
+        return userID != null && occurrenceID != null;
     }
 
     public LoginResponse getToken() {
@@ -43,11 +47,5 @@ public class ListOccurrenceCommentData {
         this.occurrenceID = occurrenceID;
     }
 
-    public String getCursor() {
-        return cursor;
-    }
 
-    public void setCursor(String cursor) {
-        this.cursor = cursor;
-    }
 }

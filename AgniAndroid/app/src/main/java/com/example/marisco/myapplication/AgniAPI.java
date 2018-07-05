@@ -1,5 +1,21 @@
 package com.example.marisco.myapplication;
 
+import com.example.marisco.myapplication.constructors.CursorList;
+import com.example.marisco.myapplication.constructors.EditProfileData;
+import com.example.marisco.myapplication.constructors.ListOccurrenceCommentData;
+import com.example.marisco.myapplication.constructors.ListOccurrenceData;
+import com.example.marisco.myapplication.constructors.ListOccurrenceLikeData;
+import com.example.marisco.myapplication.constructors.MediaUploadResponse;
+import com.example.marisco.myapplication.constructors.OccurrenceCommentData;
+import com.example.marisco.myapplication.constructors.OccurrenceData;
+import com.example.marisco.myapplication.constructors.OccurrenceDeleteData;
+import com.example.marisco.myapplication.constructors.OccurrenceEditData;
+import com.example.marisco.myapplication.constructors.OccurrenceLikeCheckData;
+import com.example.marisco.myapplication.constructors.OccurrenceLikeCountData;
+import com.example.marisco.myapplication.constructors.ProfileRequest;
+import com.example.marisco.myapplication.constructors.ProfileResponse;
+import com.example.marisco.myapplication.constructors.ProfileUsernameData;
+
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -27,7 +43,7 @@ public interface AgniAPI {
     Call<String> getUsername(@Body ProfileUsernameData request);
 
     @POST("profile/edit")
-    Call<ResponseBody> changeProfile(@Body EditProfileData request);
+    Call<Long> changeProfile(@Body EditProfileData request);
 
     @POST("occurrence/register")
     Call<ResponseBody> registerOccurrence(@Body OccurrenceData data);
@@ -39,7 +55,7 @@ public interface AgniAPI {
     Call<ResponseBody> uploadPhoto(@Path("id") Long l, @Header("Content-Type") String contentType, @Body RequestBody file);
 
     @GET("occurrence/list")
-    Call<CursorList > getOccurrences();
+    Call<CursorList> getOccurrences();
 
     @POST("occurrence/list")
     Call<CursorList > getMoreOccurrences(@Body ListOccurrenceData data);
