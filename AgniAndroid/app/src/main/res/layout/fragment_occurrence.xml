@@ -6,28 +6,29 @@
     android:layout_height="wrap_content"
     android:padding="10dp">
 
-    <android.support.constraint.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
+        <ImageView
+            android:id="@+id/occurrence_photo"
+            android:layout_width="match_parent"
+            android:layout_height="300dp" />
 
         <EditText
             android:id="@+id/occurrence_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="788dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="20dp"
             android:hint="@string/occurrence_title"
             android:imeActionId="6"
             android:imeOptions="actionUnspecified"
             android:inputType="textPersonName"
             android:maxLines="1"
-            android:singleLine="true"
-            app:layout_constraintBottom_toTopOf="@+id/view2"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:singleLine="true" />
 
         <EditText
             android:id="@+id/occurrence_description"
@@ -41,30 +42,24 @@
             android:lines="6"
             android:maxLines="8"
             android:minLines="4"
-            android:scrollbars="vertical"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/occurrence_title" />
+            android:scrollbars="vertical" />
 
         <TextView
             android:id="@+id/radio_title_type"
             android:layout_width="wrap_content"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:text="@string/occurrence_type"
-            android:textSize="20sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/occurrence_description" />
+            android:textSize="20sp" />
 
         <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/occurrence_type"
             android:layout_width="fill_parent"
-            android:layout_height="107dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:orientation="vertical"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/radio_title_type">
+            android:orientation="vertical">
 
             <RadioButton
                 android:id="@+id/occurrence_clean"
@@ -89,23 +84,19 @@
         <TextView
             android:id="@+id/radio_title"
             android:layout_width="wrap_content"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:text="@string/occurrence_severity"
-            android:textSize="20sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/occurrence_privacy" />
+            android:textSize="20sp" />
 
         <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/occurrence_severity"
-            android:layout_width="fill_parent"
-            android:layout_height="0dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:orientation="horizontal"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/radio_title">
+            android:orientation="horizontal">
 
             <RadioButton
                 android:id="@+id/severity_one"
@@ -145,19 +136,15 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:text="@string/occurrence_area"
-            android:textSize="20sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/occurrence_type" />
+            android:textSize="20sp" />
 
         <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/occurrence_privacy"
             android:layout_width="fill_parent"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:orientation="horizontal"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/area">
+            android:orientation="horizontal">
 
             <RadioButton
                 android:id="@+id/private_area"
@@ -167,7 +154,7 @@
 
             <RadioButton
                 android:id="@+id/public_area"
-                android:layout_width="128dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/occurrence_public" />
 
@@ -176,15 +163,13 @@
         <CheckBox
             android:id="@+id/occurrence_notification"
             android:layout_width="wrap_content"
-            android:layout_height="29dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:button="@null"
             android:drawableRight="?android:attr/listChoiceIndicatorMultiple"
             android:text="@string/occurrence_notification"
-            android:textSize="20dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/occurrence_severity" />
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/location"
@@ -193,35 +178,21 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:text="@string/occurrence_location"
-            android:textSize="20sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/occurrence_notification" />
+            android:textSize="20sp" />
 
         <com.example.marisco.myapplication.CustomMapView
             android:id="@+id/mapView"
             android:layout_width="349dp"
-            android:layout_height="214dp"
+            android:layout_height="414dp"
             android:layout_marginStart="4dp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/location" />
+            android:layout_marginEnd="4dp"
+            android:layout_marginTop="8dp" />
 
         <Button
             android:id="@+id/occurrence_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:text="@string/register_occurrence"
-            app:layout_constraintBottom_toTopOf="@+id/view2"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <View
-            android:id="@+id/view2"
-            android:layout_width="360dp"
-            android:layout_height="0dp"
-            android:layout_marginStart="12dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/occurrence_button"
-            app:layout_constraintTop_toBottomOf="@+id/occurrence_title" />
-    </android.support.constraint.ConstraintLayout>
+            android:text="@string/register_occurrence" />
+    </LinearLayout>
 </ScrollView>

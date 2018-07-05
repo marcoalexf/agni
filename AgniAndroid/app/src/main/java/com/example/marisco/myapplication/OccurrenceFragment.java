@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
@@ -56,6 +57,7 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback {
 
     public static final String ENDPOINT = "https://custom-tine-204615.appspot.com/rest/";
     private static final String TOKEN = "token";
+    private static final String PHOTO = "PHOTO";
     private static final String MARKER_NAME = "Nova ocorrência";
     private static final int CLEAN_ID = 0, ZONE_ID = 1, OTHER_ID = 2;
     private static final int ONE = 1, TWO = 2, THREE = 3, FOUR = 4, FIVE = 5;
@@ -105,6 +107,8 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback {
     RadioButton r_private;
     @BindView(R.id.public_area)
     RadioButton r_public;
+    @BindView(R.id.occurrence_photo)
+    ImageView occurrence_photo;
 
     public OccurrenceFragment() {
 
@@ -119,7 +123,11 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback {
         Bundle b = this.getArguments();
         if (b != null) {
             this.token = (LoginResponse) b.getSerializable(TOKEN);
-            this.photoFile = (File) b.getSerializable("PHOTO");
+            this.photoFile = (File) b.getSerializable(PHOTO);
+        }
+
+        if(photoFile == null){
+            occurrence_photo.setVisibility(View.GONE);
         }
 
         map.onCreate(savedInstanceState);
@@ -136,6 +144,20 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback {
 
         setRadioIds();
         return v;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(photoFile  != null)
+            loadPhoto();
+    }
+
+
+    private void loadPhoto(){
+        Bitmap myBitmap = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
+        occurrence_photo.setImageBitmap(myBitmap);
+        occurrence_photo.setRotation(90);
     }
 
     private void setRadioIds() {
@@ -222,11 +244,9 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback {
 
         OccurrenceData data = null;
         if(this.photoFile != null){
-            Log.d("PHOTO", "IS NOT NULL");
             data = new OccurrenceData(token, occ_title, occ_description, occ_type, level,
                     visibility, lat, lon, notificationOn, true, 1);
         }else{
-            Log.d("PHOTO", "IS NULL");
             data = new OccurrenceData(token, occ_title, occ_description, occ_type, level,
                     visibility, lat, lon, notificationOn, false, 0);
         }
