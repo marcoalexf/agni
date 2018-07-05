@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class RVAdapter extends RecyclerView.Adapter<RVAdapter.NewsViewHolder> {
 
@@ -21,6 +22,7 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.NewsViewHolder> {
 
         NewsViewHolder(View itemView){
             super(itemView);
+            ButterKnife.bind(this, itemView);
         }
     }
 
