@@ -83,7 +83,9 @@ public class HomePage extends AppCompatActivity
                 .build();
         NewsAPI newsAPI = retrofit.create(NewsAPI.class);
         Map<String, String> options = new HashMap<>();
-        options.put("country", "us");
+        options.put("country", "pt");
+        options.put("q", "fogo");
+        options.put("sortBy", "popularity");
         options.put("apiKey", "888b98dd2a90421c950ffd72830ee6f4");
         Log.d("LOGGING: ", "before Call<NewsDataCard>");
         Call<NewsDataCard> call = newsAPI.topHeadlines(options);
@@ -93,7 +95,7 @@ public class HomePage extends AppCompatActivity
                     Log.d("Got 200 ok", "at least we enter");
 
                     List<Article> r = response.body().getArticles();
-                    Log.d("Num results: ", String.valueOf(response.body().getTotalResults()));
+                    Log.d("Num results: ", String.valueOf(r.size()));
                     RVAdapter adapter = new RVAdapter(r);
                     rv.setAdapter(adapter);
                     Log.d("SO I DID THE NEWS THING", "AND IT WAS AWESOME");
