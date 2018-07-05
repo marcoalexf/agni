@@ -7,6 +7,7 @@ import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.InputType;
@@ -81,14 +82,14 @@ public class ProfileFragment extends Fragment {
     @BindView(R.id.profile_locality) EditText profile_locality;
     @BindView(R.id.profile_county) EditText profile_county;
     @BindView(R.id.profile_district) EditText profile_district;
-    @BindView(R.id.edit_button) Button edit_button;
+    @BindView(R.id.edit_button) FloatingActionButton edit_button;
     @BindView(R.id.edit_photo) ImageButton edit_photo;
     @BindView(R.id.btnSave) Button save_button;
     @BindView(R.id.btnCancelSave) Button cancel_button;
-    @BindView(R.id.occurrences_img)ImageView occurrences_img;
-    @BindView(R.id.liked_occurrences_img)ImageView liked_occurrences_img;
-    @BindView(R.id.liked_occurrences_number)TextView liked_occurrences_number;
-    @BindView(R.id.registered_occurrences_number)TextView registered_occurrences_number;
+    //@BindView(R.id.occurrences_img)ImageView occurrences_img;
+    //@BindView(R.id.liked_occurrences_img)ImageView liked_occurrences_img;
+    //@BindView(R.id.liked_occurrences_number)TextView liked_occurrences_number;
+    //@BindView(R.id.registered_occurrences_number)TextView registered_occurrences_number;
 
     public ProfileFragment() {
         list = new LinkedList<Map<String, Object>>();
@@ -98,7 +99,7 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View v = inflater.inflate(R.layout.fragment_profile, container, false);
+        View v = inflater.inflate(R.layout.modern_profile_fragment, container, false);
         ButterKnife.bind(this, v);
         Bundle b = this.getArguments();
         if(b != null){
@@ -130,6 +131,7 @@ public class ProfileFragment extends Fragment {
                 restoreInitialValues();
             }
         });
+        /*
         occurrences_img.setClickable(true);
         occurrences_img.setOnClickListener( new View.OnClickListener(){
             public void onClick(View v) {
@@ -154,7 +156,7 @@ public class ProfileFragment extends Fragment {
                 od.setArguments(args);
                 fman.beginTransaction().replace(R.id.fragment, od).commit();
             }
-        });
+        });*/
         edit_photo.setOnClickListener( new View.OnClickListener(){
             public void onClick(View v) {
                 Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -436,13 +438,15 @@ public class ProfileFragment extends Fragment {
                     cursor = c.getCursor();
                     if(!c.getMapList().isEmpty()){
                         list.addAll( c.getMapList());
-                        if(c.getMapList().size() == QUERY_LIMIT)
-                            liked_occurrences_number.setText("99+");
+                        if(c.getMapList().size() == QUERY_LIMIT) Log.d("this has to be gone", "now");
+                            //liked_occurrences_number.setText("99+");
                         else
-                            liked_occurrences_number.setText(c.getMapList().size()+"");
+                            //liked_occurrences_number.setText(c.getMapList().size()+"");
+                            Log.d("this has to be gone", "now");
 
                     }
-                    else liked_occurrences_number.setText("0");
+                    else //liked_occurrences_number.setText("0");
+                        Log.d("this has to be gone", "now");
                 }
                 else {
                     Toast toast = Toast.makeText(getActivity(), "Failed to get occurrences" + response.code(), Toast.LENGTH_SHORT);
@@ -474,12 +478,14 @@ public class ProfileFragment extends Fragment {
                     cursor = c.getCursor();
                     if(!c.getMapList().isEmpty()){
                         list.addAll( c.getMapList());
-                        if(c.getMapList().size() == QUERY_LIMIT)
-                            registered_occurrences_number.setText("99+");
+                        if(c.getMapList().size() == QUERY_LIMIT)Log.d("this has to be gone", "now");
+                            //registered_occurrences_number.setText("99+");
                         else
-                            registered_occurrences_number.setText(c.getMapList().size()+"");
+                            //registered_occurrences_number.setText(c.getMapList().size()+"");
+                            Log.d("this has to be gone", "now");
                     }
-                    else registered_occurrences_number.setText("0");
+                    else //registered_occurrences_number.setText("0");
+                        Log.d("this has to be gone", "now");
                 }
                 else {
                     Toast toast = Toast.makeText(getActivity(), "Failed to get occurrences" + response.code(), Toast.LENGTH_SHORT);
