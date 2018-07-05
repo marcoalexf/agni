@@ -17,11 +17,15 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,9 +33,18 @@ import java.io.Serializable;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class HomePage extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, Serializable {
@@ -40,6 +53,11 @@ public class HomePage extends AppCompatActivity
     private LoginResponse token;
     private static final String TOKEN = "token";
 
+    @BindView(R.id.rv) RecyclerView rv;
+    @BindView(R.id.fab) FloatingActionButton fab;
+
+    private Retrofit retrofit;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,11 +65,45 @@ public class HomePage extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ButterKnife.bind(this);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 callCamera();
+            }
+        });
+
+
+        rv.hasFixedSize();
+        final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
+        rv.setLayoutManager(linearLayoutManager);
+        Log.d("LOGGING: ", "before all the retrofit bullshit");
+        retrofit = new Retrofit.Builder()
+                .baseUrl("https://newsapi.org/v2/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        NewsAPI newsAPI = retrofit.create(NewsAPI.class);
+        Map<String, String> options = new HashMap<>();
+        options.put("country", "us");
+        options.put("apiKey", "888b98dd2a90421c950ffd72830ee6f4");
+        Log.d("LOGGING: ", "before Call<NewsDataCard>");
+        Call<NewsDataCard> call = newsAPI.topHeadlines(options);
+        call.enqueue(new Callback<NewsDataCard>() {
+            public void onResponse(Call<NewsDataCard> call, Response<NewsDataCard> response) {
+                if (response.code() == 200) {
+                    Log.d("Got 200 ok", "at least we enter");
+
+                    List<Article> r = response.body().getArticles();
+                    Log.d("Num results: ", String.valueOf(response.body().getTotalResults()));
+                    RVAdapter adapter = new RVAdapter(r);
+                    rv.setAdapter(adapter);
+                    Log.d("SO I DID THE NEWS THING", "AND IT WAS AWESOME");
+                }
+                else {
+                    Log.d("SO I DID THE NEWS THING", "AND IT FAILED MISERABLY");
+                }
+            }
+            public void onFailure(Call<NewsDataCard> call, Throwable t) {
+                Log.e("ERROR", t.toString());
             }
         });
 
