@@ -1,6 +1,7 @@
 package com.example.marisco.myapplication;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -68,7 +69,7 @@ public class ProfileFragment extends Fragment {
     private Retrofit retrofit;
     private LoginResponse token;
     private List<Map<String, Object>> list;
-    private File photofile;
+    private Bitmap photoImg;
 
     private static final int QUERY_LIMIT = 100;
 
@@ -120,8 +121,8 @@ public class ProfileFragment extends Fragment {
         });
         save_button.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
-                changeProfile();
                 fieldsSetup();
+                changeProfile();
             }
         });
 
@@ -179,16 +180,17 @@ public class ProfileFragment extends Fragment {
     {
         if (requestCode == PICK_IMAGE && resultCode == RESULT_OK && data != null && data.getData() != null) {
             Uri uri = data.getData();
+
             try {
+
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), uri);
                 // Log.d(TAG, String.valueOf(bitmap));
                 Matrix matrix = new Matrix();
 
                 matrix.postRotate(90);
 
-                Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-                profile_img.setImageBitmap(rotatedBitmap);
-                photofile = new File(uri.toString());
+                photoImg = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                profile_img.setImageBitmap(photoImg);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -321,7 +323,7 @@ public class ProfileFragment extends Fragment {
 
         EditProfileData request = new EditProfileData(token, profile_username.getText().toString(),
                 profile_email.getText().toString(), profile_district.getText().toString(), profile_county.getText().toString(),
-                profile_locality.getText().toString(), photofile != null);
+                profile_locality.getText().toString(), photoImg != null);
         Call<Long> call = agniAPI.changeProfile(request);
 
         call.enqueue(new Callback<Long>() {
@@ -330,10 +332,10 @@ public class ProfileFragment extends Fragment {
                 if (response.code() == 200){
                     Toast toast = Toast.makeText(getActivity(), "Perfil alterado", Toast.LENGTH_SHORT);
                     toast.show();
-                    if(photofile != null){
-                        List<Long> list  = new LinkedList<Long>();
+                    if(photoImg.getByteCount() > 0){
+                        List<Long> list  = new LinkedList<>();
                         list.add(response.body());
-                        uploadPhoto(photofile, list);
+                        uploadPhoto(list);
                     }
 
                 }
@@ -350,25 +352,29 @@ public class ProfileFragment extends Fragment {
     }
 
     private void getProfileImage(){
-        RequestCreator f = Picasso.get().load(DOWNLOAD_ENDPOINT + "user/"
-                + token.getUserid() + "/photo/").rotate(90);
-        try{
+        String path = DOWNLOAD_ENDPOINT  + token.getUserid() + "/photo";
+
+        RequestCreator f = Picasso.get().load(path);
+        f.into(profile_img);
+        /*try{
+            //Log.d("PHOTO SIZE -> ", "" + f.get().getByteCount());
             if(f.get().getByteCount() > 0)
                 f.into(profile_img);
-        }catch (Exception e){}
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }*/
     }
 
-    private void uploadPhoto(File photoFile, List<Long> list_of_ids_to_upload_to){
+    private void uploadPhoto( List<Long> list_of_ids_to_upload_to){
         AgniAPI agniAPI = retrofit.create(AgniAPI.class);
         Long id = list_of_ids_to_upload_to.get(0);
-        Log.d("ID IS -> ", String.valueOf(id));
 
         try {
-            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-            Bitmap bitmap = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
-            int factor = calculateResizeFactor(bitmap);
-            Bitmap resized = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth()/4,
-                    bitmap.getHeight()/4, true);
+
+            //int factor = calculateResizeFactor(bitmap);
+            Bitmap resized = Bitmap.createScaledBitmap(photoImg, photoImg.getWidth()/4,
+                    photoImg.getHeight()/4, true);
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             resized.compress(Bitmap.CompressFormat.JPEG, 50, stream);
             byte[] data = stream.toByteArray();
@@ -384,6 +390,10 @@ public class ProfileFragment extends Fragment {
                     if(response.isSuccessful()){
                         Toast toast = Toast.makeText(getActivity(), "Photo successfully uploaded", Toast.LENGTH_SHORT);
                         toast.show();
+                        photoImg = null;
+                    }else{
+                        Toast toast = Toast.makeText(getActivity(), "Failed to upload photo: " + response.code(), Toast.LENGTH_SHORT);
+                        toast.show();
                     }
                 }
 
@@ -394,6 +404,8 @@ public class ProfileFragment extends Fragment {
                 }
             });
         } catch (Exception e) {
+            Toast toast = Toast.makeText(getActivity(), "Excecao no uploadPhoto ", Toast.LENGTH_SHORT);
+            toast.show();
             e.printStackTrace();
         }
     }
