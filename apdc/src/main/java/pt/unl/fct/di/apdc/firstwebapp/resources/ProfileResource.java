@@ -49,16 +49,34 @@ public class ProfileResource {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response getProfile(ProfileData data) {
-		LOG.info("Attempt to get user " + data.username + " profile information requested by user: " + data.token.username);
-		FilterPredicate filter = new FilterPredicate("user_username", FilterOperator.EQUAL, data.username);
-		Query userQuery = new Query("User").setFilter(filter);
-		List<Entity> results = datastore.prepare(userQuery).asList(FetchOptions.Builder.withDefaults());
-		if(results.isEmpty()) {
-			// Username does not exist
-			LOG.warning("Failed to request profile, user:" + data.username + " does not exist");
-			return Response.status(Status.BAD_REQUEST).build();
+		Entity user;
+		if(data.userID != null) {
+			LOG.info("Attempt to get user with id " + data.userID + " profile information requested by user: " + data.token.username);
+			Key userKey = KeyFactory.createKey("User", data.userID);
+			try {
+				user = datastore.get(userKey);
+			} catch (EntityNotFoundException e) {
+				// Username does not exist
+				LOG.warning("Failed to request profile, userwith id: " + data.userID + " does not exist");
+				return Response.status(Status.BAD_REQUEST).build();
+			}
 		}
-		Entity user = results.get(0);
+		else if(data.username != null && !data.username.isEmpty()) {
+			LOG.info("Attempt to get user " + data.username + " profile information requested by user: " + data.token.username);
+			FilterPredicate filter = new FilterPredicate("user_username", FilterOperator.EQUAL, data.username);
+			Query userQuery = new Query("User").setFilter(filter);
+			List<Entity> results = datastore.prepare(userQuery).asList(FetchOptions.Builder.withDefaults());
+			if(results.isEmpty()) {
+				// Username does not exist
+				LOG.warning("Failed to request profile, user: " + data.username + " does not exist");
+				return Response.status(Status.BAD_REQUEST).build();
+			}
+			user = results.get(0);
+		}
+		else {
+			return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
+		}
+		
 		if(!data.token.isTokenValid()) {
 			LOG.warning("Failed to request profile, token for user: " + data.token.username + " is invalid");
 			return Response.status(Status.FORBIDDEN).build();
