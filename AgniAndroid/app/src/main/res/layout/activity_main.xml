@@ -46,6 +46,8 @@
                     android:inputType="textPersonName"
                     android:hint="@string/login_username"
                     android:layout_gravity="center"
+                    android:textColor="@android:color/white"
+                    android:textColorHint="@color/accentBlue"
                     android:paddingTop="@dimen/buttons_padding_top"/>
 
                 <EditText
@@ -55,6 +57,8 @@
                     android:hint="@string/login_password"
                     android:inputType="textPassword"
                     android:layout_gravity="center"
+                    android:textColor="@android:color/white"
+                    android:textColorHint="@color/accentBlue"
                     android:paddingTop="@dimen/buttons_padding_top" />
 
                 <Button
@@ -63,6 +67,8 @@
                     android:layout_height="wrap_content"
                     android:text="@string/action_sign_in"
                     android:layout_gravity="center"
+                    android:textColor="@android:color/white"
+                    android:background="@android:color/transparent"
                     android:paddingTop="@dimen/buttons_padding_top" />
 
                 <Button
@@ -71,6 +77,8 @@
                     android:layout_height="wrap_content"
                     android:text="@string/action_register"
                     android:layout_gravity="center"
+                    android:textColor="@android:color/white"
+                    android:background="@android:color/transparent"
                     android:paddingTop="@dimen/buttons_padding_top" />
 
                 <TextView
@@ -79,6 +87,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/forgotten_password"
                     android:clickable="true"
+                    android:textColor="@color/accentBlue"
                     android:layout_gravity="center"
                     android:paddingTop="@dimen/buttons_padding_top"/>
 
@@ -86,6 +95,9 @@
                     android:id="@+id/save_credentials"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:layout_marginTop="10dp"
+                    android:textColor="@color/accentBlue"
                     android:text="@string/remember_credencials"/>
 
             </LinearLayout>

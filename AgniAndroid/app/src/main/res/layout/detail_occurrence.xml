@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/scroll_view"
-    android:background="@color/colorPrimary">
+    android:background="@color/colorPrimary"
+    android:animateLayoutChanges="true">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -16,7 +17,8 @@
         android:background="@color/colorPrimary"
         android:orientation="vertical"
         tools:context=".OccurrenceDetails"
-        android:padding="15dp">
+        android:padding="15dp"
+        android:animateLayoutChanges="true">
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/edit_button"
@@ -118,12 +120,14 @@
         android:id="@+id/LinearLayout03"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:animateLayoutChanges="true">
         <ToggleButton
             android:id="@+id/likeBtn"
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:background="@drawable/toggle_selector"
+            android:backgroundTint="#FF0000"
             android:padding="6dp"
             android:textOn=""
             android:textOff="" />
@@ -167,6 +171,18 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/cancel"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:background="@color/colorAccent"
+            android:textColor="@android:color/white">
+        </Button>
+
+        <Button
+            android:id="@+id/accept_occurrence"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="accept"
             android:layout_marginLeft="5dp"
             android:background="@color/colorAccent"
             android:textColor="@android:color/white">
