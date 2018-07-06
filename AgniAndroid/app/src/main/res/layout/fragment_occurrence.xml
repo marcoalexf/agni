@@ -99,6 +99,8 @@
             android:layout_marginTop="8dp"
             android:orientation="horizontal">
 
+
+
             <RadioButton
                 android:id="@+id/severity_one"
                 android:layout_width="wrap_content"
