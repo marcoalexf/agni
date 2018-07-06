@@ -24,7 +24,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:tint="@android:color/white"
-            app:backgroundTint="@color/colorPrimaryDark"
             android:elevation="2dp"
             app:fabSize="normal"
             app:srcCompat="@drawable/ic_baseline_border_color_24px"/>
@@ -158,7 +157,8 @@
             android:layout_weight="1"
             android:text="@string/save"
             android:layout_marginRight="5dp"
-            android:background="@drawable/button_blue_round">
+            android:background="@color/colorAccent"
+            android:textColor="@android:color/white">
         </Button>
 
         <Button
@@ -168,7 +168,8 @@
             android:layout_weight="1"
             android:text="@string/cancel"
             android:layout_marginLeft="5dp"
-            android:background="@drawable/button_blue_round">
+            android:background="@color/colorAccent"
+            android:textColor="@android:color/white">
         </Button>
     </LinearLayout>
         <LinearLayout
@@ -181,8 +182,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/comments"
                 android:textSize="30sp"
-                android:textStyle="bold"
-                android:textColor="@android:color/black"/>
+                android:textStyle="bold"/>
 
             <EditText
                 android:id="@+id/new_comment_text"

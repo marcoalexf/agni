@@ -29,6 +29,7 @@
             android:layout_height="wrap_content"
             android:alpha="0.85"
             android:background="@drawable/filter_button"
+            android:backgroundTint="@color/colorAccent"
             android:padding="35dp"
             android:scaleType="centerInside"
             android:src="@drawable/location_icon" />
@@ -53,6 +54,7 @@
             android:scaleType="centerInside"
             android:src="@drawable/filter_icon"
             android:alpha="0.85"
+            android:backgroundTint="@color/colorAccent"
             android:scaleY="-1"/>
     </LinearLayout>
 
