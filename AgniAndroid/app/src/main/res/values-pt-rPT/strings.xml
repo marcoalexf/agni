@@ -29,8 +29,7 @@
     <string name="prompt_district">Distrito</string>
     <string-array name="user_types">
         <item>Civil</item>
-        <item>Funcionário</item>
-        <item>Bombeiro</item>
+        <item>Trabalhador</item>
     </string-array>
 
     <!--Profile info-->

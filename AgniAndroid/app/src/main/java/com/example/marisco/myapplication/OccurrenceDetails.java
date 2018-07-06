@@ -22,11 +22,14 @@ import android.widget.ToggleButton;
 
 import com.example.marisco.myapplication.constructors.CursorList;
 import com.example.marisco.myapplication.constructors.ListOccurrenceCommentData;
+import com.example.marisco.myapplication.constructors.OccurrenceAcceptData;
 import com.example.marisco.myapplication.constructors.OccurrenceCommentData;
 import com.example.marisco.myapplication.constructors.OccurrenceDeleteData;
 import com.example.marisco.myapplication.constructors.OccurrenceEditData;
 import com.example.marisco.myapplication.constructors.OccurrenceLikeCheckData;
 import com.example.marisco.myapplication.constructors.OccurrenceLikeCountData;
+import com.example.marisco.myapplication.constructors.ProfileRequest;
+import com.example.marisco.myapplication.constructors.ProfileResponse;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -62,6 +65,7 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
     private static final String ID = "occurrence_id";
     private static final String TOKEN = "token";
     public static final String ENDPOINT = "https://custom-tine-204615.appspot.com/rest/";
+    private static final String WORKER = "WORKER";
 
     private GoogleMap mapG;
     private MarkerOptions mp;
@@ -108,6 +112,8 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
     ToggleButton like_btn;
     @BindView(R.id.number_of_likes)
     TextView likes;
+    @BindView(R.id.accept_occurrence)
+    Button accept_btn;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -152,6 +158,7 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
         getMoreComments();
         getLikes();
         setInitialLikeState();
+        checkUserType();
         scrollView.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
             @Override
             public void onScrollChanged() {
@@ -164,6 +171,7 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
         });
         save_btn.setVisibility(View.GONE);
         cancel_btn.setVisibility(View.GONE);
+        accept_btn.setVisibility(View.GONE);
         fieldsSetup();
          if(userID != Long.parseLong(token.userID)){
             edit_btn.setVisibility(View.GONE);
@@ -189,6 +197,12 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
                 restoreInitialValues();
             }
         });
+        accept_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                acceptOccurrence();
+            }
+        });
 
         //Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
@@ -205,6 +219,40 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
             }
         });
         return v;
+    }
+
+    private void checkUserType(){
+        if (retrofit == null) {
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(ENDPOINT)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+        }
+
+        AgniAPI agniAPI = retrofit.create(AgniAPI.class);
+
+        ProfileRequest request = new ProfileRequest(token.username, token);
+        Call<ProfileResponse> call = agniAPI.getProfile(request);
+
+        call.enqueue(new Callback<ProfileResponse>() {
+            @Override
+            public void onResponse(Call<ProfileResponse> call, Response<ProfileResponse> response) {
+                if (response.code() == 200){
+                    if(response.body().getRole().equals(WORKER)){
+                        accept_btn.setVisibility(View.VISIBLE);
+                    }
+                }
+                else {
+                    Toast toast = Toast.makeText(getActivity(), "Failed to get profile" + response.code(), Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ProfileResponse> call, Throwable t) {
+                Log.e("ERROR", t.toString());
+            }
+        });
     }
 
     private void saveInitialValues(){
@@ -519,6 +567,34 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
                 }
             }
             public void onFailure(Call<Boolean> call, Throwable t) {
+                Log.e("ERROR", t.toString());
+            }
+        });
+    }
+
+    private void acceptOccurrence(){
+        if (retrofit == null) {
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(ENDPOINT)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+        }
+
+        AgniAPI agniAPI = retrofit.create(AgniAPI.class);
+
+        Call<ResponseBody> call = agniAPI.acceptOccurrence(new OccurrenceAcceptData(token,  userID, occurrence_id));
+
+        call.enqueue(new Callback<ResponseBody>() {
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.code() == 200) {
+                    Toast toast = Toast.makeText(getActivity(), "Ocorrência aceite" , Toast.LENGTH_SHORT);
+                    toast.show();
+                }else{
+                    Toast toast = Toast.makeText(getActivity(), "Falha ao aceitar ocorrência: " +response.code() , Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+            }
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
                 Log.e("ERROR", t.toString());
             }
         });

@@ -187,7 +187,7 @@ public class ProfileFragment extends Fragment {
                 // Log.d(TAG, String.valueOf(bitmap));
                 Matrix matrix = new Matrix();
 
-                matrix.postRotate(90);
+                //matrix.postRotate(90);
 
                 photoImg = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
                 profile_img.setImageBitmap(photoImg);
@@ -377,9 +377,9 @@ public class ProfileFragment extends Fragment {
 
         try {
 
-            //int factor = calculateResizeFactor(bitmap);
-            Bitmap resized = Bitmap.createScaledBitmap(photoImg, photoImg.getWidth()/4,
-                    photoImg.getHeight()/4, true);
+            int factor = calculateResizeFactor(photoImg);
+            Bitmap resized = Bitmap.createScaledBitmap(photoImg, photoImg.getWidth()/factor,
+                    photoImg.getHeight()/factor, true);
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             resized.compress(Bitmap.CompressFormat.JPEG, 50, stream);
             byte[] data = stream.toByteArray();
