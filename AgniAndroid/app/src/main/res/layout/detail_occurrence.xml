@@ -7,7 +7,8 @@
     android:layout_height="match_parent"
     android:id="@+id/scroll_view"
     android:background="@color/colorPrimary"
-    android:animateLayoutChanges="true">
+    android:animateLayoutChanges="true"
+    android:screenOrientation="portrait">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -127,7 +128,7 @@
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:background="@drawable/toggle_selector"
-            android:backgroundTint="#FF0000"
+            app:backgroundTint="#FF0000"
             android:padding="6dp"
             android:textOn=""
             android:textOff="" />

@@ -32,7 +32,8 @@
             android:backgroundTint="@color/colorAccent"
             android:padding="35dp"
             android:scaleType="centerInside"
-            android:src="@drawable/location_icon" />
+            android:src="@drawable/location_icon"
+            android:screenOrientation="portrait"/>
 
     </LinearLayout>
 

@@ -6,7 +6,8 @@
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
     android:orientation="vertical"
-    tools:context=".ProfileFragment">
+    tools:context=".ProfileFragment"
+    android:screenOrientation="portrait">
 
     <RelativeLayout
         android:layout_width="match_parent"

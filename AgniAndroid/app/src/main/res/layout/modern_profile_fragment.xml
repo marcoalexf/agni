@@ -74,7 +74,7 @@
         android:layout_margin="@dimen/fab_margin"
         android:src="@drawable/edit_profile_icon"
         app:layout_anchor="@id/app_bar"
-        android:tint="@android:color/white"
+        app:tint="@android:color/white"
         app:layout_anchorGravity="bottom|end" />
 
 </android.support.design.widget.CoordinatorLayout>

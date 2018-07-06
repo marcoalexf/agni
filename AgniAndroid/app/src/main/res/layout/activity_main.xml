@@ -6,7 +6,8 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity"
     android:animateLayoutChanges="true"
-    android:background="@color/colorPrimary">
+    android:background="@color/colorPrimary"
+    android:screenOrientation="portrait">
 
     <RelativeLayout
         android:layout_width="match_parent"
