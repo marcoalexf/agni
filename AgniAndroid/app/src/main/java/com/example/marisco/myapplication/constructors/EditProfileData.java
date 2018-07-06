@@ -4,35 +4,45 @@ import com.example.marisco.myapplication.LoginResponse;
 
 public class EditProfileData {
 
-    public String username;
-    public LoginResponse token;
-    public String role;
-    public String district;
-    public String county;
-    public String locality;
-    public String email;
-    public boolean uploadPhoto;
+    public String name;
+        public LoginResponse token;
+        public Long userID;
+        public String role;
+        public String district;
+        public String county;
+        public String locality;
+        public String email;
+        public String newUsername;
+        public String password;
+        public String newPassword;
+        public boolean uploadPhoto;
 
-    public EditProfileData() {
+        public EditProfileData() {
 
+        }
+
+        public EditProfileData(LoginResponse token, Long userID, String newUsername, String password,
+                               String newPassword, String email, String name, String district, String county, String locality,
+                               boolean uploadPhoto) {
+            this.name = name;
+            this.token = token;
+            this.userID = userID;
+            this.newUsername = newUsername;
+            this.password = password;
+            this.newPassword = newPassword;
+            this.email = email;
+            this.district = district;
+            this.county = county;
+            this.locality = locality;
+            this.uploadPhoto = uploadPhoto;
+        }
+
+    public String getName() {
+        return name;
     }
 
-    public EditProfileData(LoginResponse token, String username, String email, String district, String county, String locality, boolean uploadPhoto) {
-        this.username = username;
-        this.token = token;
-        this.email = email;
-        this.district = district;
-        this.county = county;
-        this.locality = locality;
-        this.uploadPhoto = uploadPhoto;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public LoginResponse getToken() {
@@ -41,6 +51,14 @@ public class EditProfileData {
 
     public void setToken(LoginResponse token) {
         this.token = token;
+    }
+
+    public Long getUserID() {
+        return userID;
+    }
+
+    public void setUserID(Long userID) {
+        this.userID = userID;
     }
 
     public String getRole() {
@@ -81,6 +99,30 @@ public class EditProfileData {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getNewUsername() {
+        return newUsername;
+    }
+
+    public void setNewUsername(String newUsername) {
+        this.newUsername = newUsername;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getNewPassword() {
+        return newPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
     }
 
     public boolean isUploadPhoto() {
