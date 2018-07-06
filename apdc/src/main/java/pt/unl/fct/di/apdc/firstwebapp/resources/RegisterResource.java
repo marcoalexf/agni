@@ -45,18 +45,22 @@ public class RegisterResource {
 			return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
 		}
 		
+		if(!data.password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{6,}$")) {
+			return Response.status(Status.BAD_REQUEST).entity("New password should have atleast a number, a lower case char, a upper case char, a special char and no spaces.").build();
+		}
+		
 		TransactionOptions options = TransactionOptions.Builder.withXG(true);
 		Transaction txn = datastore.beginTransaction(options);
 		try {
 			FilterPredicate filter = new FilterPredicate("user_username", FilterOperator.EQUAL, data.username);
-			Query ctrQuery = new Query("User").setFilter(filter);
+			Query ctrQuery = new Query("User").setFilter(filter).setKeysOnly();
 			List<Entity> results = datastore.prepare(ctrQuery).asList(FetchOptions.Builder.withDefaults());
 			if(!results.isEmpty()) {
 				txn.rollback();
 				return Response.status(Status.BAD_REQUEST).entity("User already exists.").build();
 			}
 			filter = new FilterPredicate("user_email", FilterOperator.EQUAL, data.email);
-			ctrQuery.setFilter(filter);
+			ctrQuery.setFilter(filter).setKeysOnly();
 			results = datastore.prepare(ctrQuery).asList(FetchOptions.Builder.withDefaults());
 			if(!results.isEmpty()) {
 				txn.rollback();

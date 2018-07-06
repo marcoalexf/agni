@@ -2,8 +2,9 @@ package pt.unl.fct.di.apdc.firstwebapp.resources.constructors;
 
 public class ProfileEditData {
 
-	public String username;
+	public String name;
 	public AuthToken token;
+	public Long userID;
 	public String role;
 	public String district;
 	public String county;
@@ -18,11 +19,12 @@ public class ProfileEditData {
 		
 	}
 	
-	public ProfileEditData(AuthToken token, String username, String newUsername, String password, 
-			String newPassword, String email, String district, String county, String locality, 
+	public ProfileEditData(AuthToken token, Long userID, String newUsername, String password, 
+			String newPassword, String email, String name, String district, String county, String locality, 
 			boolean uploadPhoto) {
-		this.username = username;
+		this.name = name;
 		this.token = token;
+		this.userID = userID;
 		this.newUsername = newUsername;
 		this.password = password;
 		this.newPassword = newPassword;
@@ -34,7 +36,7 @@ public class ProfileEditData {
 	}
 
 	public boolean valid() {
-		return token != null && username != null;
+		return token != null && userID != null;
 	}
 	
 }

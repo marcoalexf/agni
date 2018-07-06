@@ -372,7 +372,7 @@ public class OccurrenceResource {
 			}
 		}
 		/**TODO
-		 * delete media, comments, likes, etc
+		 * delete media, comments, likes, management entities (accepted, resolved, concluded), etc
 		 */
 	}
 	

@@ -78,7 +78,7 @@ public class ProfileResource {
 	@Path("/edit")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response editProfile(ProfileEditData data) {
-		LOG.fine("Attempt to edit profile for user: " + data.username);
+		LOG.fine("Attempt to edit profile for user with id: " + data.userID);
 		if(!data.valid()) {
 			return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
 		}
@@ -86,26 +86,31 @@ public class ProfileResource {
 			LOG.warning("Failed to edit profile, token for user: " + data.token.username + " is invalid");
 			return Response.status(Status.FORBIDDEN).build();
 		}
-		if(!data.token.username.equals(data.username) && !SecurityManager.userHasAccess("edit_user_profile", data.token.userID)) {
+		if(data.token.userID != data.userID && !SecurityManager.userHasAccess("edit_user_profile", data.token.userID)) {
 			LOG.warning("Failed to edit profile, user: " + data.token.username + " does not have the rights to do it");
 			return Response.status(Status.FORBIDDEN).build();
 		}
 		TransactionOptions options = TransactionOptions.Builder.withXG(true);
 		Transaction txn = datastore.beginTransaction(options);
 		try {
-			FilterPredicate filter = new FilterPredicate("user_username", FilterOperator.EQUAL, data.username);
-			Query userQuery = new Query("User").setFilter(filter);
-			List<Entity> results = datastore.prepare(userQuery).asList(FetchOptions.Builder.withDefaults());
+			FilterPredicate filter;
+			Query userQuery;
+			List<Entity> results;
+			/**filter = new FilterPredicate("user_username", FilterOperator.EQUAL, data.username);
+			userQuery = new Query("User").setFilter(filter);
+			results = datastore.prepare(userQuery).asList(FetchOptions.Builder.withDefaults());
 			if(results.isEmpty()) {
 				// Username does not exist
 				txn.rollback();
 				LOG.warning("Failed to edit profile, user:" + data.username + " does not exist");
 				return Response.status(Status.BAD_REQUEST).build();
 			}
-			Entity user = results.get(0);
+			Entity user = results.get(0);**/
+			Key userKey = KeyFactory.createKey("User", data.userID);
+			Entity user = datastore.get(userKey);
 			if(data.email != null && !data.email.isEmpty()) {
 				filter = new FilterPredicate("user_email", FilterOperator.EQUAL, data.email);
-				userQuery.setFilter(filter);
+				userQuery = new Query("User").setFilter(filter).setKeysOnly();
 				results = datastore.prepare(userQuery).asList(FetchOptions.Builder.withDefaults());
 				if(!results.isEmpty()) {
 					txn.rollback();
@@ -122,19 +127,27 @@ public class ProfileResource {
 			if(data.locality != null && !data.locality.isEmpty()) {
 				user.setProperty("user_locality", data.locality);
 			}
+			if(data.name != null && !data.name.isEmpty()) {
+				user.setProperty("user_name", data.name);
+			}
 			if(data.newUsername != null && !data.newUsername.isEmpty()) {
-				filter = new FilterPredicate("user_username", FilterOperator.EQUAL, data.username);
-				userQuery = new Query("User").setFilter(filter);
+				filter = new FilterPredicate("user_username", FilterOperator.EQUAL, data.newUsername);
+				userQuery = new Query("User").setFilter(filter).setKeysOnly();
 				results = datastore.prepare(userQuery).asList(FetchOptions.Builder.withDefaults());
 				if(!results.isEmpty()) {
 					txn.rollback();
-					return Response.status(Status.BAD_REQUEST).entity("User already exists.").build();
+					return Response.status(Status.BAD_REQUEST).entity("User already exists with newUsername.").build();
 				}
-				user.setProperty("user_username", data.newPassword);
+				user.setProperty("user_username", data.newUsername);
 			}
 			if(data.password != null && !data.password.isEmpty() && data.newPassword != null && !data.newPassword.isEmpty()) {
 				if(((String)(user.getProperty("user_pwd"))).equals(DigestUtils.sha256Hex(data.password))) {
-					user.setProperty("user_pwd", DigestUtils.sha256Hex(data.newPassword));
+					if(data.newPassword.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{6,}$")) {
+						user.setProperty("user_pwd", DigestUtils.sha256Hex(data.newPassword));
+					}
+					else {
+						return Response.status(Status.BAD_REQUEST).entity("New password should have atleast a number, a lower case char, a upper case char, a special char and no spaces.").build();
+					}
 				}
 				else {
 					return Response.status(Status.BAD_REQUEST).entity("Old password doesn't match.").build();
@@ -151,12 +164,16 @@ public class ProfileResource {
 						);
 				datastore.put(txn, fileUpload);
 				txn.commit();
-				LOG.info("User " + data.username + " profile updated");
+				LOG.info("User profile with id " + data.userID + " was updated");
 				return Response.ok(g.toJson(fileUpload.getKey().getId())).build();
 			}
 			txn.commit();
-			LOG.info("User " + data.username + " profile updated");
+			LOG.info("User profile with id " + data.userID + " was updated");
 			return Response.ok().build();
+		} catch (EntityNotFoundException e) {
+			txn.rollback();
+			LOG.warning("Failed to edit profile, user with id: " + data.userID + " does not exist");
+			return Response.status(Status.BAD_REQUEST).build();
 		} finally {
 			if (txn.isActive()) {
 				txn.rollback();
