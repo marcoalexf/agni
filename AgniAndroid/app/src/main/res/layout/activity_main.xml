@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
-    android:animateLayoutChanges="true">
+    android:animateLayoutChanges="true"
+    android:background="@color/colorAccent">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -22,6 +23,7 @@
             android:adjustViewBounds="true"
             android:scaleType="fitCenter"
             android:layout_centerHorizontal="true"
+            android:tint="@color/accentBlue"
             />
         
         <RelativeLayout
