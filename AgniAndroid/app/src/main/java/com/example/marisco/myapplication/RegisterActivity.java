@@ -33,6 +33,8 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
 
     public static final String RESPONSE = "com.example.marisco.myapplication.RESPONSE";
     public static final String ENDPOINT = "https://custom-tine-204615.appspot.com/rest/";
+    public static final String USER = "USER";
+    public static final String WORKER = "WORKER";
     private View mProgressView;
     private View mRegisterFormView;
     Retrofit retrofit;
@@ -216,15 +218,7 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
     }
 
     private boolean isPasswordValid(String password) {
-        if(password.length() < 6 || password.length() > 30)
-            return false;
-
-        if(password.matches("[a-zA-Z0-9.? ]*"))
-            return false;
-
-        if(password.equals(password.toLowerCase()) )
-            return false;
-        return true;
+        return password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{6,}$");
     }
 
     private void registerUser(){
@@ -246,9 +240,14 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
         }
 
         AgniAPI agniAPI = retrofit.create(AgniAPI.class);
+        String [] users = getResources().getStringArray(R.array.user_types);
+        UserRegister user;
+        if(type.equals(users[0]))
+            user = new UserRegister(name, username, password, email, USER, locality, county, district);
+        else
+            user = new UserRegister(name, username, password, email, WORKER, locality, county, district);
 
-        UserRegister ur = new UserRegister(name, username, password, email, type, locality, county, district);
-        Call<ResponseBody> call = agniAPI.registerUser(ur);
+        Call<ResponseBody> call = agniAPI.registerUser(user);
 
         call.enqueue(new Callback<ResponseBody>() {
             @Override

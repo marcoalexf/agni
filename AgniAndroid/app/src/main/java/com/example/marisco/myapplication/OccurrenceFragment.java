@@ -327,8 +327,8 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback {
             BitmapFactory.Options bmOptions = new BitmapFactory.Options();
             Bitmap bitmap = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
             int factor = calculateResizeFactor(bitmap);
-            Bitmap resized = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth()/4,
-                    bitmap.getHeight()/4, true);
+            Bitmap resized = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth()/factor,
+                    bitmap.getHeight()/factor, true);
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             resized.compress(Bitmap.CompressFormat.JPEG, 50, stream);
             byte[] data = stream.toByteArray();

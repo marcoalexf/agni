@@ -24,9 +24,8 @@
         completions."
     </string>
     <string-array name="user_types">
-        <item>Civilian</item>
+        <item>User</item>
         <item>Worker</item>
-        <item>Firefighter</item>
     </string-array>
 
 

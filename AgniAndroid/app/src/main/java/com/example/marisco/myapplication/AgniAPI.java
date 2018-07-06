@@ -6,6 +6,7 @@ import com.example.marisco.myapplication.constructors.ListOccurrenceCommentData;
 import com.example.marisco.myapplication.constructors.ListOccurrenceData;
 import com.example.marisco.myapplication.constructors.ListOccurrenceLikeData;
 import com.example.marisco.myapplication.constructors.MediaUploadResponse;
+import com.example.marisco.myapplication.constructors.OccurrenceAcceptData;
 import com.example.marisco.myapplication.constructors.OccurrenceCommentData;
 import com.example.marisco.myapplication.constructors.OccurrenceData;
 import com.example.marisco.myapplication.constructors.OccurrenceDeleteData;
@@ -80,4 +81,7 @@ public interface AgniAPI {
 
     @POST("occurrence/like/check")
     Call<Boolean> checkLike(@Body OccurrenceLikeCheckData data);
+
+    @POST("backoffice/accept")
+    Call<ResponseBody> acceptOccurrence(@Body OccurrenceAcceptData data);
 }
