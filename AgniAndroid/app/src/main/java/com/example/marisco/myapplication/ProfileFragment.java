@@ -355,14 +355,15 @@ public class ProfileFragment extends Fragment {
         String path = DOWNLOAD_ENDPOINT  + token.getUserid() + "/photo";
 
         RequestCreator f = Picasso.get().load(path);
-        try{
+        f.into(profile_img);
+        /*try{
             //Log.d("PHOTO SIZE -> ", "" + f.get().getByteCount());
             if(f.get().getByteCount() > 0)
                 f.into(profile_img);
 
         }catch (Exception e){
             e.printStackTrace();
-        }
+        }*/
     }
 
     private void uploadPhoto( List<Long> list_of_ids_to_upload_to){
