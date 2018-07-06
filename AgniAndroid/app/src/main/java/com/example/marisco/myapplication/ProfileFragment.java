@@ -65,7 +65,7 @@ public class ProfileFragment extends Fragment {
     public static final String ENDPOINT = "https://custom-tine-204615.appspot.com/rest/";
     private static final String DOWNLOAD_ENDPOINT = "https://storage.googleapis.com/custom-tine-204615.appspot.com/user/";
     private static final int PICK_IMAGE = 1;
-    private String username, email, name, locality, county, district, cursor;
+    private String username, email, fullName, locality, county, district, cursor;
     private Retrofit retrofit;
     private LoginResponse token;
     private List<Map<String, Object>> list;
@@ -199,7 +199,7 @@ public class ProfileFragment extends Fragment {
 
     private void saveInitialValues(){
         username = profile_username.getText().toString();
-        name = profile_name.getText().toString();
+        fullName = profile_name.getText().toString();
         email = profile_email.getText().toString();
         locality = profile_locality.getText().toString();
         county = profile_county.getText().toString();
@@ -208,7 +208,7 @@ public class ProfileFragment extends Fragment {
 
     private void restoreInitialValues(){
         profile_username.setText(username);
-        profile_name.setText(name);
+        profile_name.setText(fullName);
         profile_email.setText(email);
         profile_locality.setText(locality);
         profile_county.setText(county);
@@ -320,10 +320,15 @@ public class ProfileFragment extends Fragment {
         }
 
         AgniAPI agniAPI = retrofit.create(AgniAPI.class);
+        String newUsername = profile_username.getText().toString().equals(username) ? null : profile_username.getText().toString();
+        String newFullname = profile_name.getText().toString().equals(fullName) ? null : profile_name.getText().toString();
+        String newEmail = profile_email.getText().toString().equals(email) ? null : profile_email.getText().toString();
+        String newDistrict = profile_district.getText().toString().equals(district) ? null : profile_district.getText().toString();
+        String newCounty = profile_county.getText().toString().equals(county) ? null : profile_county.getText().toString();
+        String newLocality = profile_locality.getText().toString().equals(locality) ? null : profile_locality.getText().toString();
 
-        EditProfileData request = new EditProfileData(token, profile_username.getText().toString(),
-                profile_email.getText().toString(), profile_district.getText().toString(), profile_county.getText().toString(),
-                profile_locality.getText().toString(), photoImg != null);
+        EditProfileData request = new EditProfileData(token, Long.parseLong(token.getUserid()), newUsername, null,
+                null, newEmail,newFullname, newDistrict, newCounty, newLocality, photoImg != null);
         Call<Long> call = agniAPI.changeProfile(request);
 
         call.enqueue(new Callback<Long>() {
