@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -424,11 +425,19 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
             return;
         }
 
-        int totalHeight = 0;
+        int totalHeight = comment_list.getPaddingTop() + comment_list.getPaddingBottom();
+        int desiredWidth = View.MeasureSpec.makeMeasureSpec(comment_list.getWidth(), View.MeasureSpec.AT_MOST);
+
         for (int i = 0; i < adapter.getCount(); i++) {
             View listItem = adapter.getView(i, null, comment_list);
-            listItem.measure(0, 0);
-            totalHeight += listItem.getMeasuredHeight();
+
+            if(listItem != null){
+                // This next line is needed before you call measure or else you won't get measured height at all. The listitem needs to be drawn first to know the height.
+                listItem.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT));
+                listItem.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED);
+                totalHeight += listItem.getMeasuredHeight();
+
+            }
         }
 
         ViewGroup.LayoutParams params = comment_list.getLayoutParams();

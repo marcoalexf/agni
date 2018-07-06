@@ -27,6 +27,9 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.RequestCreator;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -39,6 +42,7 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -52,6 +56,7 @@ public class HomePage extends AppCompatActivity
     String username, name, email, type, mCurrentPhotoPath;
     private LoginResponse token;
     private static final String TOKEN = "token";
+    private static final String DOWNLOAD_ENDPOINT = "https://storage.googleapis.com/custom-tine-204615.appspot.com/user/";
 
     @BindView(R.id.rv) RecyclerView rv;
     @BindView(R.id.fab) FloatingActionButton fab;
@@ -129,7 +134,13 @@ public class HomePage extends AppCompatActivity
         this.username = response.getUsername();
 
         this.token = response;
+
+        CircleImageView header_photo = header.findViewById(R.id.profile_avatar_drawer);
+        String path = DOWNLOAD_ENDPOINT + token.getUserid() + "/photo";
+        Picasso.get().load(path).into(header_photo);
     }
+
+
 
     public void callCamera(){
         //hasPermissionInManifest(this, "android.permission.CAMERA"); // android doesnt not guarentee that the permission is installed in install time... fuck this
