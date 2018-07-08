@@ -78,6 +78,9 @@
     <string name="occurrence_type_zone">Difficult access</string>
     <string name="occurrence_type_other">Other</string>
     <string name="occurrence_likes">likes</string>
+    <string name="choose_photo">Choose photo</string>
+    <string name="accept">Accept</string>
+
 
     <string name="map">Map</string>
     <string name="new_saved_location">Save location</string>

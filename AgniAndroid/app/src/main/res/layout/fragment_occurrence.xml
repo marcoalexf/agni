@@ -1,23 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/colorPrimary"
     android:screenOrientation="portrait">
 
-    <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="10dp">
 
+        <Button
+            android:id="@+id/photo_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:text="@string/choose_photo"
+            android:background="@color/colorAccent"
+            android:textColor="@android:color/white" />
+
         <ImageView
             android:id="@+id/occurrence_photo"
             android:layout_width="match_parent"
-            android:layout_height="300dp" />
+            android:layout_height="300dp"
+            android:layout_marginTop="8dp"/>
 
         <EditText
             android:id="@+id/occurrence_title"
@@ -197,6 +204,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:text="@string/register_occurrence" />
+            android:text="@string/register_occurrence"
+            android:background="@color/colorAccent"
+            android:textColor="@android:color/white"/>
     </LinearLayout>
 </ScrollView>

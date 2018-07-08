@@ -1,8 +1,12 @@
 package com.example.marisco.myapplication;
 
 import android.Manifest;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -32,6 +36,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +51,8 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static android.app.Activity.RESULT_OK;
+
 
 public class OccurrenceFragment extends Fragment implements OnMapReadyCallback {
 
@@ -56,6 +63,7 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback {
     private static final int CLEAN_ID = 0, ZONE_ID = 1, OTHER_ID = 2;
     private static final int ONE = 1, TWO = 2, THREE = 3, FOUR = 4, FIVE = 5;
     private static final int PRIVATE_ID = 10, PUBLIC_ID = 11;
+    private static final int PICK_IMAGE = 1;
 
     private GoogleMap mapG;
     private MarkerOptions mp;
@@ -63,7 +71,8 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback {
 
     private Retrofit retrofit;
     private LoginResponse token;
-    private File photoFile;
+    private File file;
+    private Bitmap photoFile;
 
     @BindView(R.id.occurrence_title)
     EditText title;
@@ -81,6 +90,8 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback {
     MapView map;
     @BindView(R.id.occurrence_button)
     Button button;
+    @BindView(R.id.photo_btn)
+    Button photo_button;
     @BindView(R.id.occurrence_clean)
     RadioButton r_clean;
     @BindView(R.id.occurrence_zone)
@@ -117,12 +128,10 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback {
         Bundle b = this.getArguments();
         if (b != null) {
             this.token = (LoginResponse) b.getSerializable(TOKEN);
-            this.photoFile = (File) b.getSerializable(PHOTO);
+            file = (File) b.getSerializable(PHOTO);
         }
+        occurrence_photo.setVisibility(View.GONE);
 
-        if(photoFile == null){
-            occurrence_photo.setVisibility(View.GONE);
-        }
 
         map.onCreate(savedInstanceState);
         map.onResume(); // needed to get the map to display immediately
@@ -136,22 +145,71 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
+        photo_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                choosePhoto();
+            }
+        });
         setRadioIds();
         return v;
+    }
+
+    private void choosePhoto(){
+        Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
+        getIntent.setType("image/*");
+
+        Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        pickIntent.setType("image/*");
+
+        Intent chooserIntent = Intent.createChooser(getIntent, "Escolha a foto");
+        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] {pickIntent});
+
+        startActivityForResult(chooserIntent, PICK_IMAGE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        if (requestCode == PICK_IMAGE && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            Uri uri = data.getData();
+
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), uri);
+                Matrix matrix = new Matrix();
+
+                matrix.postRotate(90);
+
+                photoFile = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                occurrence_photo.setImageBitmap(photoFile);
+                occurrence_photo.setVisibility(View.VISIBLE);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if(photoFile  != null)
+        if(file != null){
+            Toast toast2 = Toast.makeText(getActivity(), "Tou no if do OnResume" , Toast.LENGTH_SHORT);
+            toast2.show();
             loadPhoto();
+        }
     }
 
 
     private void loadPhoto(){
-        Bitmap myBitmap = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
-        occurrence_photo.setImageBitmap(myBitmap);
-        occurrence_photo.setRotation(90);
+        Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
+        Matrix matrix = new Matrix();
+
+        matrix.postRotate(90);
+        if(file != null){
+            photoFile = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+            occurrence_photo.setImageBitmap(photoFile);
+            occurrence_photo.setVisibility(View.VISIBLE);
+        }
     }
 
     private void setRadioIds() {
@@ -266,7 +324,7 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback {
                         toast.show();
 
                         list_of_ids_to_upload_to.addAll(response.body().getList());
-                        uploadPhoto(photoFile, list_of_ids_to_upload_to);
+                        uploadPhoto(list_of_ids_to_upload_to);
 
                     }
                     else {
@@ -317,18 +375,20 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    public void uploadPhoto(File photoFile, List<Long> list_of_ids_to_upload_to){
+    public void uploadPhoto( List<Long> list_of_ids_to_upload_to){
         this.button.setEnabled(false);
         AgniAPI agniAPI = retrofit.create(AgniAPI.class);
         Long id = list_of_ids_to_upload_to.get(0);
         Log.d("ID IS -> ", String.valueOf(id));
-
+        if(photoFile == null){
+            Toast toast = Toast.makeText(getActivity(), "PhotoFile nulo ", Toast.LENGTH_SHORT);
+            toast.show();
+        }
         try {
             BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-            Bitmap bitmap = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
-            int factor = calculateResizeFactor(bitmap);
-            Bitmap resized = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth()/factor,
-                    bitmap.getHeight()/factor, true);
+            int factor = calculateResizeFactor();
+            Bitmap resized = Bitmap.createScaledBitmap(photoFile, photoFile.getWidth()/factor,
+                    photoFile.getHeight()/factor, true);
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             resized.compress(Bitmap.CompressFormat.JPEG, 50, stream);
             byte[] data = stream.toByteArray();
@@ -354,6 +414,8 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback {
                     }
             });
         } catch (Exception e) {
+            Toast toast = Toast.makeText(getActivity(), "excecao no upload Photo", Toast.LENGTH_SHORT);
+            toast.show();
             e.printStackTrace();
         }
         this.button.setEnabled(true);
@@ -386,11 +448,11 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    public int calculateResizeFactor(Bitmap bitmap){
-        int width = bitmap.getWidth();
-        int height = bitmap.getHeight();
+    public int calculateResizeFactor(){
+        int width = photoFile.getWidth();
+        int height = photoFile.getHeight();
         if(width + height > 2000)
-            return width + height / 2000;
+            return (width + height) / 2000;
         else
             return 1;
     }

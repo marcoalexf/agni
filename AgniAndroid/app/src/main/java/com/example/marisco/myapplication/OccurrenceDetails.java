@@ -326,7 +326,7 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
 
         if(mediaIDs != null && !mediaIDs.isEmpty()) {
             Picasso.get().load("https://storage.googleapis.com/custom-tine-204615.appspot.com/user/"
-                    + userID + "/occurrence/" + occurrence_id + "/" + mediaIDs.get(0)).rotate(90).into(image);
+                    + userID + "/occurrence/" + occurrence_id + "/" + mediaIDs.get(0)).into(image);
         }
     }
 
