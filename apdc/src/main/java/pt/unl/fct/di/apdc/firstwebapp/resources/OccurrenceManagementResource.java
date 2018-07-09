@@ -1,8 +1,10 @@
 package pt.unl.fct.di.apdc.firstwebapp.resources;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
@@ -13,18 +15,27 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
+import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Transaction;
 import com.google.appengine.api.datastore.TransactionOptions;
+import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Query.FilterPredicate;
+import com.google.appengine.api.datastore.Query.SortDirection;
+import com.google.appengine.api.datastore.QueryResultList;
 import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceAcceptData;
+import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceAcceptListData;
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceResolveData;
+import pt.unl.fct.di.apdc.firstwebapp.util.CursorList;
 import pt.unl.fct.di.apdc.firstwebapp.util.ListIds;
 import pt.unl.fct.di.apdc.firstwebapp.util.SecurityManager;
 
@@ -35,6 +46,7 @@ public class OccurrenceManagementResource {
 	private static final Logger LOG = Logger.getLogger(OccurrenceManagementResource.class.getName());
 	private final Gson g = new Gson();
 	private static final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+	private static final int QUERY_LIMIT = 100;
 	
 	public OccurrenceManagementResource() { } //Nothing to be done here...
 	
@@ -54,7 +66,8 @@ public class OccurrenceManagementResource {
 			LOG.warning("Failed to accept occurrence, user: " + data.token.username + " with id: " + data.token.userID + " does not have the rights to do it");
 			return Response.status(Status.FORBIDDEN).build();
 		}
-		Transaction txn = datastore.beginTransaction();
+		TransactionOptions options = TransactionOptions.Builder.withXG(true);
+		Transaction txn = datastore.beginTransaction(options);
 		try {
 			Key userOccurrenceKey = KeyFactory.createKey("User", data.userID);
 			Key occurrenceKey = KeyFactory.createKey(userOccurrenceKey, "UserOccurrence", data.occurrenceID);
@@ -68,9 +81,8 @@ public class OccurrenceManagementResource {
 			occurrenceEntity.setProperty("user_occurrence_status", "ACCEPTED");
 			datastore.put(txn, occurrenceEntity);
 			
-			Key userKey = KeyFactory.createKey("User", data.token.userID);
 			Entity acceptedEntity = new Entity("AcceptedOccurrence", KeyFactory.keyToString(occurrenceKey));
-			acceptedEntity.setProperty("accepted_occurrence_userID", userKey);
+			acceptedEntity.setProperty("accepted_occurrence_userID", data.token.userID);
 			acceptedEntity.setProperty("accepted_occurrence_date", new Date());
 			
 			datastore.put(txn, acceptedEntity);
@@ -289,6 +301,144 @@ public class OccurrenceManagementResource {
 				txn.rollback();
 			}
 		}
+	}
+	
+	@POST
+	@Path("/accept/list")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response acceptedListOccurrences(OccurrenceAcceptListData data) {
+		if(!data.valid()) {
+			return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
+		}
+		LOG.fine("Attempt to get accepted occurrences list for user with id " + data.userID + " by user: " + data.token.username);
+		if(!data.token.isTokenValid()) {
+			LOG.warning("Failed to get accepted occurrences list, token for user: " + data.token.username + "is invalid");
+			return Response.status(Status.FORBIDDEN).build();
+		}
+		if(data.userID != data.token.userID && !SecurityManager.userHasAccess("see_accepted_occurrences", data.token.userID)) {
+			LOG.warning("Failed to get accepted occurrences list, user: " + data.token.username + " with id: " + data.token.userID + " does not have the rights to do it");
+			return Response.status(Status.FORBIDDEN).build();
+		}
+		
+		FetchOptions fetchOptions = FetchOptions.Builder.withLimit(QUERY_LIMIT);
+		if(data.cursor != null) {
+			fetchOptions.startCursor(Cursor.fromWebSafeString(data.cursor));
+		}
+		FilterPredicate filter = new FilterPredicate("accepted_occurrence_userID", FilterOperator.EQUAL, data.userID);
+		Query ctrQuery = new Query("AcceptedOccurrence").setFilter(filter).addSort("accepted_occurrence_date", SortDirection.DESCENDING);
+		QueryResultList<Entity> results = datastore.prepare(ctrQuery).asQueryResultList(fetchOptions);
+		
+		List<Map<String, Object>> occurrences = new LinkedList<Map<String, Object>>();
+		Query ctrQueryMedia;
+		Map<String, Object> occurrenceMap;
+		List<Entity> mediaResults;
+		List<String> mediaIDs;
+		Key occurrenceKey;
+		Key userOccurrenceKey;
+		for(Entity acceptEntity: results) {
+			try {
+				Entity occurrenceEntity = datastore.get(KeyFactory.stringToKey(acceptEntity.getKey().getName()));
+			
+				occurrenceKey = occurrenceEntity.getKey();
+				userOccurrenceKey = occurrenceEntity.getParent();
+				
+				occurrenceMap = new HashMap<String, Object>();
+				occurrenceMap.putAll(occurrenceEntity.getProperties());
+				occurrenceMap.put("username", userOccurrenceKey.getName());
+				occurrenceMap.put("occurrenceID", String.valueOf(occurrenceKey.getId()));
+				occurrenceMap.put("userID", String.valueOf(userOccurrenceKey.getId()));
+				occurrenceMap.put("accepted_occurrence_date", (Date)(acceptEntity.getProperty("accepted_occurrence_date")));
+				ctrQueryMedia = new Query("UserOccurrenceMedia").setAncestor(occurrenceKey);
+				mediaResults = datastore.prepare(ctrQueryMedia).asList(FetchOptions.Builder.withDefaults());
+				mediaIDs = new LinkedList<String>();
+				for(Entity occurrenceMediaEntity: mediaResults) {
+					mediaIDs.add(String.valueOf(occurrenceMediaEntity.getKey().getId()));
+				}
+				occurrenceMap.put("mediaIDs", mediaIDs);
+				ctrQueryMedia = new Query("UserResolvedOccurrenceMedia").setAncestor(occurrenceEntity.getKey());
+				mediaResults = datastore.prepare(ctrQueryMedia).asList(FetchOptions.Builder.withDefaults());
+				mediaIDs = new LinkedList<String>();
+				for(Entity occurrenceMediaEntity: mediaResults) {
+					mediaIDs.add(String.valueOf(occurrenceMediaEntity.getKey().getId()));
+				}
+				occurrenceMap.put("resolvedMediaIDs", mediaIDs);
+				occurrences.add(occurrenceMap);
+			} catch (EntityNotFoundException e) {
+				// shouldn't activate i guess
+			}
+		}
+		CursorList cursorList = new CursorList(results.getCursor().toWebSafeString(), occurrences);
+		LOG.info("List of accepted occurrences sent");
+		return Response.ok(g.toJson(cursorList)).build();
+	}
+	
+	@POST
+	@Path("/resolve/list")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response resolvedListOccurrences(OccurrenceAcceptListData data) {
+		if(!data.valid()) {
+			return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
+		}
+		LOG.fine("Attempt to get resolved occurrences list for user with id " + data.userID + " by user: " + data.token.username);
+		if(!data.token.isTokenValid()) {
+			LOG.warning("Failed to get resolved occurrences list, token for user: " + data.token.username + "is invalid");
+			return Response.status(Status.FORBIDDEN).build();
+		}
+		if(data.userID != data.token.userID && !SecurityManager.userHasAccess("see_accepted_occurrences", data.token.userID)) {
+			LOG.warning("Failed to get resolved occurrences list, user: " + data.token.username + " with id: " + data.token.userID + " does not have the rights to do it");
+			return Response.status(Status.FORBIDDEN).build();
+		}
+		
+		FetchOptions fetchOptions = FetchOptions.Builder.withLimit(QUERY_LIMIT);
+		if(data.cursor != null) {
+			fetchOptions.startCursor(Cursor.fromWebSafeString(data.cursor));
+		}
+		FilterPredicate filter = new FilterPredicate("resolved_occurrence_userID", FilterOperator.EQUAL, data.userID);
+		Query ctrQuery = new Query("ResolvedOccurrence").setFilter(filter).addSort("resolved_occurrence_date", SortDirection.DESCENDING).setKeysOnly();
+		QueryResultList<Entity> results = datastore.prepare(ctrQuery).asQueryResultList(fetchOptions);
+		
+		List<Map<String, Object>> occurrences = new LinkedList<Map<String, Object>>();
+		Query ctrQueryMedia;
+		Map<String, Object> occurrenceMap;
+		List<Entity> mediaResults;
+		List<String> mediaIDs;
+		Key occurrenceKey;
+		Key userOccurrenceKey;
+		for(Entity resolveEntity: results) {
+			try {
+				Entity occurrenceEntity = datastore.get(KeyFactory.stringToKey(resolveEntity.getKey().getName()));
+			
+				occurrenceKey = occurrenceEntity.getKey();
+				userOccurrenceKey = occurrenceEntity.getParent();
+				
+				occurrenceMap = new HashMap<String, Object>();
+				occurrenceMap.putAll(occurrenceEntity.getProperties());
+				occurrenceMap.put("username", userOccurrenceKey.getName());
+				occurrenceMap.put("occurrenceID", String.valueOf(occurrenceKey.getId()));
+				occurrenceMap.put("userID", String.valueOf(userOccurrenceKey.getId()));
+				occurrenceMap.put("resolved_occurrence_date", (Date)(resolveEntity.getProperty("resolved_occurrence_date")));
+				ctrQueryMedia = new Query("UserOccurrenceMedia").setAncestor(occurrenceKey);
+				mediaResults = datastore.prepare(ctrQueryMedia).asList(FetchOptions.Builder.withDefaults());
+				mediaIDs = new LinkedList<String>();
+				for(Entity occurrenceMediaEntity: mediaResults) {
+					mediaIDs.add(String.valueOf(occurrenceMediaEntity.getKey().getId()));
+				}
+				occurrenceMap.put("mediaIDs", mediaIDs);
+				ctrQueryMedia = new Query("UserResolvedOccurrenceMedia").setAncestor(occurrenceEntity.getKey());
+				mediaResults = datastore.prepare(ctrQueryMedia).asList(FetchOptions.Builder.withDefaults());
+				mediaIDs = new LinkedList<String>();
+				for(Entity occurrenceMediaEntity: mediaResults) {
+					mediaIDs.add(String.valueOf(occurrenceMediaEntity.getKey().getId()));
+				}
+				occurrenceMap.put("resolvedMediaIDs", mediaIDs);
+				occurrences.add(occurrenceMap);
+			} catch (EntityNotFoundException e) {
+				// shouldn't activate i guess
+			}
+		}
+		CursorList cursorList = new CursorList(results.getCursor().toWebSafeString(), occurrences);
+		LOG.info("List of accepted occurrences sent");
+		return Response.ok(g.toJson(cursorList)).build();
 	}
 
 }

@@ -49,6 +49,9 @@ public class SecurityManager {
 		modSet.add("see_liked_occurrences");
 		modSet.add("conclude_user_occurrence");
 		modSet.add("reject_user_occurrence");
+		modSet.add("approve_worker");
+		modSet.add("remove_worker");
+		modSet.add("see_accepted_occurrences");
 		////////////////////////////////////////////
 		
 		//////////////// ADMIN /////////////////////
@@ -58,6 +61,8 @@ public class SecurityManager {
 		adminSet.addAll(modSet);
 		adminSet.addAll(workerSet);
 		adminSet.add("edit_user_profile");
+		adminSet.add("make_moderator");
+		adminSet.add("remove_moderator");
 		////////////////////////////////////////////
 		
 		// Create the immutable map
