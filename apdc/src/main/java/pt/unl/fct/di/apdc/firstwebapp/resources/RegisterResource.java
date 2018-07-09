@@ -78,7 +78,15 @@ public class RegisterResource {
 			user.setProperty("user_county", data.county);
 			user.setProperty("user_locality", data.locality);
 			if(data.role.equals("WORKER")) {
-				user.setProperty("user_waiting_approval", true);
+				switch(data.entity) {
+				case "PROTEÇÃO CIVIL":
+				case "BOMBEIROS":
+					user.setProperty("user_entity", data.entity);
+					user.setProperty("user_waiting_worker_approval", true);
+				default:
+					txn.rollback();
+					return Response.status(Status.BAD_REQUEST).entity("There is no such entity").build();
+				}
 			}
 			datastore.put(txn, user);
 			

@@ -11,6 +11,7 @@ public class RegisterData {
 	public String county;
 	public String locality;
 	public boolean uploadPhoto;
+	public String entity;
 
 	
 	public RegisterData() {
@@ -18,7 +19,7 @@ public class RegisterData {
 	}
 	
 	public RegisterData(String username, String password, String name, String email, String role, 
-			String district, String county, String locality, boolean uploadPhoto) {
+			String district, String county, String locality, boolean uploadPhoto, String entity) {
 		this.username = username;
 		this.password = password;
 		this.name = name;
@@ -28,6 +29,7 @@ public class RegisterData {
 		this.county = county;
 		this.locality = locality;
 		this.uploadPhoto = uploadPhoto;
+		this.entity = entity;
 	}
 	
 	private boolean nonEmptyField(String field) {

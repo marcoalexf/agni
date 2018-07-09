@@ -20,6 +20,7 @@ import com.google.appengine.api.datastore.Transaction;
 import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.UserApprovalData;
+import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.UserModData;
 import pt.unl.fct.di.apdc.firstwebapp.util.SecurityManager;
 
 @Path("/backoffice")
@@ -56,10 +57,21 @@ public class UserManagementResource {
 			Entity userEntity = datastore.get(txn, userKey);
 			Boolean waitingApproval = (Boolean)userEntity.getProperty("user_waiting_approval");
 			if(waitingApproval != null && !waitingApproval) {
+				txn.rollback();
 				LOG.warning("Failed to approve user, it isn't waiting for approval");
 				return Response.status(Status.FORBIDDEN).build();
 			}
-			userEntity.setProperty("user_waiting_approval", false);
+			
+			Key modKey = KeyFactory.createKey("User", data.token.userID);
+			// Get mod
+			Entity modEntity = datastore.get(txn, modKey);
+			if(!((String)(modEntity.getProperty("user_entity"))).equals(((String)(userEntity.getProperty("user_entity"))))) {
+				txn.rollback();
+				LOG.warning("Failed to approve user, it isn't from the same entity as the moderator");
+				return Response.status(Status.FORBIDDEN).build();
+			}
+			
+			userEntity.setProperty("user_waiting_worker_approval", false);
 			userEntity.setProperty("user_role", "WORKER");
 			datastore.put(txn, userEntity);
 			
@@ -119,7 +131,7 @@ public class UserManagementResource {
 	@POST
 	@Path("/moderator/give")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response giveMod(UserApprovalData data) {
+	public Response giveMod(UserModData data) {
 		if(!data.valid()) {
 			return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
 		}
@@ -143,6 +155,7 @@ public class UserManagementResource {
 				return Response.status(Status.FORBIDDEN).build();
 			}
 			userEntity.setProperty("user_role", "MOD");
+			userEntity.setProperty("user_entity", data.entity);
 			datastore.put(txn, userEntity);
 			
 			txn.commit();
