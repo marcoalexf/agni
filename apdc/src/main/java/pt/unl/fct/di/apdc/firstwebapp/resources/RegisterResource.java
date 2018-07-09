@@ -66,17 +66,27 @@ public class RegisterResource {
 				txn.rollback();
 				return Response.status(Status.BAD_REQUEST).entity("Email already exists.").build();
 			}
+			
 			Entity user = new Entity("User");
 			user.setProperty("user_username", data.username);
 			user.setProperty("user_name", data.name);
 			user.setProperty("user_pwd", DigestUtils.sha256Hex(data.password));
 			user.setProperty("user_email", data.email);
 			user.setUnindexedProperty("user_creation_time", new Date());
-			user.setProperty("user_role", data.role);
+			user.setProperty("user_role", "USER");
 			user.setProperty("user_district", data.district);
 			user.setProperty("user_county", data.county);
 			user.setProperty("user_locality", data.locality);
+			if(data.role.equals("WORKER")) {
+				user.setProperty("user_waiting_approval", true);
+			}
 			datastore.put(txn, user);
+			
+			/*if(data.role.equals("WORKER")) {
+				Entity worker = new Entity("WorkerApproval", user.getKey());
+				datastore.put(worker);
+			}*/
+			
 			if(data.uploadPhoto) {
 				txn.commit();
 				txn = datastore.beginTransaction(options);
