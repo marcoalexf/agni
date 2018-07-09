@@ -87,10 +87,13 @@ public class ProfileFragment extends Fragment {
     @BindView(R.id.edit_photo) ImageButton edit_photo;
     @BindView(R.id.btnSave) Button save_button;
     @BindView(R.id.btnCancelSave) Button cancel_button;
-    //@BindView(R.id.occurrences_img)ImageView occurrences_img;
-    //@BindView(R.id.liked_occurrences_img)ImageView liked_occurrences_img;
-    //@BindView(R.id.liked_occurrences_number)TextView liked_occurrences_number;
-    //@BindView(R.id.registered_occurrences_number)TextView registered_occurrences_number;
+    @BindView(R.id.occurrences_img)ImageView occurrences_img;
+    @BindView(R.id.liked_occurrences_img)ImageView liked_occurrences_img;
+    @BindView(R.id.liked_occurrences_number)TextView liked_occurrences_number;
+    @BindView(R.id.registered_occurrences_number)TextView registered_occurrences_number;
+    @BindView(R.id.new_password) EditText new_password;
+    @BindView(R.id.new_password_retype) EditText new_password_retype;
+    @BindView(R.id.old_password) EditText old_password;
 
     public ProfileFragment() {
         list = new LinkedList<Map<String, Object>>();
@@ -132,7 +135,7 @@ public class ProfileFragment extends Fragment {
                 restoreInitialValues();
             }
         });
-        /*
+
         occurrences_img.setClickable(true);
         occurrences_img.setOnClickListener( new View.OnClickListener(){
             public void onClick(View v) {
@@ -157,7 +160,7 @@ public class ProfileFragment extends Fragment {
                 od.setArguments(args);
                 fman.beginTransaction().replace(R.id.fragment, od).commit();
             }
-        });*/
+        });
         edit_photo.setOnClickListener( new View.OnClickListener(){
             public void onClick(View v) {
                 Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -248,6 +251,9 @@ public class ProfileFragment extends Fragment {
         save_button.setVisibility(View.GONE);
         cancel_button.setVisibility(View.GONE);
         edit_photo.setVisibility(View.GONE);
+        new_password.setVisibility(View.GONE);
+        new_password_retype.setVisibility(View.GONE);
+        old_password.setVisibility(View.GONE);
     }
 
     public void editProfile(){
@@ -278,6 +284,9 @@ public class ProfileFragment extends Fragment {
         save_button.setVisibility(View.VISIBLE);
         cancel_button.setVisibility(View.VISIBLE);
         edit_photo.setVisibility(View.VISIBLE);
+        new_password.setVisibility(View.VISIBLE);
+        new_password_retype.setVisibility(View.VISIBLE);
+        old_password.setVisibility(View.VISIBLE);
     }
 
     public void getProfile() {
@@ -361,14 +370,14 @@ public class ProfileFragment extends Fragment {
 
         RequestCreator f = Picasso.get().load(path);
         f.into(profile_img);
-        /*try{
+        try{
             //Log.d("PHOTO SIZE -> ", "" + f.get().getByteCount());
             if(f.get().getByteCount() > 0)
                 f.into(profile_img);
 
         }catch (Exception e){
             e.printStackTrace();
-        }*/
+        }
     }
 
     private void uploadPhoto( List<Long> list_of_ids_to_upload_to){
@@ -455,15 +464,14 @@ public class ProfileFragment extends Fragment {
                     cursor = c.getCursor();
                     if(!c.getMapList().isEmpty()){
                         list.addAll( c.getMapList());
-                        if(c.getMapList().size() == QUERY_LIMIT) Log.d("this has to be gone", "now");
-                            //liked_occurrences_number.setText("99+");
+                        if(c.getMapList().size() == QUERY_LIMIT)
+                            liked_occurrences_number.setText("99+");
                         else
-                            //liked_occurrences_number.setText(c.getMapList().size()+"");
-                            Log.d("this has to be gone", "now");
+                            liked_occurrences_number.setText(c.getMapList().size()+"");
 
                     }
-                    else //liked_occurrences_number.setText("0");
-                        Log.d("this has to be gone", "now");
+                    else
+                        liked_occurrences_number.setText("0");
                 }
                 else {
                     Toast toast = Toast.makeText(getActivity(), "Failed to get occurrences" + response.code(), Toast.LENGTH_SHORT);
@@ -495,14 +503,13 @@ public class ProfileFragment extends Fragment {
                     cursor = c.getCursor();
                     if(!c.getMapList().isEmpty()){
                         list.addAll( c.getMapList());
-                        if(c.getMapList().size() == QUERY_LIMIT)Log.d("this has to be gone", "now");
-                            //registered_occurrences_number.setText("99+");
+                        if(c.getMapList().size() == QUERY_LIMIT)
+                            registered_occurrences_number.setText("99+");
                         else
-                            //registered_occurrences_number.setText(c.getMapList().size()+"");
-                            Log.d("this has to be gone", "now");
+                            registered_occurrences_number.setText(c.getMapList().size()+"");
                     }
-                    else //registered_occurrences_number.setText("0");
-                        Log.d("this has to be gone", "now");
+                    else
+                        registered_occurrences_number.setText("0");
                 }
                 else {
                     Toast toast = Toast.makeText(getActivity(), "Failed to get occurrences" + response.code(), Toast.LENGTH_SHORT);

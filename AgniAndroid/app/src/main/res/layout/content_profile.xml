@@ -29,7 +29,8 @@
                 android:layout_centerVertical="true"
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
                 android:layout_marginRight="@dimen/activity_horizontal_margin"
-                android:src="@drawable/ic_person_black_24px" />
+                android:src="@android:drawable/ic_menu_call"
+                android:tint="@android:color/black" />
 
             <EditText
                 android:id="@+id/profile_name"
@@ -113,13 +114,57 @@
             android:padding="@dimen/activity_horizontal_margin">
 
             <ImageView
+                android:id="@+id/liked_occurrences_img"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_baseline_favorite_24px" />
+
+            <TextView
+                android:id="@+id/liked_occurrences_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_toRightOf="@id/occurrences_img"
+                android:layout_below="@id/liked_occurrences_img"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="20sp"/>
+
+            <ImageView
+                android:id="@+id/occurrences_img"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_below="@id/liked_occurrences_img"
+                android:src="@drawable/ic_baseline_warning_24px" />
+
+            <TextView
+                android:id="@+id/registered_occurrences_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_toRightOf="@id/occurrences_img"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="20sp"/>
+
+        </RelativeLayout>
+
+        <include layout="@layout/item_divider"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:clickable="true"
+            android:padding="@dimen/activity_horizontal_margin">
+
+            <ImageView
                 android:id="@+id/ivContactItem3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
                 android:layout_marginRight="@dimen/activity_horizontal_margin"
-                android:src="@android:drawable/edit_text" />
+                android:src="@android:drawable/ic_dialog_email"
+                android:tint="@android:color/black" />
 
             <EditText
                 android:id="@+id/profile_email"
@@ -166,7 +211,8 @@
                 android:layout_centerVertical="true"
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
                 android:layout_marginRight="@dimen/activity_horizontal_margin"
-                android:src="@android:drawable/edit_text" />
+                android:src="@android:drawable/ic_dialog_info"
+                android:tint="@android:color/black" />
 
             <EditText
                 android:id="@+id/profile_locality"
@@ -211,7 +257,6 @@
                 android:layout_centerVertical="true"
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
                 android:layout_marginRight="@dimen/activity_horizontal_margin"
-                android:src="@android:drawable/edit_text"
                 android:visibility="invisible" />
 
             <EditText
@@ -257,7 +302,6 @@
                 android:layout_centerVertical="true"
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
                 android:layout_marginRight="@dimen/activity_horizontal_margin"
-                android:src="@android:drawable/edit_text"
                 android:visibility="invisible" />
 
             <EditText
@@ -294,26 +338,42 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:padding="@dimen/activity_horizontal_margin">
+
+            <EditText
+                android:id="@+id/old_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Current Password" />
+
+            <EditText
+                android:id="@+id/new_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="New Password" />
+
+            <EditText
+                android:id="@+id/new_password_retype"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Confirm password" />
 
             <Button
                 android:id="@+id/btnSave"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/save"
-                android:background="@drawable/filter_button">
-            </Button>
+                android:background="@drawable/filter_button"
+                android:text="@string/save"></Button>
 
             <Button
                 android:id="@+id/btnCancelSave"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/cancel"
-                android:background="@drawable/filter_button">
-            </Button>
+                android:background="@drawable/filter_button"
+                android:text="@string/cancel"></Button>
 
         </LinearLayout>
     </LinearLayout>

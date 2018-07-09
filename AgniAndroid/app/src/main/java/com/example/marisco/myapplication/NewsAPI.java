@@ -9,7 +9,7 @@ import retrofit2.http.QueryMap;
 
 public interface NewsAPI {
 
-    @GET("top-headlines")
+    @GET("everything")
     Call<NewsDataCard> topHeadlines(@QueryMap Map<String, String> options);
 
 }
