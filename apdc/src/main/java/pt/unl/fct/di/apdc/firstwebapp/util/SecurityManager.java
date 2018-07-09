@@ -52,6 +52,7 @@ public class SecurityManager {
 		modSet.add("approve_worker");
 		modSet.add("remove_worker");
 		modSet.add("see_accepted_occurrences");
+		modSet.add("verify_accepted_occurrence");
 		////////////////////////////////////////////
 		
 		//////////////// ADMIN /////////////////////

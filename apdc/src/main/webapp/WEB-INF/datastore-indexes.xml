@@ -29,4 +29,12 @@
     <datastore-index kind="UserOccurrenceLike" ancestor="true" source="manual">
         <property name="like_date" direction="desc"/>
     </datastore-index>
+    <datastore-index kind="AcceptedOccurrence" ancestor="false" source="manual">
+        <property name="accepted_occurrence_userID" direction="asc"/>
+        <property name="accepted_occurrence_date" direction="desc"/>
+    </datastore-index>
+    <datastore-index kind="ResolvedOccurrence" ancestor="false" source="manual">
+        <property name="resolved_occurrence_userID" direction="asc"/>
+        <property name="resolved_occurrence_date" direction="desc"/>
+    </datastore-index>
 </datastore-indexes>

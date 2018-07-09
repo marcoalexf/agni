@@ -34,6 +34,7 @@ import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceAcceptData;
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceAcceptListData;
+import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceAcceptVerifyData;
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.OccurrenceResolveData;
 import pt.unl.fct.di.apdc.firstwebapp.util.CursorList;
 import pt.unl.fct.di.apdc.firstwebapp.util.ListIds;
@@ -95,6 +96,38 @@ public class OccurrenceManagementResource {
 			if (txn.isActive()) {
 				txn.rollback();
 			}
+		}
+	}
+	
+	@POST
+	@Path("/accept/verify")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response acceptVerifyOccurrence(OccurrenceAcceptVerifyData data) {
+		if(!data.valid()) {
+			return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
+		}
+		LOG.fine("Attempt to verify if occurrence with id: " + data.occurrenceID + " was accepted by user with id: " + data.userID);
+		if(!data.token.isTokenValid()) {
+			LOG.warning("Failed to verify if occurrence was accepted, token for user: " + data.token.username + "is invalid");
+			return Response.status(Status.FORBIDDEN).build();
+		}
+		if(data.userID != data.token.userID && !SecurityManager.userHasAccess("verify_accepted_occurrence", data.token.userID)) {
+			LOG.warning("Failed to verify if occurrence was accepted, user: " + data.token.username + " with id: " + data.token.userID + " does not have the rights to do it");
+			return Response.status(Status.FORBIDDEN).build();
+		}
+		
+		try {
+			Key userOccurrenceKey = KeyFactory.createKey("User", data.occurrenceUserID);
+			Key occurrenceKey = KeyFactory.createKey(userOccurrenceKey, "UserOccurrence", data.occurrenceID);
+			Key acceptKey = KeyFactory.createKey("AcceptedOccurrence", KeyFactory.keyToString(occurrenceKey));
+			
+			// Get occurrence
+			Entity acceptEntity = datastore.get(acceptKey);
+			
+			LOG.info("Occurrence verified if was accepted by user with id " + data.userID);
+			return Response.ok(g.toJson(((long)(acceptEntity.getProperty("accepted_occurrence_userID"))) == data.userID)).build();
+		} catch (EntityNotFoundException e) {
+			return Response.ok(g.toJson(false)).build();
 		}
 	}
 	

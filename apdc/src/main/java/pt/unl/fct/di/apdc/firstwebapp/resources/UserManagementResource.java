@@ -54,7 +54,8 @@ public class UserManagementResource {
 			
 			// Get user
 			Entity userEntity = datastore.get(txn, userKey);
-			if(!(Boolean)userEntity.getProperty("user_waiting_approval")) {
+			Boolean waitingApproval = (Boolean)userEntity.getProperty("user_waiting_approval");
+			if(waitingApproval != null && !waitingApproval) {
 				LOG.warning("Failed to approve user, it isn't waiting for approval");
 				return Response.status(Status.FORBIDDEN).build();
 			}

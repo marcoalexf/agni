@@ -25,6 +25,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Transaction;
+import com.google.appengine.api.datastore.TransactionOptions;
 import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.datastore.QueryResultList;
 import com.google.gson.Gson;
@@ -58,7 +59,8 @@ public class OccurrenceLikeResource {
 			LOG.warning("Failed to like occurrence, token for user: " + data.token.username + " is invalid");
 			return Response.status(Status.FORBIDDEN).build();
 		}
-		Transaction txn = datastore.beginTransaction();
+		TransactionOptions options = TransactionOptions.Builder.withXG(true);
+		Transaction txn = datastore.beginTransaction(options);
 		try {
 			Key userOccurrenceKey = KeyFactory.createKey("User", data.userID);
 			Key occurrenceKey = KeyFactory.createKey(userOccurrenceKey, "UserOccurrence", data.occurrenceID);
