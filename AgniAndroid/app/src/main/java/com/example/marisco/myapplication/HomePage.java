@@ -273,8 +273,6 @@ public class HomePage extends AppCompatActivity
 
             map.setArguments(args);
             fman.beginTransaction().replace(R.id.fragment, map).commit();
-        } else if (id == R.id.nav_statistics) {
-
         } else if (id == R.id.nav_view) {
 
         }
@@ -288,6 +286,11 @@ public class HomePage extends AppCompatActivity
 
             lo.setArguments(args);
             fman.beginTransaction().replace(R.id.fragment, lo).commit();
+        }else if(id == R.id.help_menu){
+            setTitle("Help");
+
+            Intent intent = new Intent(this, HelpMenu.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
