@@ -120,7 +120,7 @@
                 android:src="@drawable/ic_baseline_favorite_24px" />
 
             <TextView
-                android:id="@+id/liked_occurrences_number"
+                android:id="@+id/registered_occurrences_number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
@@ -137,7 +137,7 @@
                 android:src="@drawable/ic_baseline_warning_24px" />
 
             <TextView
-                android:id="@+id/registered_occurrences_number"
+                android:id="@+id/liked_occurrences_number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
@@ -345,19 +345,22 @@
                 android:id="@+id/old_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Current Password" />
+                android:hint="@string/old_password"
+                android:inputType="textPassword"/>
 
             <EditText
                 android:id="@+id/new_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="New Password" />
+                android:hint="@string/new_password"
+                android:inputType="textPassword"/>
 
             <EditText
                 android:id="@+id/new_password_retype"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Confirm password" />
+                android:hint="@string/prompt_password_conf"
+                android:inputType="textPassword"/>
 
             <Button
                 android:id="@+id/btnSave"

@@ -21,6 +21,9 @@
     <string name="forgotten_password">Esqueceu-se da sua password?</string>
     <string name="remember_credencials">Lembrar credenciais</string>
 
+    <string name="old_password">Password atual</string>
+    <string name="new_password">Nova password</string>
+
     <string name="prompt_email">Email</string>
     <string name="prompt_user_type">Tipo de utilizador</string>
     <string name="prompt_name">Nome</string>

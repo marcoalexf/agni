@@ -12,6 +12,9 @@
     <string name="action_sign_out">Sign out</string>
     <string name="action_edit_profile">Edit profile</string>
 
+    <string name="old_password">Old password</string>
+    <string name="new_password">New password</string>
+
     <string name="action_register">Register</string>
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_invalid_password">Password must contain a special character, a capital letter and contain between 6 and 30 characters</string>

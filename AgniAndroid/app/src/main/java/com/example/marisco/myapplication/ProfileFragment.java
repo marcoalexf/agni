@@ -139,6 +139,7 @@ public class ProfileFragment extends Fragment {
         occurrences_img.setClickable(true);
         occurrences_img.setOnClickListener( new View.OnClickListener(){
             public void onClick(View v) {
+
                 ListOccurrences od = new ListOccurrences();
                 FragmentManager fman = getFragmentManager();
                 Bundle args = new Bundle();
@@ -335,9 +336,15 @@ public class ProfileFragment extends Fragment {
         String newDistrict = profile_district.getText().toString().equals(district) ? null : profile_district.getText().toString();
         String newCounty = profile_county.getText().toString().equals(county) ? null : profile_county.getText().toString();
         String newLocality = profile_locality.getText().toString().equals(locality) ? null : profile_locality.getText().toString();
+        String oldPassword = old_password.getText().toString();
+        String newPassword = new_password.getText().toString();
+        if(newPassword.equals(new_password_retype.getText().toString())){
+            if(newPassword.equals(""))
+                newPassword = null;
+        }else newPassword = null;
 
-        EditProfileData request = new EditProfileData(token, Long.parseLong(token.getUserid()), newUsername, null,
-                null, newEmail,newFullname, newDistrict, newCounty, newLocality, photoImg != null);
+        EditProfileData request = new EditProfileData(token, Long.parseLong(token.getUserid()), newUsername, oldPassword,
+                newPassword, newEmail,newFullname, newDistrict, newCounty, newLocality, photoImg != null);
         Call<Long> call = agniAPI.changeProfile(request);
 
         call.enqueue(new Callback<Long>() {

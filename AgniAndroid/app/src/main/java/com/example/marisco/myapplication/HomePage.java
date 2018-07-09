@@ -316,8 +316,6 @@ public class HomePage extends AppCompatActivity
 
             map.setArguments(args);
             fman.beginTransaction().replace(R.id.fragment, map).commit();
-        } else if (id == R.id.nav_statistics) {
-
         } else if (id == R.id.nav_view) {
 
         }
