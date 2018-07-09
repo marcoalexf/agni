@@ -67,6 +67,7 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
     private static final String TOKEN = "token";
     public static final String ENDPOINT = "https://custom-tine-204615.appspot.com/rest/";
     private static final String WORKER = "WORKER";
+    private static final int COMMENT_LIMIT = 20;
 
     private GoogleMap mapG;
     private MarkerOptions mp;
@@ -81,7 +82,7 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
 
     private String i_title, i_description;
     private boolean i_visibility;
-
+    private boolean finishedComments;
 
     @BindView(R.id.detail_title)
     EditText o_title;
@@ -131,6 +132,7 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
         double level = 1;
         occurrence_id = 0l;
         userID = 0l;
+        finishedComments = false;
         ArrayList<String> mediaIDs = null;
         if (b != null) {
             title = (String)b.getSerializable(TITLE);
@@ -165,7 +167,9 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
             public void onScrollChanged() {
                 if (scrollView != null) {
                     if (scrollView.getChildAt(0).getBottom() <= (scrollView.getHeight() + scrollView.getScrollY())) {
-                        getMoreComments();
+                        if(!finishedComments){
+                            getMoreComments();
+                        }
                     }
                 }
             }
@@ -401,6 +405,9 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
                     if(!c.getCursor().equals(cursor)){
                         cursor = c.getCursor();
                         if(!c.getMapList().isEmpty()){
+                            if(c.getMapList().size() < COMMENT_LIMIT){
+                                finishedComments = true;
+                            }
                             comments.addAll( c.getMapList());
                             adapter = new ListAdapterComments(getContext(), comments, android.R.layout.simple_list_item_1);
                             comment_list.setAdapter(adapter);

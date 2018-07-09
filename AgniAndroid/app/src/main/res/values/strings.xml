@@ -92,6 +92,8 @@
 
     <string name="statistics">Statistics</string>
 
+    <string name="accepted_occurrences">Accepted Occurrences</string>
+
     <!--Filter menu-->
     <string name="minimum_level">Minimum severity:</string>
     <string name="apply">Apply</string>

@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.example.marisco.myapplication.constructors.CursorList;
 import com.example.marisco.myapplication.constructors.ListOccurrenceData;
 import com.example.marisco.myapplication.constructors.ListOccurrenceLikeData;
+import com.example.marisco.myapplication.constructors.OccurrenceAcceptListData;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -46,6 +47,7 @@ public class ListOccurrences extends Fragment implements AbsListView.OnScrollLis
     private static final String MODE = "mode";
     private static final String LIKED_OCCURRENCES = "liked_occurrences";
     private static final String REGISTERED_OCCURRENCES = "registered_occurrences";
+    private static final String ACCEPTED_OCCURRENCES = "accepted_occurrences";
     private Retrofit retrofit;
 
     @BindView(R.id.list_occurrences) ListView lv;
@@ -126,6 +128,10 @@ public class ListOccurrences extends Fragment implements AbsListView.OnScrollLis
             call = agniAPI.getMoreOccurrences(new ListOccurrenceData(token, true, token.username, cursor, null, null, null));
         else if(mode.equals(LIKED_OCCURRENCES))
             call = agniAPI.getLikedOccurrences(new ListOccurrenceLikeData(token, Long.parseLong(token.userID), cursor));
+        else if(mode.equals(ACCEPTED_OCCURRENCES)){
+            call = agniAPI.getAcceptedOccurrences(new OccurrenceAcceptListData(token, Long.parseLong(token.userID), cursor));
+        }
+
 
         call.enqueue(new Callback<CursorList>() {
             public void onResponse(Call<CursorList> call, Response<CursorList> response) {

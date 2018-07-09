@@ -7,6 +7,7 @@ import com.example.marisco.myapplication.constructors.ListOccurrenceData;
 import com.example.marisco.myapplication.constructors.ListOccurrenceLikeData;
 import com.example.marisco.myapplication.constructors.MediaUploadResponse;
 import com.example.marisco.myapplication.constructors.OccurrenceAcceptData;
+import com.example.marisco.myapplication.constructors.OccurrenceAcceptListData;
 import com.example.marisco.myapplication.constructors.OccurrenceCommentData;
 import com.example.marisco.myapplication.constructors.OccurrenceData;
 import com.example.marisco.myapplication.constructors.OccurrenceDeleteData;
@@ -75,6 +76,9 @@ public interface AgniAPI {
 
     @POST("occurrence/like/list")
     Call<CursorList> getLikedOccurrences(@Body ListOccurrenceLikeData data);
+
+    @POST("backoffice/accept/list")
+    Call<CursorList> getAcceptedOccurrences(@Body OccurrenceAcceptListData data);
 
     @POST("occurrence/like/count")
     Call<Integer> getLikes(@Body OccurrenceLikeCountData data);

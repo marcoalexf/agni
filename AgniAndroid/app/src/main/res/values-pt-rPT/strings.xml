@@ -74,6 +74,8 @@
 
     <string name="list_occurrences">Listar ocorrências</string>
 
+    <string name="accepted_occurrences">Ocorrências aceites</string>
+
     <string name="statistics">Estatísticas</string>
 
     <!--Filter menu-->

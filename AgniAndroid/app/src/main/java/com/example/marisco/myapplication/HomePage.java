@@ -27,6 +27,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.marisco.myapplication.constructors.ProfileRequest;
+import com.example.marisco.myapplication.constructors.ProfileResponse;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 
@@ -57,11 +59,17 @@ public class HomePage extends AppCompatActivity
     private LoginResponse token;
     private static final String TOKEN = "token";
     private static final String DOWNLOAD_ENDPOINT = "https://storage.googleapis.com/custom-tine-204615.appspot.com/user/";
+    public static final String ENDPOINT = "https://custom-tine-204615.appspot.com/rest/";
+    private static final String WORKER = "WORKER";
+    private static final String MODE = "mode";
+    private static final String ACCEPTED_OCCURRENCES = "accepted_occurrences";
+    private static final int ACCEPTED_OCCURRENCES_ID = 10;
 
     @BindView(R.id.rv) RecyclerView rv;
     @BindView(R.id.fab) FloatingActionButton fab;
 
     private Retrofit retrofit;
+    private Retrofit retrofit2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +89,6 @@ public class HomePage extends AppCompatActivity
         rv.hasFixedSize();
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         rv.setLayoutManager(linearLayoutManager);
-        Log.d("LOGGING: ", "before all the retrofit bullshit");
         retrofit = new Retrofit.Builder()
                 .baseUrl("https://newsapi.org/v2/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -125,9 +132,8 @@ public class HomePage extends AppCompatActivity
 
         Intent i = getIntent();
         LoginResponse response = (LoginResponse) i.getSerializableExtra(MainActivity.RESPONSE);
-        NavigationView nv = findViewById(R.id.nav_view);
-        nv.setNavigationItemSelectedListener(this);
-        View header = nv.getHeaderView(0);
+        navigationView.setNavigationItemSelectedListener(this);
+        View header = navigationView.getHeaderView(0);
         TextView header_username = header.findViewById(R.id.header_username);
         header_username.setText(response.getUsername());
 
@@ -138,8 +144,45 @@ public class HomePage extends AppCompatActivity
         CircleImageView header_photo = header.findViewById(R.id.profile_avatar_drawer);
         String path = DOWNLOAD_ENDPOINT + token.getUserid() + "/photo";
         Picasso.get().load(path).into(header_photo);
+
+        checkUserType(navigationView);
     }
 
+    private void checkUserType(final NavigationView navigationView){
+        if (retrofit2 == null) {
+            retrofit2 = new Retrofit.Builder()
+                    .baseUrl(ENDPOINT)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+        }
+
+        AgniAPI agniAPI = retrofit2.create(AgniAPI.class);
+
+        ProfileRequest request = new ProfileRequest(token.username, token);
+        Call<ProfileResponse> call = agniAPI.getProfile(request);
+
+        call.enqueue(new Callback<ProfileResponse>() {
+            @Override
+            public void onResponse(Call<ProfileResponse> call, Response<ProfileResponse> response) {
+                if (response.code() == 200){
+                    if(response.body().getRole().equals(WORKER)){
+                        Menu menu = navigationView.getMenu();
+                        MenuItem item = menu.add(R.id.group1, ACCEPTED_OCCURRENCES_ID, 6, getResources().getString(R.string.accepted_occurrences));
+                        item.setIcon(R.drawable.ic_report_problem_black_24px);
+                    }
+                }
+                else {
+                    Toast toast = Toast.makeText(getBaseContext(), "Failed to get profile" + response.code(), Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ProfileResponse> call, Throwable t) {
+                Log.e("ERROR", t.toString());
+            }
+        });
+    }
 
 
     public void callCamera(){
@@ -287,6 +330,18 @@ public class HomePage extends AppCompatActivity
             FragmentManager fman = getSupportFragmentManager();
             Bundle args = new Bundle();
             args.putSerializable(TOKEN, token);
+
+            lo.setArguments(args);
+            fman.beginTransaction().replace(R.id.fragment, lo).commit();
+        }
+        else if (id == ACCEPTED_OCCURRENCES_ID){
+            setTitle(R.string.accepted_occurrences);
+
+            ListOccurrences lo = new ListOccurrences();
+            FragmentManager fman = getSupportFragmentManager();
+            Bundle args = new Bundle();
+            args.putSerializable(TOKEN, token);
+            args.putSerializable(MODE, ACCEPTED_OCCURRENCES);
 
             lo.setArguments(args);
             fman.beginTransaction().replace(R.id.fragment, lo).commit();
