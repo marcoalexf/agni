@@ -17,10 +17,6 @@
             android:icon="@drawable/ic_terrain_black_24px"
             android:title="@string/map" />
         <item
-            android:id="@+id/nav_statistics"
-            android:icon="@drawable/ic_check_box_black_24px"
-            android:title="@string/statistics" />
-        <item
             android:id="@+id/occurences_list"
             android:icon="@drawable/ic_person_black_24px"
             android:title="@string/list_occurrences" />
