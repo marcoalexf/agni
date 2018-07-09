@@ -22,13 +22,17 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.example.marisco.myapplication.constructors.CursorList;
+import com.example.marisco.myapplication.constructors.ListIds;
 import com.example.marisco.myapplication.constructors.ListOccurrenceCommentData;
 import com.example.marisco.myapplication.constructors.OccurrenceAcceptData;
+import com.example.marisco.myapplication.constructors.OccurrenceAcceptListData;
+import com.example.marisco.myapplication.constructors.OccurrenceAcceptVerifyData;
 import com.example.marisco.myapplication.constructors.OccurrenceCommentData;
 import com.example.marisco.myapplication.constructors.OccurrenceDeleteData;
 import com.example.marisco.myapplication.constructors.OccurrenceEditData;
 import com.example.marisco.myapplication.constructors.OccurrenceLikeCheckData;
 import com.example.marisco.myapplication.constructors.OccurrenceLikeCountData;
+import com.example.marisco.myapplication.constructors.OccurrenceResolveData;
 import com.example.marisco.myapplication.constructors.ProfileRequest;
 import com.example.marisco.myapplication.constructors.ProfileResponse;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -116,6 +120,8 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
     TextView likes;
     @BindView(R.id.accept_occurrence)
     Button accept_btn;
+    @BindView(R.id.finish_occurrence)
+    Button finish_btn;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -177,6 +183,7 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
         save_btn.setVisibility(View.GONE);
         cancel_btn.setVisibility(View.GONE);
         accept_btn.setVisibility(View.GONE);
+        finish_btn.setVisibility(View.GONE);
         fieldsSetup();
          if(userID != Long.parseLong(token.userID)){
             edit_btn.setVisibility(View.GONE);
@@ -223,6 +230,12 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
                 toggleLike();
             }
         });
+        finish_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                resolveOccurrence();
+            }
+        });
         return v;
     }
 
@@ -245,6 +258,7 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
                 if (response.code() == 200){
                     if(response.body().getRole().equals(WORKER)){
                         accept_btn.setVisibility(View.VISIBLE);
+                        checkIfAccepted();
                     }
                 }
                 else {
@@ -611,6 +625,59 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
                 }
             }
             public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.e("ERROR", t.toString());
+            }
+        });
+    }
+
+    private void checkIfAccepted(){
+        AgniAPI agniAPI = retrofit.create(AgniAPI.class);
+
+        OccurrenceAcceptVerifyData request = new OccurrenceAcceptVerifyData(token, Long.parseLong(token.getUserid()), userID, occurrence_id);
+        Call<Boolean> call = agniAPI.checkIsAccepted(request);
+
+        call.enqueue(new Callback<Boolean>() {
+            @Override
+            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                if (response.code() == 200){
+                    if(response.body()){
+                        accept_btn.setVisibility(View.GONE);
+                        finish_btn.setVisibility(View.VISIBLE);
+                    }
+                }
+                else {
+                    Toast toast = Toast.makeText(getActivity(), "Failed to get profile" + response.code(), Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Boolean> call, Throwable t) {
+                Log.e("ERROR", t.toString());
+            }
+        });
+    }
+
+    private void resolveOccurrence(){
+        AgniAPI agniAPI = retrofit.create(AgniAPI.class);
+
+        OccurrenceResolveData request = new OccurrenceResolveData(token, userID, occurrence_id, false, 0);
+        Call<ListIds> call = agniAPI.resolveOccurrence(request);
+
+        call.enqueue(new Callback<ListIds>() {
+            @Override
+            public void onResponse(Call<ListIds> call, Response<ListIds> response) {
+                if (response.code() == 200){
+                    Toast toast = Toast.makeText(getActivity(), "Ocorrência terminada", Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+                else {
+                    Toast toast = Toast.makeText(getActivity(), "Failed to get resolve" + response.code(), Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+            }
+            @Override
+            public void onFailure(Call<ListIds> call, Throwable t) {
                 Log.e("ERROR", t.toString());
             }
         });

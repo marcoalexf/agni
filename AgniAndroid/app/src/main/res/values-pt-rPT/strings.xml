@@ -67,6 +67,7 @@
     </string-array>
     <string name="choose_photo">Escolher foto</string>
     <string name="accept">Aceitar</string>
+    <string name="resolve">Resolver</string>
 
     <string name="map">Mapa</string>
     <string name="new_saved_location">Guardar localização</string>

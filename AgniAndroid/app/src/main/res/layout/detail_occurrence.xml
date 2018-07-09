@@ -184,7 +184,18 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/accept"
-            android:layout_marginLeft="5dp"
+            android:layout_marginStart="5dp"
+            android:background="@color/colorAccent"
+            android:textColor="@android:color/white">
+        </Button>
+
+        <Button
+            android:id="@+id/finish_occurrence"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/resolve"
+            android:layout_marginStart="5dp"
             android:background="@color/colorAccent"
             android:textColor="@android:color/white">
         </Button>

@@ -178,7 +178,7 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), uri);
                 Matrix matrix = new Matrix();
 
-                matrix.postRotate(90);
+                //matrix.postRotate(90);
 
                 photoFile = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
                 occurrence_photo.setImageBitmap(photoFile);
@@ -193,8 +193,6 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback {
     public void onResume() {
         super.onResume();
         if(file != null){
-            Toast toast2 = Toast.makeText(getActivity(), "Tou no if do OnResume" , Toast.LENGTH_SHORT);
-            toast2.show();
             loadPhoto();
         }
     }

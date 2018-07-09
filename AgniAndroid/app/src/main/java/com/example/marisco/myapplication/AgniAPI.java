@@ -2,18 +2,21 @@ package com.example.marisco.myapplication;
 
 import com.example.marisco.myapplication.constructors.CursorList;
 import com.example.marisco.myapplication.constructors.EditProfileData;
+import com.example.marisco.myapplication.constructors.ListIds;
 import com.example.marisco.myapplication.constructors.ListOccurrenceCommentData;
 import com.example.marisco.myapplication.constructors.ListOccurrenceData;
 import com.example.marisco.myapplication.constructors.ListOccurrenceLikeData;
 import com.example.marisco.myapplication.constructors.MediaUploadResponse;
 import com.example.marisco.myapplication.constructors.OccurrenceAcceptData;
 import com.example.marisco.myapplication.constructors.OccurrenceAcceptListData;
+import com.example.marisco.myapplication.constructors.OccurrenceAcceptVerifyData;
 import com.example.marisco.myapplication.constructors.OccurrenceCommentData;
 import com.example.marisco.myapplication.constructors.OccurrenceData;
 import com.example.marisco.myapplication.constructors.OccurrenceDeleteData;
 import com.example.marisco.myapplication.constructors.OccurrenceEditData;
 import com.example.marisco.myapplication.constructors.OccurrenceLikeCheckData;
 import com.example.marisco.myapplication.constructors.OccurrenceLikeCountData;
+import com.example.marisco.myapplication.constructors.OccurrenceResolveData;
 import com.example.marisco.myapplication.constructors.ProfileRequest;
 import com.example.marisco.myapplication.constructors.ProfileResponse;
 import com.example.marisco.myapplication.constructors.ProfileUsernameData;
@@ -88,4 +91,10 @@ public interface AgniAPI {
 
     @POST("backoffice/accept")
     Call<ResponseBody> acceptOccurrence(@Body OccurrenceAcceptData data);
+
+    @POST("backoffice/accept/verify")
+    Call<Boolean> checkIsAccepted(@Body OccurrenceAcceptVerifyData data);
+
+    @POST("backoffice/resolve")
+    Call<ListIds> resolveOccurrence(@Body OccurrenceResolveData data);
 }
