@@ -329,6 +329,11 @@ public class HomePage extends AppCompatActivity
 
             lo.setArguments(args);
             fman.beginTransaction().replace(R.id.fragment, lo).commit();
+        }else if(id == R.id.help_menu){
+            setTitle("Help");
+
+            Intent intent = new Intent(this, HelpMenu.class);
+            startActivity(intent);
         }
         else if (id == ACCEPTED_OCCURRENCES_ID){
             setTitle(R.string.accepted_occurrences);
