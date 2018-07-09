@@ -62,6 +62,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
 
     private static final String TITLE = "title";
+    private static final String STATE = "state";
     private static final String DESCRIPTION = "description";
     private static final String LATITUDE = "latitude";
     private static final String LONGITUDE = "longitude";
@@ -76,7 +77,7 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
     private GoogleMap mapG;
     private MarkerOptions mp;
     private double lat, lon;
-    private String title;
+    private String title, state;
     private Long occurrence_id ,userID;
     private Retrofit retrofit;
     private LoginResponse token;
@@ -122,6 +123,8 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
     Button accept_btn;
     @BindView(R.id.finish_occurrence)
     Button finish_btn;
+    @BindView(R.id.detail_state)
+    TextView o_state;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -131,6 +134,7 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
         ButterKnife.bind(this, v);
         Bundle b = this.getArguments();
         title = "";
+        state = "";
         String description = "";
         lat = 0;
         lon = 0;
@@ -142,6 +146,7 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
         ArrayList<String> mediaIDs = null;
         if (b != null) {
             title = (String)b.getSerializable(TITLE);
+            state = (String)b.getSerializable(STATE);
             description = (String)b.getSerializable(DESCRIPTION);
             lat = (double)b.getSerializable(LATITUDE);
             lon = (double)b.getSerializable(LONGITUDE);
@@ -320,10 +325,6 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
         o_description.setEnabled(true);
         o_description.setTextIsSelectable(true);
 
-        o_level.setInputType(InputType.TYPE_CLASS_TEXT);
-        o_level.setEnabled(true);
-        o_level.setTextIsSelectable(true);
-
         o_visibility.setEnabled(true);
 
         save_btn.setVisibility(View.VISIBLE);
@@ -333,6 +334,14 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
     private void fillInfo(String title, String description, boolean visibility, double level
     , Long occurrence_id, Long userID, ArrayList<String> mediaIDs){
         o_title.setText(title);
+        if(state != null){
+            if(state.equals("OPEN"))
+                o_state.setText(" " + getResources().getString(R.string.state_open));
+            else if (state.equals("RESOLVED"))
+                o_state.setText(" " + getResources().getString(R.string.state_accepted));
+            else if (state.equals("CONCLUDED"))
+                o_state.setText(" "+  getResources().getString(R.string.state_concluded));
+        }
         o_description.setText(description);
 
         o_level.setText((int)level + "");

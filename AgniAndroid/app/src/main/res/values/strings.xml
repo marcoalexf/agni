@@ -33,7 +33,7 @@
 
 
     <string name="forgotten_password">Forgot your password?</string>
-    <string name="remember_credencials">Remember credencials</string>
+    <string name="remember_credencials">Remember credentials</string>
 
 
     <string name="prompt_name">Name</string>
@@ -73,7 +73,11 @@
     <string name="occurrence_public">Public</string>
     <string name="occurrence_private">Private</string>
     <string name="occurrence_severity">Severity:</string>
-    <string name="occurrence_notification">Notificate when resolved:</string>
+    <string name="occurrence_state">State:</string>
+    <string name="state_open">Open</string>
+    <string name="state_accepted">Accepted</string>
+    <string name="state_concluded">Concluded</string>
+    <string name="occurrence_notification">Notify when resolved:</string>
     <string name="occurrence_location">Location:</string>
     <string name="register_occurrence">Register occurrence</string>
     <string name="occurrence_type">Occurrence type:</string>

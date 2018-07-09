@@ -37,6 +37,7 @@ public class ListOccurrences extends Fragment implements AbsListView.OnScrollLis
 
     public static final String ENDPOINT = "https://custom-tine-204615.appspot.com/rest/";
     private static final String TITLE = "title";
+    private static final String STATE = "state";
     private static final String DESCRIPTION = "description";
     private static final String LATITUDE = "latitude";
     private static final String LONGITUDE = "longitude";
@@ -99,6 +100,7 @@ public class ListOccurrences extends Fragment implements AbsListView.OnScrollLis
         FragmentManager fman = getFragmentManager();
         Bundle args = new Bundle();
         args.putSerializable(TITLE, (String) map_list.get(position).get("user_occurrence_title"));
+        args.putSerializable(STATE, (String) map_list.get(position).get("user_occurrence_status"));
         args.putSerializable(DESCRIPTION, (String) map_list.get(position).get("user_occurrence_description"));
         args.putSerializable(LEVEL, (double) map_list.get(position).get("user_occurrence_level"));
         args.putSerializable(VISIBILITY, (boolean) map_list.get(position).get("user_occurrence_visibility"));
