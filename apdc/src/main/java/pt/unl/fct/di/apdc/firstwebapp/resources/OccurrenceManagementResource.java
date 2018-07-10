@@ -52,6 +52,56 @@ public class OccurrenceManagementResource {
 	public OccurrenceManagementResource() { } //Nothing to be done here...
 	
 	@POST
+	@Path("/approve")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response approveOccurrence(OccurrenceAcceptData data) {
+		if(!data.valid()) {
+			return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
+		}
+		LOG.fine("Attempt to approve occurrence with id: " + data.occurrenceID + " by user: " + data.token.username);
+		if(!data.token.isTokenValid()) {
+			LOG.warning("Failed to approve occurrence, token for user: " + data.token.username + "is invalid");
+			return Response.status(Status.FORBIDDEN).build();
+		}
+		if(!SecurityManager.userHasAccess("approve_user_occurrence", data.token.userID)) {
+			LOG.warning("Failed to approve occurrence, user: " + data.token.username + " with id: " + data.token.userID + " does not have the rights to do it");
+			return Response.status(Status.FORBIDDEN).build();
+		}
+		TransactionOptions options = TransactionOptions.Builder.withXG(true);
+		Transaction txn = datastore.beginTransaction(options);
+		try {
+			Key modKey = KeyFactory.createKey("User", data.token.userID);
+			Key userOccurrenceKey = KeyFactory.createKey("User", data.userID);
+			Key occurrenceKey = KeyFactory.createKey(userOccurrenceKey, "UserOccurrence", data.occurrenceID);
+			
+			// Get occurrence
+			Entity occurrenceEntity = datastore.get(txn, occurrenceKey);
+			if(!((String)occurrenceEntity.getProperty("user_occurrence_status")).equals("OPEN")) {
+				LOG.warning("Failed to approve occurrence, it is being resolved already");
+				return Response.status(Status.FORBIDDEN).build();
+			}
+			occurrenceEntity.setProperty("user_occurrence_status", "APPROVED");
+			datastore.put(txn, occurrenceEntity);
+			
+			Entity approvedEntity = new Entity("ApprovedOccurrence", KeyFactory.keyToString(occurrenceKey));
+			approvedEntity.setProperty("approved_occurrence_userID", data.token.userID);
+			approvedEntity.setProperty("approved_occurrence_date", new Date());
+			approvedEntity.setProperty("approved_occurrence_entity", (String)(datastore.get(txn, modKey).getProperty("user_entity")));
+			
+			datastore.put(txn, approvedEntity);
+			txn.commit();
+			LOG.info("User " + data.token.username + " with id " + data.token.userID + " accepted the occurrence with id: " + data.occurrenceID);
+			return Response.ok().build();
+		} catch (EntityNotFoundException e) {
+			return Response.status(Status.BAD_REQUEST).entity("Occurrence not found.").build();
+		} finally {
+			if (txn.isActive()) {
+				txn.rollback();
+			}
+		}
+	}
+	
+	@POST
 	@Path("/accept")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response acceptOccurrence(OccurrenceAcceptData data) {
@@ -70,12 +120,25 @@ public class OccurrenceManagementResource {
 		TransactionOptions options = TransactionOptions.Builder.withXG(true);
 		Transaction txn = datastore.beginTransaction(options);
 		try {
+			Key workerKey = KeyFactory.createKey("User", data.token.userID);
 			Key userOccurrenceKey = KeyFactory.createKey("User", data.userID);
 			Key occurrenceKey = KeyFactory.createKey(userOccurrenceKey, "UserOccurrence", data.occurrenceID);
+			Key approvedKey = KeyFactory.createKey("ApprovedOccurrence", KeyFactory.keyToString(occurrenceKey));
+			
+			// Check approved occurrence existence
+			Entity approvedEntity = datastore.get(txn, approvedKey);
+			
+			// Check occurrence was accepted by the user
+			if(!((String)(approvedEntity.getProperty("approved_occurrence_entity"))).equals(((String)(datastore.get(txn, workerKey).getProperty("user_entity"))))) {
+				txn.rollback();
+				LOG.warning("Failed to accept occurrence, the occurrence was not approved by the same entity.");
+				return Response.status(Status.FORBIDDEN).build();
+			}
 			
 			// Get occurrence
 			Entity occurrenceEntity = datastore.get(txn, occurrenceKey);
-			if(!((String)occurrenceEntity.getProperty("user_occurrence_status")).equals("OPEN")) {
+			if(!((String)occurrenceEntity.getProperty("user_occurrence_status")).equals("APPROVED")) {
+				txn.rollback();
 				LOG.warning("Failed to accept occurrence, it is being resolved already");
 				return Response.status(Status.FORBIDDEN).build();
 			}
@@ -91,7 +154,7 @@ public class OccurrenceManagementResource {
 			LOG.info("User " + data.token.username + " with id " + data.token.userID + " accepted the occurrence with id: " + data.occurrenceID);
 			return Response.ok().build();
 		} catch (EntityNotFoundException e) {
-			return Response.status(Status.BAD_REQUEST).entity("Occurrence not found.").build();
+			return Response.status(Status.BAD_REQUEST).entity("Occurrence not approved.").build();
 		} finally {
 			if (txn.isActive()) {
 				txn.rollback();
@@ -303,7 +366,7 @@ public class OccurrenceManagementResource {
 			
 			// Get occurrence
 			Entity occurrenceEntity = datastore.get(txn, occurrenceKey);
-			occurrenceEntity.setProperty("user_occurrence_status", "OPEN");
+			occurrenceEntity.setProperty("user_occurrence_status", "APPROVED");
 			datastore.put(txn, occurrenceEntity);
 			
 			txn.commit();
