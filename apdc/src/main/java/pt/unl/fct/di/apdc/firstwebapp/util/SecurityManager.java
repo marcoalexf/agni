@@ -34,6 +34,7 @@ public class SecurityManager {
 		workerSet.add("see_private_occurrences");
 		workerSet.add("accept_user_occurrence");
 		workerSet.add("resolve_user_occurrence");
+		workerSet.add("see_approved_occurrences");
 		////////////////////////////////////////////
         
 		//////////////// MOD ///////////////////////
@@ -54,6 +55,7 @@ public class SecurityManager {
 		modSet.add("see_accepted_occurrences");
 		modSet.add("verify_accepted_occurrence");
 		modSet.add("approve_user_occurrence");
+		modSet.add("see_approved_occurrences");
 		////////////////////////////////////////////
 		
 		//////////////// ADMIN /////////////////////
