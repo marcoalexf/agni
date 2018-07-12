@@ -53,7 +53,9 @@
     <string name="occurrence_state">Estado:</string>
     <string name="state_open">Aberta</string>
     <string name="state_accepted">Aceite</string>
-    <string name="state_concluded">Conluída</string>
+    <string name="state_concluded">Concluída</string>
+    <string name="state_resolved">Resolvida</string>
+    <string name="state_approved">Aprovada</string>
     <string name="occurrence_public">Público</string>
     <string name="occurrence_private">Privado</string>
     <string name="occurrence_severity">Gravidade:</string>

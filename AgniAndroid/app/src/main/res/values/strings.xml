@@ -77,6 +77,8 @@
     <string name="state_open">Open</string>
     <string name="state_accepted">Accepted</string>
     <string name="state_concluded">Concluded</string>
+    <string name="state_approved">Approved</string>
+    <string name="state_resolved">Resolved</string>
     <string name="occurrence_notification">Notify when resolved:</string>
     <string name="occurrence_location">Location:</string>
     <string name="register_occurrence">Register occurrence</string>
