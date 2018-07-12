@@ -112,7 +112,8 @@ public class ListOccurrences extends Fragment implements AbsListView.OnScrollLis
         args.putSerializable(TOKEN, token);
 
         od.setArguments(args);
-        fman.beginTransaction().replace(R.id.fragment, od).commit();
+        fman.beginTransaction().add(R.id.fragment, od) // Add this transaction to the back stack (name is an optional name for this back stack state, or null).
+                .addToBackStack(null).commit();
     }
 
     private void getMoreOccurrences(){

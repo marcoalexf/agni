@@ -95,7 +95,7 @@ public class HomePage extends AppCompatActivity
                 .build();
         NewsAPI newsAPI = retrofit.create(NewsAPI.class);
         Map<String, String> options = new HashMap<>();
-        options.put("q", "incendio OR fogo OR incêndio");
+        options.put("q", "Incêndio");
         options.put("apiKey", "888b98dd2a90421c950ffd72830ee6f4");
         Log.d("LOGGING: ", "before Call<NewsDataCard>");
         Call<NewsDataCard> call = newsAPI.topHeadlines(options);
@@ -244,7 +244,9 @@ public class HomePage extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else {
+        } else if (getFragmentManager().getBackStackEntryCount() > 0) {
+            getFragmentManager().popBackStackImmediate();
+        }  else {
             super.onBackPressed();
         }
     }
@@ -287,6 +289,7 @@ public class HomePage extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_profile) {
+
             setTitle(R.string.profile);
             ProfileFragment profile = new ProfileFragment();
             FragmentManager fman = getSupportFragmentManager();
@@ -295,7 +298,8 @@ public class HomePage extends AppCompatActivity
             args.putSerializable(TOKEN, token);
             profile.setArguments(args);
 
-            fman.beginTransaction().replace(R.id.fragment, profile).commit();
+            fman.beginTransaction().add(R.id.fragment, profile) // Add this transaction to the back stack (name is an optional name for this back stack state, or null).
+                    .addToBackStack(null).commit();
         } else if (id == R.id.nav_occurencies) {
             setTitle(R.string.register_occurrence);
 
@@ -305,7 +309,8 @@ public class HomePage extends AppCompatActivity
             args.putSerializable(TOKEN, token);
 
             of.setArguments(args);
-            fman.beginTransaction().replace(R.id.fragment, of).commit();
+            fman.beginTransaction().add(R.id.fragment, of) // Add this transaction to the back stack (name is an optional name for this back stack state, or null).
+                    .addToBackStack(null).commit();
         } else if (id == R.id.nav_map) {
             setTitle(R.string.map);
 
@@ -315,7 +320,8 @@ public class HomePage extends AppCompatActivity
             args.putSerializable(TOKEN, token);
 
             map.setArguments(args);
-            fman.beginTransaction().replace(R.id.fragment, map).commit();
+            fman.beginTransaction().add(R.id.fragment, map) // Add this transaction to the back stack (name is an optional name for this back stack state, or null).
+                    .addToBackStack(null).commit();
         } else if (id == R.id.nav_view) {
 
         }
@@ -328,7 +334,8 @@ public class HomePage extends AppCompatActivity
             args.putSerializable(TOKEN, token);
 
             lo.setArguments(args);
-            fman.beginTransaction().replace(R.id.fragment, lo).commit();
+            fman.beginTransaction().add(R.id.fragment, lo) // Add this transaction to the back stack (name is an optional name for this back stack state, or null).
+                    .addToBackStack(null).commit();
         }else if(id == R.id.help_menu){
             setTitle("Help");
 
@@ -345,7 +352,8 @@ public class HomePage extends AppCompatActivity
             args.putSerializable(MODE, ACCEPTED_OCCURRENCES);
 
             lo.setArguments(args);
-            fman.beginTransaction().replace(R.id.fragment, lo).commit();
+            fman.beginTransaction().add(R.id.fragment, lo) // Add this transaction to the back stack (name is an optional name for this back stack state, or null).
+                    .addToBackStack(null).commit();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

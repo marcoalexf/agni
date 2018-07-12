@@ -341,7 +341,7 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
                 o_state.setText(" "+  getResources().getString(R.string.state_approved));
             else if (state.equals("ACCEPTED"))
                 o_state.setText(" " + getResources().getString(R.string.state_accepted));
-            else if(state.equals("RESOLVED"))
+            else if (state.equals("RESOLVED"))
                 o_state.setText(" "+  getResources().getString(R.string.state_resolved));
             else if (state.equals("CONCLUDED"))
                 o_state.setText(" "+  getResources().getString(R.string.state_concluded));

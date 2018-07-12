@@ -77,6 +77,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private static final String MEDIA_IDS = "mediaIDs";
     private static final String ID = "occurrence_id";
     private static final String USER_ID = "userID";
+    private static final String STATE = "state";
     private static final int QUERY_LIMIT = 100;
 
     private GoogleMap map;
@@ -415,9 +416,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             args.putSerializable(ID, Long.parseLong((String) entry.get("occurrenceID")));
             args.putSerializable(USER_ID, Long.parseLong((String)entry.get("userID")) );
             args.putSerializable(TOKEN, token);
-
+            args.putSerializable(STATE, (String) entry.get("user_occurrence_status"));
             od.setArguments(args);
-            fman.beginTransaction().replace(R.id.fragment, od).commit();
+            fman.beginTransaction().add(R.id.fragment, od) // Add this transaction to the back stack (name is an optional name for this back stack state, or null).
+                    .addToBackStack(null).commit();
         }else {
             Toast toast = Toast.makeText(getActivity(), "entrada nula" , Toast.LENGTH_SHORT);
             toast.show();
