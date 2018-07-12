@@ -1,0 +1,7 @@
+Utilizador normal: 
+username: xico
+password: Password1+
+
+Trabalhador:
+username: XicoTrabalhador
+password: Password1+
