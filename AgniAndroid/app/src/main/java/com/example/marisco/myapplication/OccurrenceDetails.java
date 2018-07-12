@@ -435,7 +435,7 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
                             adapter = new ListAdapterComments(getContext(), comments, android.R.layout.simple_list_item_1);
                             comment_list.setAdapter(adapter);
                             putComments();
-                        }
+                        }else finishedComments = true;
                     }
                 }
                 else {
