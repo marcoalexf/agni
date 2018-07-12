@@ -56,6 +56,7 @@ public class SecurityManager {
 		modSet.add("verify_accepted_occurrence");
 		modSet.add("approve_user_occurrence");
 		modSet.add("see_approved_occurrences");
+		modSet.add("see_resolved_occurrences");
 		////////////////////////////////////////////
 		
 		//////////////// ADMIN /////////////////////
