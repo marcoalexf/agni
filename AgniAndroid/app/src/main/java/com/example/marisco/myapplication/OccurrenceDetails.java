@@ -481,7 +481,7 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
         newComment.put("comment_text", text);
         newComment.put("comment_date", new Date());
         newComment.put("comment_userID", Double.parseDouble(token.userID));
-        newComment.put("comment_author", token.username);
+        newComment.put("comment_username", token.username);
         comments.add(0, newComment);
         adapter = new ListAdapterComments(getContext(), comments, android.R.layout.simple_list_item_1);
         comment_list.setAdapter(adapter);

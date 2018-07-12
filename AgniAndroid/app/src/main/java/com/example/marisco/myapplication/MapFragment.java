@@ -159,8 +159,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mClusterManager.setOnClusterItemInfoWindowClickListener(new ClusterManager.OnClusterItemInfoWindowClickListener<MyItem>() {
             @Override
             public void onClusterItemInfoWindowClick(MyItem myItem) {
-                Toast toast = Toast.makeText(getActivity(), "titulo: " + myItem.getTitle(), Toast.LENGTH_SHORT);
-                toast.show();
                 if(myItem.getTitle().equals(getResources().getString(R.string.new_saved_location))){
                     saveLocationWindow();
                 }
@@ -169,11 +167,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
-
-        // Point the map's listeners at the listeners implemented by the cluster
-        // manager.
         map.setOnCameraIdleListener(mClusterManager);
         map.setOnMarkerClickListener(mClusterManager);
+        map.setOnInfoWindowClickListener(mClusterManager);
     }
 
     private void getSavedLocations(){
@@ -306,7 +302,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
-        map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+        /*map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
                 Toast toast = Toast.makeText(getActivity(), "map InfoWindow" , Toast.LENGTH_SHORT);
@@ -317,7 +313,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 else
                     listOccurrenceDetails(marker_list.get(marker));
             }
-        });
+        });*/
+
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
