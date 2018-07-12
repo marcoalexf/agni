@@ -26,7 +26,9 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.example.marisco.myapplication.constructors.CursorList;
+import com.example.marisco.myapplication.constructors.CustomRenderer;
 import com.example.marisco.myapplication.constructors.ListOccurrenceData;
+import com.example.marisco.myapplication.constructors.MyItem;
 import com.example.marisco.myapplication.constructors.SavedLocation;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -40,10 +42,12 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.VisibleRegion;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.google.maps.android.clustering.ClusterManager;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -80,12 +84,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @BindView(R.id.filters_button) ImageButton filter_button;
     @BindView(R.id.location_button) ImageButton location_button;
 
-    private List<Map<String, Object>> map_list;
+    private Map<String, Map<String, Object>> map_list;
     private Retrofit retrofit;
 
     private List<SavedLocation> savedLocations;
 
-    private Map<Marker, Map<String, Object>> marker_list;
+    private Map<MyItem, Map<String, Object>> marker_list;
 
     private Location initialLoc;
     private int minDifficulty;
@@ -97,6 +101,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private LayoutInflater inflater;
     private ViewGroup container;
 
+    private ClusterManager<MyItem> mClusterManager;
+
     public MapFragment() {
         minDifficulty = 1;
         cleanIsChecked = true;
@@ -104,7 +110,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         otherIsChecked = true;
         marker_list = new HashMap<>();
         savedLocations = new ArrayList<>(10);
-        map_list = new LinkedList<>();
+        map_list = new HashMap<>();
     }
 
     @Override
@@ -145,6 +151,31 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         return v;
     }
 
+    private void setUpClusterer() {
+
+        // Initialize the manager with the context and the map.
+        // (Activity extends context, so we can pass 'this' in the constructor.)
+        mClusterManager = new ClusterManager<>(getContext(), map);
+        mClusterManager.setOnClusterItemInfoWindowClickListener(new ClusterManager.OnClusterItemInfoWindowClickListener<MyItem>() {
+            @Override
+            public void onClusterItemInfoWindowClick(MyItem myItem) {
+                Toast toast = Toast.makeText(getActivity(), "titulo: " + myItem.getTitle(), Toast.LENGTH_SHORT);
+                toast.show();
+                if(myItem.getTitle().equals(getResources().getString(R.string.new_saved_location))){
+                    saveLocationWindow();
+                }
+                else
+                    listOccurrenceDetails(marker_list.get(myItem));
+            }
+        });
+
+
+        // Point the map's listeners at the listeners implemented by the cluster
+        // manager.
+        map.setOnCameraIdleListener(mClusterManager);
+        map.setOnMarkerClickListener(mClusterManager);
+    }
+
     private void getSavedLocations(){
         // load tasks from preference
         SharedPreferences prefs = this.getActivity().getSharedPreferences(SAVED_LOCATIONS, Context.MODE_PRIVATE);
@@ -167,6 +198,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                             if (initialLoc == null) {
                                 map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(),
                                         location.getLongitude()), 14));
+                            setUpClusterer();
                             }
                             initialLoc = location;
                         }
@@ -217,18 +249,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 public void onResponse(Call<CursorList> call, Response<CursorList> response) {
                     if (response.code() == 200) {
                         CursorList c = response.body();
-                        if(c.getMapList() != null)
-                            map_list.addAll(c.getMapList());
+                        /*if(cursor == null)
+                            if(c.getMapList() != null)
+                                map_list = c.getMapList();
+                        else{
+                            if(c.getMapList() != null)
+                                map_list.addAll(c.getMapList());
+                            }*/
                         cursor = c.getCursor();
                         if(!c.getMapList().isEmpty()) {
                             //Toast toast = Toast.makeText(getActivity(), "Ocorrências recebidas: " + map_list.size(), Toast.LENGTH_SHORT);
                             //toast.show();
                             putNewMarkers(c.getMapList());
                         }
+                        putInMapList(c.getMapList());
                     }
                     else {
                         Toast toast = Toast.makeText(getActivity(), "Failed to get public occurrences: " + response.code(), Toast.LENGTH_SHORT);
-                        //toast.show();
+                        toast.show();
                     }
                 }
                 public void onFailure(Call<CursorList> call, Throwable t) {
@@ -237,6 +275,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             });
         }
 
+    }
+
+    private void putInMapList(List<Map<String, Object>> list){
+        for(Map<String, Object> entry : list){
+            String s = (String) entry.get("occurrenceID");
+            if(map_list.get(s) == null)
+                map_list.put(s, entry);
+        }
     }
 
     @Override
@@ -254,6 +300,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public void onCameraMoveStarted(int i) {
                 cursor = null;
+                //if(mClusterManager != null)
+                  // mClusterManager.clearItems();
                 getOccurrences();
             }
         });
@@ -261,6 +309,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
+                Toast toast = Toast.makeText(getActivity(), "map InfoWindow" , Toast.LENGTH_SHORT);
+                toast.show();
                 if(marker.getTitle().equals(getResources().getString(R.string.new_saved_location))){
                     saveLocationWindow();
                 }
@@ -278,17 +328,23 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private void putAllMarkers(){
         //map.clear();
-
-        for(Map<String, Object> entry: map_list){
+        for (Map.Entry<String, Map<String, Object>> entry : map_list.entrySet()) {
+            Map<String, Object> p = entry.getValue();
+            if(isNotFiltered(p))
+                putMarker(p);
+        }
+        /*for(Map<String, Object> entry: map_list){
             if(isNotFiltered(entry))
                 putMarker(entry);
-        }
+        }*/
     }
 
     private void putNewMarkers(List<Map<String, Object>> newMarkers){
         for(Map<String, Object> entry: newMarkers){
-            if(isNotFiltered(entry))
+            String s = (String) entry.get("occurrenceID");
+            if(isNotFiltered(entry) &&  map_list.get(s) == null){
                 putMarker(entry);
+            }
         }
         if(newMarkers.size() == QUERY_LIMIT )
             getOccurrences();
@@ -311,9 +367,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         MarkerOptions mp = new MarkerOptions();
         mp.position(new LatLng((double)entry.get("user_occurrence_lat"), (double)entry.get("user_occurrence_lon")));
         mp.title((String) entry.get("user_occurrence_title"));
-        Marker m = map.addMarker(mp);
-
-        switch ((int) Math.round((double)entry.get("user_occurrence_level"))){
+        //Marker m = map.addMarker(mp);
+        /*switch ((int) Math.round((double)entry.get("user_occurrence_level"))){
             case 1:
                 m.setIcon(BitmapDescriptorFactory
                         .defaultMarker(130.0f));
@@ -334,8 +389,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 m.setIcon(BitmapDescriptorFactory
                         .defaultMarker(BitmapDescriptorFactory.HUE_RED));
                 break;
+        }*/
+
+        String level = ((int) Math.round((double)entry.get("user_occurrence_level"))) + "";
+        MyItem offsetItem = new MyItem(mp.getPosition().latitude, mp.getPosition().longitude, mp.getTitle(), level);
+        mClusterManager.addItem(offsetItem);
+        try {
+            mClusterManager.setRenderer(new CustomRenderer<>(getContext(), map, mClusterManager));
+        } catch (Exception e){
+            e.printStackTrace();
         }
-        marker_list.put(m, entry);
+        marker_list.put(offsetItem, entry);
     }
 
     private void listOccurrenceDetails( Map<String, Object> entry){
@@ -357,6 +421,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
             od.setArguments(args);
             fman.beginTransaction().replace(R.id.fragment, od).commit();
+        }else {
+            Toast toast = Toast.makeText(getActivity(), "entrada nula" , Toast.LENGTH_SHORT);
+            toast.show();
         }
     }
 
@@ -391,6 +458,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 zoneIsChecked = cb_zone.isChecked();
                 otherIsChecked = cb_other.isChecked();
                 map.clear();
+                mClusterManager.clearItems();
                 putAllMarkers();
                 popupWindow.dismiss();
             }
