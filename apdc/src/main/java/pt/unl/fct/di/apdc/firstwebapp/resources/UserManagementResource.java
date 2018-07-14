@@ -1,5 +1,9 @@
 package pt.unl.fct.di.apdc.firstwebapp.resources;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
@@ -10,17 +14,30 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
+import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.PropertyProjection;
+import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.QueryResultList;
 import com.google.appengine.api.datastore.Transaction;
+import com.google.appengine.api.datastore.Query.CompositeFilter;
+import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
+import com.google.appengine.api.datastore.Query.Filter;
+import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Query.FilterPredicate;
+import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.UserApprovalData;
+import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.UserListData;
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.UserModData;
+import pt.unl.fct.di.apdc.firstwebapp.util.CursorList;
 import pt.unl.fct.di.apdc.firstwebapp.util.SecurityManager;
 
 @Path("/backoffice")
@@ -30,6 +47,7 @@ public class UserManagementResource {
 	private static final Logger LOG = Logger.getLogger(UserManagementResource.class.getName());
 	private final Gson g = new Gson();
 	private static final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+	private static final int QUERY_LIMIT = 100;
 	
 	public UserManagementResource() { } //Nothing to be done here...
 	
@@ -209,6 +227,61 @@ public class UserManagementResource {
 				txn.rollback();
 			}
 		}
+	}
+	
+	@POST
+	@Path("/user")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response userList(UserListData data) {
+		if(!data.valid()) {
+			return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
+		}
+		LOG.fine("Attempt to users list by user: " + data.token.username);
+		if(!data.token.isTokenValid()) {
+			LOG.warning("Failed to get users list, token for user: " + data.token.username + "is invalid");
+			return Response.status(Status.FORBIDDEN).build();
+		}
+		if(!SecurityManager.userHasAccess("see_users_list", data.token.userID)) {
+			LOG.warning("Failed to get users list, user: " + data.token.username + " with id: " + data.token.userID + " does not have the rights to do it");
+			return Response.status(Status.FORBIDDEN).build();
+		}
+		
+		FetchOptions fetchOptions = FetchOptions.Builder.withLimit(QUERY_LIMIT);
+		if(data.cursor != null) {
+			fetchOptions.startCursor(Cursor.fromWebSafeString(data.cursor));
+		}
+		
+		List<Filter>subFilters = new LinkedList<Filter>();
+		
+		if(data.entity != null && !data.entity.isEmpty()) {
+			subFilters.add(new FilterPredicate("user_entity", FilterOperator.EQUAL, data.entity));
+		}
+		if(data.role != null && !data.role.isEmpty()) {
+			subFilters.add(new FilterPredicate("user_role", FilterOperator.EQUAL, data.role));
+		}
+		if(data.waitingModApproval == true) {
+			subFilters.add(new FilterPredicate("user_waiting_worker_approval", FilterOperator.EQUAL, data.waitingModApproval));
+		}
+		
+		CompositeFilter compositeFilter = CompositeFilterOperator.and(subFilters);
+		Query ctrQuery = new Query("ResolvedOccurrence").setFilter(compositeFilter).addSort("user_creation_time", SortDirection.DESCENDING);
+		ctrQuery.addProjection(new PropertyProjection("user_username", String.class));
+		ctrQuery.addProjection(new PropertyProjection("user_name", String.class));
+		QueryResultList<Entity> results = datastore.prepare(ctrQuery).asQueryResultList(fetchOptions);
+		
+		List<Map<String, Object>> users = new LinkedList<Map<String, Object>>();
+		Map<String, Object> userMap;
+		long userID;
+		for(Entity userEntity: results) {
+			userID = userEntity.getKey().getId();
+			userMap = new HashMap<String, Object>();
+			userMap.putAll(userEntity.getProperties());
+			userMap.put("userID", userID);
+			users.add(userMap);
+		}
+		CursorList cursorList = new CursorList(results.getCursor().toWebSafeString(), users);
+		LOG.info("List of users sent");
+		return Response.ok(g.toJson(cursorList)).build();
 	}
 
 }

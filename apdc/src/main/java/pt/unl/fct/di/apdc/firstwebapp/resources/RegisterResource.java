@@ -45,7 +45,7 @@ public class RegisterResource {
 			return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
 		}
 		
-		if(!data.password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{6,}$")) {
+		if(!data.password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[\\Q!@#$%^&*()_+\\=-[]{};':\"|,.<>/?¨»«£§\\E])(?=\\S+$).{6,}$")) {
 			return Response.status(Status.BAD_REQUEST).entity("New password should have atleast a number, a lower case char, a upper case char, a special char and no spaces.").build();
 		}
 		

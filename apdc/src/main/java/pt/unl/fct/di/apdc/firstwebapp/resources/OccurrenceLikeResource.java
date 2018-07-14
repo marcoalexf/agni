@@ -26,6 +26,8 @@ import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Transaction;
 import com.google.appengine.api.datastore.TransactionOptions;
+import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.datastore.QueryResultList;
 import com.google.gson.Gson;
@@ -69,13 +71,15 @@ public class OccurrenceLikeResource {
 			datastore.get(txn, occurrenceKey);
 			
 			Key userKey = KeyFactory.createKey("User", data.token.userID);
-			Key likeKey = KeyFactory.createKey(userKey, "UserOccurrenceLike", KeyFactory.keyToString(occurrenceKey));
+			String occurrenceKeyString = KeyFactory.keyToString(occurrenceKey);
+			Key likeKey = KeyFactory.createKey(userKey, "UserOccurrenceLike", occurrenceKeyString);
 			try {
 				datastore.get(likeKey);
 				datastore.delete(likeKey);
 			} catch (EntityNotFoundException e) {
 				Entity likeEntity = new Entity(likeKey);
 				likeEntity.setProperty("like_date", new Date());
+				likeEntity.setProperty("like_occurrenceID", occurrenceKeyString);
 				datastore.put(likeEntity);
 			}
 			
@@ -163,7 +167,8 @@ public class OccurrenceLikeResource {
 			// Check occurrence existence
 			datastore.get(occurrenceKey);
 			
-			Query ctrQuery = new Query("UserOccurrenceLike").setKeysOnly();
+			FilterPredicate filter = new FilterPredicate("like_occurrenceID", FilterOperator.EQUAL, KeyFactory.keyToString(occurrenceKey));
+			Query ctrQuery = new Query("UserOccurrenceLike").setFilter(filter).setKeysOnly();
 			int count = datastore.prepare(ctrQuery).countEntities();
 			
 			LOG.info("Like count from occurrence with id " + data.occurrenceID + " sent");
