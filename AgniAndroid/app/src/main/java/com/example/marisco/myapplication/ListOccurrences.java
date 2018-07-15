@@ -74,6 +74,14 @@ public class ListOccurrences extends Fragment implements AbsListView.OnScrollLis
             this.token = (LoginResponse) b.getSerializable(TOKEN);
             this.mode = (String)b.getSerializable(MODE);
         }
+        if(mode == null)
+            ((HomePage) getActivity()).setActionBarTitle(getResources().getString(R.string.list_occurrences));
+        else if(mode.equals(LIKED_OCCURRENCES))
+            ((HomePage) getActivity()).setActionBarTitle(getResources().getString(R.string.supported_occurrences));
+        else if(mode.equals(REGISTERED_OCCURRENCES))
+            ((HomePage) getActivity()).setActionBarTitle(getResources().getString(R.string.registered_occurrences));
+        else if(mode.equals(ACCEPTED_OCCURRENCES))
+            ((HomePage) getActivity()).setActionBarTitle(getResources().getString(R.string.accepted_occurrences));
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener()
         {

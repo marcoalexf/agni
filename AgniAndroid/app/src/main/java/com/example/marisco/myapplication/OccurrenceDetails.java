@@ -129,7 +129,7 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
+        ((HomePage) getActivity()).setActionBarTitle(getResources().getString(R.string.occurrence_details));
         View v = inflater.inflate(R.layout.detail_occurrence, container, false);
         ButterKnife.bind(this, v);
         Bundle b = this.getArguments();
@@ -242,6 +242,16 @@ public class OccurrenceDetails extends Fragment implements OnMapReadyCallback {
             }
         });
         return v;
+    }
+
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        Toast toast = Toast.makeText(getActivity(), "Tou no setUserVisibleHint", Toast.LENGTH_SHORT);
+        toast.show();
+        if(isVisibleToUser) {
+            // Set title
+            ((HomePage) getActivity()).setActionBarTitle(getResources().getString(R.string.occurrence_details));
+        }
     }
 
     private void checkUserType(){

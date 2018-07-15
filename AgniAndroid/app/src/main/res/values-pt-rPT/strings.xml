@@ -100,4 +100,9 @@
 
     <string name="edit">Editar</string>
 
+    <string name="supported_occurrences">Ocorrências apoiadas</string>
+    <string name="registered_occurrences">Ocorrências registadas</string>
+
+    <string name="occurrence_details">Detalhes da ocorrência</string>
+
 </resources>

@@ -123,6 +123,7 @@ public class OccurrenceFragment extends Fragment implements OnMapReadyCallback {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        ((HomePage) getActivity()).setActionBarTitle(getResources().getString(R.string.register_occurrence));
         View v = inflater.inflate(R.layout.fragment_occurrence, container, false);
         ButterKnife.bind(this, v);
         Bundle b = this.getArguments();

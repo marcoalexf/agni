@@ -117,6 +117,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        ((HomePage) getActivity()).setActionBarTitle(getResources().getString(R.string.map));
         savedLocations = new ArrayList<>(10);
 
         Bundle b = this.getArguments();
@@ -418,7 +419,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             args.putSerializable(TOKEN, token);
             args.putSerializable(STATE, (String) entry.get("user_occurrence_status"));
             od.setArguments(args);
-            fman.beginTransaction().add(R.id.fragment, od) // Add this transaction to the back stack (name is an optional name for this back stack state, or null).
+            fman.beginTransaction().add(R.id.fragment, od,  getResources().getString(R.string.occurrence_details)) // Add this transaction to the back stack (name is an optional name for this back stack state, or null).
                     .addToBackStack(null).commit();
         }else {
             Toast toast = Toast.makeText(getActivity(), "entrada nula" , Toast.LENGTH_SHORT);

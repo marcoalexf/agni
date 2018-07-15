@@ -102,7 +102,7 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
+        ((HomePage) getActivity()).setActionBarTitle(getResources().getString(R.string.profile));
         View v = inflater.inflate(R.layout.modern_profile_fragment, container, false);
         ButterKnife.bind(this, v);
         Bundle b = this.getArguments();
@@ -146,7 +146,8 @@ public class ProfileFragment extends Fragment {
                 args.putSerializable(TOKEN, token);
                 args.putSerializable(MODE, REGISTERED_OCCURRENCES);
                 od.setArguments(args);
-                fman.beginTransaction().replace(R.id.fragment, od).commit();
+                fman.beginTransaction().add(R.id.fragment, od, getResources().getString(R.string.list_occurrences)) // Add this transaction to the back stack (name is an optional name for this back stack state, or null).
+                        .addToBackStack(null).commit();
             }
         });
 
@@ -159,7 +160,8 @@ public class ProfileFragment extends Fragment {
                 args.putSerializable(TOKEN, token);
                 args.putSerializable(MODE, LIKED_OCCURRENCES);
                 od.setArguments(args);
-                fman.beginTransaction().replace(R.id.fragment, od).commit();
+                fman.beginTransaction().add(R.id.fragment, od, getResources().getString(R.string.list_occurrences)) // Add this transaction to the back stack (name is an optional name for this back stack state, or null).
+                        .addToBackStack(null).commit();
             }
         });
         edit_photo.setOnClickListener( new View.OnClickListener(){

@@ -120,4 +120,9 @@
     <string name="title_activity_help_menu">HelpMenu</string>
     <string name="section_format">Hello World from section: %1$d</string>
 
+    <string name="supported_occurrences">Supported occurrences</string>
+    <string name="registered_occurrences">Registered occurrences</string>
+
+    <string name="occurrence_details">Occurrence details</string>
+
 </resources>

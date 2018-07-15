@@ -11,6 +11,7 @@ import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.FileProvider;
 import android.support.v4.view.GravityCompat;
@@ -242,12 +243,61 @@ public class HomePage extends AppCompatActivity
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else if (getFragmentManager().getBackStackEntryCount() > 0) {
             getFragmentManager().popBackStackImmediate();
         }  else {
             super.onBackPressed();
+        }
+
+        final ProfileFragment fragment = (ProfileFragment) getSupportFragmentManager()
+                .findFragmentByTag(getResources().getString(R.string.profile));
+        if(fragment!= null){
+            if(fragment.isResumed()){
+                setActionBarTitle(getResources().getString(R.string.profile));return;
+            }
+        }
+        final OccurrenceFragment fragment2 = (OccurrenceFragment) getSupportFragmentManager()
+                .findFragmentByTag(getResources().getString(R.string.register_occurrence));
+        if(fragment2!= null){
+            if(fragment2.isResumed()){
+                setActionBarTitle(getResources().getString(R.string.register_occurrence));return;
+            }
+        }
+
+        final MapFragment fragment3 = (MapFragment) getSupportFragmentManager()
+                .findFragmentByTag(getResources().getString(R.string.map));
+        if(fragment3!= null){
+            if(fragment3.isResumed()){
+                setActionBarTitle(getResources().getString(R.string.map));return;
+            }
+        }
+
+        final ListOccurrences fragment4 = (ListOccurrences) getSupportFragmentManager()
+                .findFragmentByTag(getResources().getString(R.string.list_occurrences));
+        if(fragment4!= null){
+            if(fragment4.isResumed()){
+                setActionBarTitle(getResources().getString(R.string.list_occurrences));return;
+            }
+        }
+
+        final ListOccurrences fragment5 = (ListOccurrences) getSupportFragmentManager()
+                .findFragmentByTag(getResources().getString(R.string.accepted_occurrences));
+        if(fragment5!= null){
+            if(fragment5.isResumed()){
+                setActionBarTitle(getResources().getString(R.string.accepted_occurrences));return;
+            }
+        }
+
+        final OccurrenceDetails fragment6 = (OccurrenceDetails) getSupportFragmentManager()
+                .findFragmentByTag(getResources().getString(R.string.occurrence_details));
+        if(fragment6!= null){
+            if(fragment5.isResumed()){
+                setActionBarTitle(getResources().getString(R.string.occurrence_details));return;
+            }
         }
     }
 
@@ -298,7 +348,7 @@ public class HomePage extends AppCompatActivity
             args.putSerializable(TOKEN, token);
             profile.setArguments(args);
 
-            fman.beginTransaction().add(R.id.fragment, profile) // Add this transaction to the back stack (name is an optional name for this back stack state, or null).
+            fman.beginTransaction().add(R.id.fragment, profile, getResources().getString(R.string.profile)) // Add this transaction to the back stack (name is an optional name for this back stack state, or null).
                     .addToBackStack(null).commit();
         } else if (id == R.id.nav_occurencies) {
             setTitle(R.string.register_occurrence);
@@ -309,7 +359,7 @@ public class HomePage extends AppCompatActivity
             args.putSerializable(TOKEN, token);
 
             of.setArguments(args);
-            fman.beginTransaction().add(R.id.fragment, of) // Add this transaction to the back stack (name is an optional name for this back stack state, or null).
+            fman.beginTransaction().add(R.id.fragment, of, getResources().getString(R.string.register_occurrence)) // Add this transaction to the back stack (name is an optional name for this back stack state, or null).
                     .addToBackStack(null).commit();
         } else if (id == R.id.nav_map) {
             setTitle(R.string.map);
@@ -320,7 +370,7 @@ public class HomePage extends AppCompatActivity
             args.putSerializable(TOKEN, token);
 
             map.setArguments(args);
-            fman.beginTransaction().add(R.id.fragment, map) // Add this transaction to the back stack (name is an optional name for this back stack state, or null).
+            fman.beginTransaction().add(R.id.fragment, map, getResources().getString(R.string.map)) // Add this transaction to the back stack (name is an optional name for this back stack state, or null).
                     .addToBackStack(null).commit();
         } else if (id == R.id.nav_view) {
 
@@ -334,7 +384,7 @@ public class HomePage extends AppCompatActivity
             args.putSerializable(TOKEN, token);
 
             lo.setArguments(args);
-            fman.beginTransaction().add(R.id.fragment, lo) // Add this transaction to the back stack (name is an optional name for this back stack state, or null).
+            fman.beginTransaction().add(R.id.fragment, lo, getResources().getString(R.string.list_occurrences)) // Add this transaction to the back stack (name is an optional name for this back stack state, or null).
                     .addToBackStack(null).commit();
         }else if(id == R.id.help_menu){
             setTitle("Help");
@@ -352,7 +402,7 @@ public class HomePage extends AppCompatActivity
             args.putSerializable(MODE, ACCEPTED_OCCURRENCES);
 
             lo.setArguments(args);
-            fman.beginTransaction().add(R.id.fragment, lo) // Add this transaction to the back stack (name is an optional name for this back stack state, or null).
+            fman.beginTransaction().add(R.id.fragment, lo, getResources().getString(R.string.accepted_occurrences)) // Add this transaction to the back stack (name is an optional name for this back stack state, or null).
                     .addToBackStack(null).commit();
         }
 
@@ -375,5 +425,11 @@ public class HomePage extends AppCompatActivity
         // Save a file: path for use with ACTION_VIEW intents
         mCurrentPhotoPath = image.getAbsolutePath();
         return image;
+    }
+
+
+
+    public void setActionBarTitle(String title) {
+        getSupportActionBar().setTitle(title);
     }
 }
