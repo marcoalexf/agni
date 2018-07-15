@@ -304,7 +304,8 @@ public class OccurrenceManagementResource {
 			LOG.warning("Failed to conclude occurrence, user: " + data.token.username + " with id: " + data.token.userID + " does not have the rights to do it");
 			return Response.status(Status.FORBIDDEN).build();
 		}
-		Transaction txn = datastore.beginTransaction();
+		TransactionOptions options = TransactionOptions.Builder.withXG(true);
+		Transaction txn = datastore.beginTransaction(options);
 		try {
 			Key userOccurrenceKey = KeyFactory.createKey("User", data.userID);
 			Key occurrenceKey = KeyFactory.createKey(userOccurrenceKey, "UserOccurrence", data.occurrenceID);
@@ -359,7 +360,8 @@ public class OccurrenceManagementResource {
 		Key userOccurrenceKey = KeyFactory.createKey("User", data.userID);
 		Key occurrenceKey = KeyFactory.createKey(userOccurrenceKey, "UserOccurrence", data.occurrenceID);
 		
-		Transaction txn = datastore.beginTransaction();	
+		TransactionOptions options = TransactionOptions.Builder.withXG(true);
+		Transaction txn = datastore.beginTransaction(options);	
 		try {	
 			Key resolvedKey = KeyFactory.createKey("ResolvedOccurrence", KeyFactory.keyToString(occurrenceKey));
 			
@@ -425,7 +427,7 @@ public class OccurrenceManagementResource {
 			fetchOptions.startCursor(Cursor.fromWebSafeString(data.cursor));
 		}
 		FilterPredicate filter = new FilterPredicate("approved_occurrence_entity", FilterOperator.EQUAL, data.entity);
-		Query ctrQuery = new Query("ApprovedOccurrence").setFilter(filter).addSort("accepted_occurrence_date", SortDirection.DESCENDING);
+		Query ctrQuery = new Query("ApprovedOccurrence").setFilter(filter).addSort("approved_occurrence_date", SortDirection.DESCENDING);
 		QueryResultList<Entity> results = datastore.prepare(ctrQuery).asQueryResultList(fetchOptions);
 		
 		List<Map<String, Object>> occurrences = new LinkedList<Map<String, Object>>();

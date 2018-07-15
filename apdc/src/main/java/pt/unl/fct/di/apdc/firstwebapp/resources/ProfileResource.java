@@ -160,7 +160,7 @@ public class ProfileResource {
 			}
 			if(data.password != null && !data.password.isEmpty() && data.newPassword != null && !data.newPassword.isEmpty()) {
 				if(((String)(user.getProperty("user_pwd"))).equals(DigestUtils.sha256Hex(data.password))) {
-					if(data.newPassword.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{6,}$")) {
+					if(data.newPassword.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[\\Q!@#$%^&*()_+\\=-[]{};':\"|,.<>/?¨»«£§\\E])(?=\\S+$).{6,}$")) {
 						user.setProperty("user_pwd", DigestUtils.sha256Hex(data.newPassword));
 					}
 					else {

@@ -37,4 +37,12 @@
         <property name="resolved_occurrence_userID" direction="asc"/>
         <property name="resolved_occurrence_date" direction="desc"/>
     </datastore-index>
+    <datastore-index kind="ApprovedOccurrence" ancestor="false" source="manual">
+        <property name="approved_occurrence_entity" direction="asc"/>
+        <property name="approved_occurrence_date" direction="desc"/>
+    </datastore-index>
+    <datastore-index kind="ResolvedOccurrence" ancestor="false" source="manual">
+        <property name="resolved_occurrence_entity" direction="asc"/>
+        <property name="resolved_occurrence_date" direction="desc"/>
+    </datastore-index>
 </datastore-indexes>
