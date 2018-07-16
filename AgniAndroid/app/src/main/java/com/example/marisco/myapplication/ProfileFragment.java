@@ -87,8 +87,8 @@ public class ProfileFragment extends Fragment {
     @BindView(R.id.edit_photo) ImageButton edit_photo;
     @BindView(R.id.btnSave) Button save_button;
     @BindView(R.id.btnCancelSave) Button cancel_button;
-    @BindView(R.id.occurrences_img)ImageView occurrences_img;
-    @BindView(R.id.liked_occurrences_img)ImageView liked_occurrences_img;
+    @BindView(R.id.registered_occurrences_btn)Button registered_occurrences_btn;
+    @BindView(R.id.liked_occurrences_btn)Button liked_occurrences_btn;
     @BindView(R.id.liked_occurrences_number)TextView liked_occurrences_number;
     @BindView(R.id.registered_occurrences_number)TextView registered_occurrences_number;
     @BindView(R.id.new_password) EditText new_password;
@@ -136,8 +136,7 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        occurrences_img.setClickable(true);
-        occurrences_img.setOnClickListener( new View.OnClickListener(){
+        registered_occurrences_btn.setOnClickListener( new View.OnClickListener(){
             public void onClick(View v) {
 
                 ListOccurrences od = new ListOccurrences();
@@ -151,8 +150,7 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        liked_occurrences_img.setClickable(true);
-        liked_occurrences_img.setOnClickListener( new View.OnClickListener(){
+        liked_occurrences_btn.setOnClickListener( new View.OnClickListener(){
             public void onClick(View v) {
                 ListOccurrences od = new ListOccurrences();
                 FragmentManager fman = getFragmentManager();

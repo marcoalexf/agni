@@ -31,6 +31,10 @@
         <item>Worker</item>
     </string-array>
 
+    <string-array name="worker_types">
+        <item>Civil Protection</item>
+        <item>Firefighter</item>
+    </string-array>
 
     <string name="forgotten_password">Forgot your password?</string>
     <string name="remember_credencials">Remember credentials</string>
@@ -124,5 +128,9 @@
     <string name="registered_occurrences">Registered occurrences</string>
 
     <string name="occurrence_details">Occurrence details</string>
+
+    <string name="county">County</string>
+    <string name="locality">Locality</string>
+    <string name="district">District</string>
 
 </resources>

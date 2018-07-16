@@ -127,7 +127,7 @@
                 android:id="@+id/locality"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Localidade"
+                android:hint="@string/locality"
                 android:imeActionId="6"
                 android:imeActionLabel="@string/action_sign_in"
                 android:imeOptions="actionUnspecified"
@@ -144,7 +144,7 @@
                 android:id="@+id/county"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Concelho"
+                android:hint="@string/county"
                 android:imeActionId="6"
                 android:imeActionLabel="@string/action_sign_in"
                 android:imeOptions="actionUnspecified"
@@ -161,7 +161,7 @@
                 android:id="@+id/district"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Distrito"
+                android:hint="@string/district"
                 android:imeActionId="6"
                 android:imeActionLabel="@string/action_sign_in"
                 android:imeOptions="actionUnspecified"
@@ -175,6 +175,12 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content" />
 
+            <Spinner
+                android:id="@+id/spinner_worker_type"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"/>
+
             <Button
                 android:id="@+id/register_button"
                 style="?android:textAppearanceSmall"
@@ -182,7 +188,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="@string/action_register"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:background="@color/colorAccent"
+                android:textColor="@android:color/white"/>
 
         </LinearLayout>
     </ScrollView>

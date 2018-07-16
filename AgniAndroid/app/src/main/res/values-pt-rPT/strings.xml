@@ -31,9 +31,16 @@
     <string name="prompt_county">Concelho</string>
     <string name="prompt_district">Distrito</string>
     <string-array name="user_types">
-        <item>Civil</item>
+        <item>Utilizador</item>
         <item>Trabalhador</item>
     </string-array>
+
+    <string-array name="worker_types">
+        <item>Proteção Civil</item>
+        <item>Bombeiro</item>
+    </string-array>
+
+
 
     <!--Profile info-->
     <string name="profile">Perfil</string>
@@ -103,6 +110,7 @@
     <string name="supported_occurrences">Ocorrências apoiadas</string>
     <string name="registered_occurrences">Ocorrências registadas</string>
 
-    <string name="occurrence_details">Detalhes da ocorrência</string>
-
+    <string name="county">Concelho</string>
+    <string name="locality">Localidade</string>
+    <string name="district">Distrito</string>
 </resources>

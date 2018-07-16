@@ -113,35 +113,37 @@
             android:clickable="true"
             android:padding="@dimen/activity_horizontal_margin">
 
-            <ImageView
-                android:id="@+id/liked_occurrences_img"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/ic_baseline_favorite_24px" />
+            <Button
+                android:id="@+id/liked_occurrences_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/supported_occurrences" />
 
             <TextView
                 android:id="@+id/registered_occurrences_number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:layout_toRightOf="@id/occurrences_img"
-                android:layout_below="@id/liked_occurrences_img"
+                android:layout_marginTop="8dp"
+                android:layout_toRightOf="@id/registered_occurrences_btn"
+                android:layout_below="@id/liked_occurrences_btn"
                 android:textColor="@color/colorPrimaryDark"
                 android:textSize="20sp"/>
 
-            <ImageView
-                android:id="@+id/occurrences_img"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_below="@id/liked_occurrences_img"
-                android:src="@drawable/ic_baseline_warning_24px" />
+            <Button
+                android:id="@+id/registered_occurrences_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/liked_occurrences_btn"
+                android:text="@string/registered_occurrences"/>
 
             <TextView
                 android:id="@+id/liked_occurrences_number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:layout_toRightOf="@id/occurrences_img"
+                android:layout_marginTop="8dp"
+                android:layout_toRightOf="@id/registered_occurrences_btn"
                 android:textColor="@color/colorPrimaryDark"
                 android:textSize="20sp"/>
 
@@ -237,7 +239,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_toEndOf="@id/ivContactItem5"
                 android:layout_toRightOf="@id/ivContactItem5"
-                android:text="Locality"
+                android:text="@string/locality"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
                 android:textColor="#727272" />
 
@@ -282,7 +284,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_toEndOf="@id/ivContactItem6"
                 android:layout_toRightOf="@id/ivContactItem6"
-                android:text="County"
+                android:text="@string/county"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
                 android:textColor="#727272" />
 
@@ -327,7 +329,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_toEndOf="@id/ivContactItem7"
                 android:layout_toRightOf="@id/ivContactItem7"
-                android:text="District"
+                android:text="@string/district"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
                 android:textColor="#727272" />
 
@@ -368,7 +370,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@drawable/filter_button"
-                android:text="@string/save"></Button>
+                android:text="@string/save"/>
 
             <Button
                 android:id="@+id/btnCancelSave"
@@ -376,7 +378,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@drawable/filter_button"
-                android:text="@string/cancel"></Button>
+                android:text="@string/cancel"/>
 
         </LinearLayout>
     </LinearLayout>

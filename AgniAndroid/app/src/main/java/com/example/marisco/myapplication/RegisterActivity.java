@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -35,6 +36,8 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
     public static final String ENDPOINT = "https://custom-tine-204615.appspot.com/rest/";
     public static final String USER = "USER";
     public static final String WORKER = "WORKER";
+    public static final String CIVIL_PROTECTION = "PROTEÇÃO CIVIL";
+    public static final String FIREFIGHTERS = "BOMBEIROS";
     private View mProgressView;
     private View mRegisterFormView;
     Retrofit retrofit;
@@ -46,6 +49,7 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
     @BindView(R.id.passwordConf) EditText password_confirmation;
     @BindView(R.id.register_button) Button register_button;
     @BindView(R.id.spinner_user_type) Spinner spinner_user_type;
+    @BindView(R.id.spinner_worker_type) Spinner spinner_worker_type;
     @BindView(R.id.county) EditText county_input;
     @BindView(R.id.district) EditText district_input;
     @BindView(R.id.locality) EditText locality_input;
@@ -72,6 +76,27 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
         spinner_user_type.setAdapter(adapter);
+
+        ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(this,
+                R.array.worker_types, android.R.layout.simple_spinner_item);
+        adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner_worker_type.setAdapter(adapter2);
+
+        spinner_user_type.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+                if(arg2 == 0)
+                    spinner_worker_type.setVisibility(View.GONE);
+                else spinner_worker_type.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+
+            }
+
+        });
     }
 
     /*private void populateAutoComplete() {
@@ -218,7 +243,7 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
     }
 
     private boolean isPasswordValid(String password) {
-        return password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{6,}$");
+        return password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[\\Q!@#$%^&*()_+\\=-[]{};:'\"|,.<>/?¨»«£§\\E])(?=\\S+$).{6,}$");
     }
 
     private void registerUser(){
@@ -230,7 +255,18 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
         String district = district_input.getText().toString();
         String county = county_input.getText().toString();
         String type = spinner_user_type.getSelectedItem().toString();
+        String entity = null;
 
+        if(spinner_user_type.getSelectedItemPosition() == 1){
+            if(spinner_worker_type.getSelectedItemPosition() == 0)
+                entity = CIVIL_PROTECTION;
+            else if (spinner_worker_type.getSelectedItemPosition() == 1)
+                entity = FIREFIGHTERS;
+        }
+
+        Toast toast2 = Toast.makeText(getApplicationContext(), "Entidade: " + entity
+                , Toast.LENGTH_SHORT);
+        toast2.show();
 
         if (retrofit == null) {
             retrofit = new Retrofit.Builder()
@@ -243,9 +279,9 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
         String [] users = getResources().getStringArray(R.array.user_types);
         UserRegister user;
         if(type.equals(users[0]))
-            user = new UserRegister(name, username, password, email, USER, locality, county, district);
+            user = new UserRegister(name, username, password, email, USER, locality, county, district, entity);
         else
-            user = new UserRegister(name, username, password, email, WORKER, locality, county, district);
+            user = new UserRegister(name, username, password, email, WORKER, locality, county, district, entity);
 
         Call<ResponseBody> call = agniAPI.registerUser(user);
 
@@ -259,7 +295,7 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
                     finish();
                 }
                 else{
-                    Toast toast = Toast.makeText(getApplicationContext(), "Registo falhado", Toast.LENGTH_SHORT);
+                    Toast toast = Toast.makeText(getApplicationContext(), "Registo falhado: " + response.code(), Toast.LENGTH_SHORT);
                     toast.show();
                 }
             }

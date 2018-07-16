@@ -18,6 +18,8 @@ public class ProfileResponse {
 
     @SerializedName("user_locality") private String locality;
 
+    @SerializedName("user_entity") private String entity;
+
     public String getName() {
         return name;
     }
@@ -73,4 +75,13 @@ public class ProfileResponse {
     public void setUsername(String username) {
         this.username = username;
     }
+
+    public String getEntity() {
+        return entity;
+    }
+
+    public void setEntity(String entity) {
+        this.entity = entity;
+    }
+
 }

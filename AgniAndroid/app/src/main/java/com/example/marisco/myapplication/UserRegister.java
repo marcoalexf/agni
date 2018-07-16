@@ -20,8 +20,10 @@ public class UserRegister{
 
     @SerializedName("password") private String password;
 
+    @SerializedName("entity") private String entity;
+
     public UserRegister(String name, String username, String password, String email, String role,
-                        String locality, String county, String district){
+                        String locality, String county, String district, String entity){
         this.username = username;
         this.password = password;
         this.email = email;
@@ -30,7 +32,17 @@ public class UserRegister{
         this.district = district;
         this.locality = locality;
         this.name = name;
+        this.entity = entity;
     }
+
+    public String getEntity() {
+        return entity;
+    }
+
+    public void setEntity(String entity) {
+        this.entity = entity;
+    }
+
 
     public String getUser_type() {
         return role;
