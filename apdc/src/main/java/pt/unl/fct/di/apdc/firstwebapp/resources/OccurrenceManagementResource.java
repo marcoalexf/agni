@@ -26,6 +26,8 @@ import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Transaction;
 import com.google.appengine.api.datastore.TransactionOptions;
+import com.google.appengine.api.datastore.Query.CompositeFilter;
+import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.Query.SortDirection;
@@ -88,6 +90,7 @@ public class OccurrenceManagementResource {
 			approvedEntity.setProperty("approved_occurrence_userID", data.token.userID);
 			approvedEntity.setProperty("approved_occurrence_date", new Date());
 			approvedEntity.setProperty("approved_occurrence_entity", (String)(datastore.get(txn, modKey).getProperty("user_entity")));
+			approvedEntity.setProperty("approved_occurrence_being_resolved", false);
 			
 			datastore.put(txn, approvedEntity);
 			txn.commit();
@@ -153,6 +156,10 @@ public class OccurrenceManagementResource {
 			acceptedEntity.setProperty("accepted_occurrence_entity", workerEntity);
 			
 			datastore.put(txn, acceptedEntity);
+			
+			approvedEntity.setProperty("approved_occurrence_being_resolved", true);
+			datastore.put(txn, approvedEntity);
+			
 			txn.commit();
 			LOG.info("User " + data.token.username + " with id " + data.token.userID + " accepted the occurrence with id: " + data.occurrenceID);
 			return Response.ok().build();
@@ -362,6 +369,8 @@ public class OccurrenceManagementResource {
 		
 		TransactionOptions options = TransactionOptions.Builder.withXG(true);
 		Transaction txn = datastore.beginTransaction(options);	
+		
+		Key approvedKey = KeyFactory.createKey("ApprovedOccurrence", KeyFactory.keyToString(occurrenceKey));
 		try {	
 			Key resolvedKey = KeyFactory.createKey("ResolvedOccurrence", KeyFactory.keyToString(occurrenceKey));
 			
@@ -374,6 +383,10 @@ public class OccurrenceManagementResource {
 			Entity occurrenceEntity = datastore.get(txn, occurrenceKey);
 			occurrenceEntity.setProperty("user_occurrence_status", "APPROVED");
 			datastore.put(txn, occurrenceEntity);
+			
+			Entity approvedEntity = datastore.get(txn, approvedKey);
+			approvedEntity.setProperty("approved_occurrence_being_resolved", false);
+			datastore.put(txn, approvedEntity);
 			
 			txn.commit();
 			LOG.info("User " + data.token.username + " rejected occurrence with id: " + data.occurrenceID);
@@ -391,6 +404,10 @@ public class OccurrenceManagementResource {
 				Entity occurrenceEntity = datastore.get(txn, occurrenceKey);
 				occurrenceEntity.setProperty("user_occurrence_status", "OPEN");
 				datastore.put(txn, occurrenceEntity);
+				
+				Entity approvedEntity = datastore.get(txn, approvedKey);
+				approvedEntity.setProperty("approved_occurrence_being_resolved", false);
+				datastore.put(txn, approvedEntity);
 				
 				txn.commit();
 				LOG.info("User " + data.token.username + " rejected occurrence with id: " + data.occurrenceID);
@@ -426,7 +443,9 @@ public class OccurrenceManagementResource {
 		if(data.cursor != null) {
 			fetchOptions.startCursor(Cursor.fromWebSafeString(data.cursor));
 		}
-		FilterPredicate filter = new FilterPredicate("approved_occurrence_entity", FilterOperator.EQUAL, data.entity);
+		FilterPredicate entityFilter = new FilterPredicate("approved_occurrence_entity", FilterOperator.EQUAL, data.entity);
+		FilterPredicate beingResolvedFilter = new FilterPredicate("approved_occurrence_being_resolved", FilterOperator.EQUAL, false);
+		CompositeFilter filter = CompositeFilterOperator.and(entityFilter, beingResolvedFilter);
 		Query ctrQuery = new Query("ApprovedOccurrence").setFilter(filter).addSort("approved_occurrence_date", SortDirection.DESCENDING);
 		QueryResultList<Entity> results = datastore.prepare(ctrQuery).asQueryResultList(fetchOptions);
 		
