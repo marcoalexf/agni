@@ -83,6 +83,7 @@ public class RegisterResource {
 				case "BOMBEIROS":
 					user.setProperty("user_entity", data.entity);
 					user.setProperty("user_waiting_worker_approval", true);
+					break;
 				default:
 					txn.rollback();
 					return Response.status(Status.BAD_REQUEST).entity("There is no such entity").build();
