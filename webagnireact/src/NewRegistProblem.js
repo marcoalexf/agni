@@ -22,6 +22,7 @@ import { FormLabel, FormControlLabel } from 'material-ui/Form';
 import Dialog, {DialogActions, DialogContent, DialogContentText, DialogTitle,} from 'material-ui/Dialog';
 import {withStyles} from "material-ui/styles/index";
 import GoogleMapReact from 'google-map-react';
+//import Marker from 'google-map-react';
 import {Link} from "react-router-dom";
 import Table, { TableBody, TableCell, TablePagination, TableHead, TableRow } from 'material-ui/Table';
 import Toolbar from 'material-ui/Toolbar';
@@ -32,9 +33,18 @@ import IconButton from 'material-ui/IconButton';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import PlacesAutocomplete from 'react-places-autocomplete';
 import { geocodeByAddress, geocodeByPlaceId, getLatLng } from 'react-places-autocomplete';
-import {SearchBox, Marker} from 'react-google-maps';
+import AddressIcon from '@material-ui/icons/Navigation';
+//import {SearchBox, Marker} from 'react-google-maps';
 import classNames from 'classnames';
 import './Maps.css';
+//import { EditControl } from './EditControl';
+import L from 'leaflet';
+import GpsIcon from '@material-ui/icons/LocationSearching';
+import {noAccess1, noAccess2, noAccess3, noAccess4, noAccess5} from './mapIcons';
+import {trash1, trash2, trash3, trash4, trash5} from "./mapIcons";
+import {greenIcon, redIcon, yellowIcon, ligthGreenIcon, orangeIcon} from "./mapIcons";
+import {cuttree1, cuttree2, cuttree3, cuttree4, cuttree5} from "./mapIcons";
+import { Map, TileLayer, Marker, Popup } from 'react-leaflet'
 
 const AnyReactComponent = ({ text }) => <div>{text}</div>;
 
@@ -88,6 +98,75 @@ const styles =  theme => ({
 
 });
 
+function getUserAddress() {
+    return new Promise( resolve => {
+        console.log("informations1");
+        var obj;
+        var token = window.localStorage.getItem('token');
+        var d = new Date();
+        var t = d.getTime();
+
+        if(token != null){
+            var uname = JSON.parse(token).username;
+            var tokenObj = JSON.parse(token);
+
+            var user = {
+                "username": uname,
+                "token": tokenObj
+            };
+
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.open( "POST", "https://custom-tine-204615.appspot.com/rest/profile/", true);
+            xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            var myJSON = JSON.stringify(user);
+            xmlHttp.send(myJSON);
+
+            xmlHttp.onreadystatechange = function() {
+                if (xmlHttp.readyState === XMLHttpRequest.DONE){
+                    if(xmlHttp.status === 200){
+                        console.log("informations2");
+                        var response = xmlHttp.response;
+                        console.log("XML response: " + response);
+                        obj = JSON.parse(response);
+                        console.log(obj);
+
+                        console.log(uname.charAt(0));
+
+                        resolve(obj.user_locality);
+                    }
+
+                    else{
+                        console.log("erro");
+                        var expirationData = JSON.parse(token).expirationData;
+                        console.log(token);
+                        console.log("tempo atual: " + t);
+                        console.log("data de expiracao: " + expirationData);
+                        if(expirationData <= t){
+                            console.log("tempo expirado");
+                            window.localStorage.removeItem('token');
+                            document.getElementById("tologin").click();
+                        }
+                    }
+                }
+            }.bind(this)
+        }
+        else{
+            console.log("Sem sessao iniciada");
+            // document.getElementById("tologin").click();
+
+        }
+    });
+}
+
+function getUserAddressLatLng(a){
+    return new Promise(resolve =>{
+        geocodeByAddress(a).then(results => getLatLng(results[0]))
+            //.then(latLng => console.log("Success", latLng))
+            .then(latLng => resolve(latLng))
+            .catch(error => console.error('Error', error));
+    })
+}
+
 let EnhancedTableToolbar = props => {
     const { classes } = props;
 
@@ -122,6 +201,13 @@ EnhancedTableToolbar.propTypes = {
 
 EnhancedTableToolbar = withStyles(styles)(EnhancedTableToolbar);
 
+function loadJS(src) {
+    var ref = window.document.getElementsByTagName("script")[0];
+    var script = window.document.createElement("script");
+    script.src = src;
+    script.async = true;
+    ref.parentNode.insertBefore(script, ref);
+}
 
 class NewRegistProblem extends React.Component {
 
@@ -154,14 +240,45 @@ class NewRegistProblem extends React.Component {
         imagePreviewUrl: '',
         address: '',
         nUploads: 0,
+        userLocality: '',
+        userLatLng: {
+            lat: 0,
+            lng: 0,
+        },
     };
 }
 
-    componentDidMount(){
+    async componentDidMount(){
         var token = window.localStorage.getItem('token');
 
         if(token != null){
-            this.getLocation();
+            let a = await getUserAddress();
+            if(a != null){
+                this.setState({userLocality: a});
+                // geocodeByAddress(a)
+                //     .then(results => getLatLng(results[0]))
+                //     //.then(latLng => this.setState({userLatLng: latLng}), console.log(this.state.userLatLng))
+                //     .then(latLng => new Promise(console.log("Success", latLng)))
+                //     //.then(latLng => this.setState({userLatLng: latLng}), console.log(this.state.userLatLng))
+                //     .catch(error => console.error('Error', error));
+                let b = await getUserAddressLatLng(a);
+                this.setState({userLatLng:{
+                        lat: b.lat,
+                        lng: b.lng
+                    } });
+                console.log(b);
+                console.log(this.state.userLatLng);
+                console.log(this.state.userLocality);
+
+                this.getLocation();
+            }
+
+            else{
+                this.getLocation();
+            }
+            //this.initMap();
+            // Asynchronously load the Google Maps script, passing in the callback reference
+            //loadJS('https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap');
         }
 
         else{
@@ -169,7 +286,41 @@ class NewRegistProblem extends React.Component {
         }
     }
 
-    getLocation() {
+    initMap () {
+        // var map = L.map('map').setView([this.state.myLatLng.lat, this.state.myLatLng.lng], 14);
+        // L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        //     attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        // }).addTo(map);
+        // var marker = L.marker([this.state.myLatLng.lat, this.state.myLatLng.lng]).addTo(map);
+        // mapLink =
+        //     '<a href="http://openstreetmap.org">OpenStreetMap</a>';
+        // L.tileLayer(
+        //     'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        //         attribution: '&copy; ' + mapLink + ' Contributors',
+        //         maxZoom: 18,
+        //     }).addTo(map);
+
+        // var drawnItems = new L.FeatureGroup();
+        // map.addLayer(drawnItems);
+        //
+        // var drawControl = new L.Control.Draw({
+        //     edit: {
+        //         featureGroup: drawnItems
+        //     }
+        // });
+        // map.addControl(drawControl);
+        //
+        // map.on('draw:created', function (e) {
+        //     var type = e.layerType,
+        //         layer = e.layer;
+        //     drawnItems.addLayer(layer);
+        // });
+    }
+
+    getLocation = () => {
+        var token = window.localStorage.getItem('token');
+        this.setState({loading: true});
+
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((position) => {
                 this.setState({
@@ -180,21 +331,34 @@ class NewRegistProblem extends React.Component {
                     }
                 );
                 this.setState({loading: false});
+                this.setState({address: ''});
             })
-        } else {
+        } else if(token != null && this.state.userLocality != '') {
             //browser doesn't support geolocation, set as vancouver
             this.setState({
-                    myLatLng: {
-                        lat: 49.8527,
-                        lng: -123.1207
-                    }
+                    myLatLng: this.state.userLatLng
                 }
             );
 
             this.setState({loading: false});
+            this.setState({address: this.state.userLocality});
 
             console.log("Browser does not support geolocation");
         }
+        else{
+            //capital - Lisboa
+            this.setState({
+                    lat: 38.729948,
+                    lng: -9.139606,
+                }
+            );
+            this.setState({loading: false});
+        }
+    }
+    
+    getAddressLocation = () => {
+        this.setState({address: this.state.userLocality});
+        this.setState({myLatLng: this.state.userLatLng});
     }
 
     handleChange = name => event => {
@@ -397,6 +561,13 @@ class NewRegistProblem extends React.Component {
             .catch(error => console.error('Error', error));
 
         this.setState({address});
+        console.log("getLatLng: ");
+
+        geocodeByAddress(address)
+            .then(results => getLatLng(results[0]))
+            .then(latLng => this.setState({myLatLng: latLng}), console.log(this.state.myLatLng));
+
+        //this.setState({myLatLng: getLatLng});
         // this.setState({ locality: address });
         // this.setState({validLocation: true});
         // console.log("locality: " + this.state.locality);
@@ -411,9 +582,63 @@ class NewRegistProblem extends React.Component {
 
             console.log(`Yay! got latitude and longitude for ${address}`, { lat, lng })
         })
-    }
+    };
 
     onChange = (address) => this.setState({ address });
+
+    iconWithLevel = (type, level) => {
+        if (level == 1) {
+            if (type == 'Limpeza de mato' || type=='Limpeza de Mato')
+                return trash1;
+            else if (type == 'Zona de mau acesso')
+                return noAccess1;
+            else if (type == "Corte de árvores")
+                return cuttree1;
+            else
+                return greenIcon;
+        }
+        else if (level == 2) {
+            if (type == 'Limpeza de mato' || type=='Limpeza de Mato')
+                return trash2;
+            else if (type == 'Zona de mau acesso')
+                return noAccess2;
+            else if (type == "Corte de árvores")
+                return cuttree2;
+            else
+                return ligthGreenIcon;
+        }
+        else if (level == 3) {
+            if (type == 'Limpeza de mato' || type=='Limpeza de Mato')
+                return trash3;
+            else if (type == 'Zona de mau acesso')
+                return noAccess3;
+            else if (type == "Corte de árvores")
+                return cuttree3;
+            else
+                return yellowIcon;
+        }
+        else if (level == 4) {
+            if(type=='Limpeza de mato'|| type=='Limpeza de Mato')
+                return trash4;
+            else if(type=='Zona de mau acesso')
+                return noAccess4;
+            else if(type=="Corte de árvores")
+                return cuttree4;
+            else
+                return orangeIcon;
+        }
+        else{
+            if(type=='Limpeza de mato'|| type=='Limpeza de Mato')
+                return trash5;
+            else if(type=='Zona de mau acesso')
+                return noAccess5;
+            else if(type=="Corte de árvores")
+                return cuttree5;
+            else
+                return redIcon;
+        }
+
+    };
 
     render(){
         const { classes } = this.props;
@@ -424,6 +649,7 @@ class NewRegistProblem extends React.Component {
         if (imagePreviewUrl) {
             $imagePreview = (<img src={imagePreviewUrl} width={300} className={classes.accountPhoto} />);
         }
+        const position = [this.state.myLatLng.lat, this.state.myLatLng.lng];
 
         return(
             <div onLoad={this.handleSeeIfLoggedIn()}>
@@ -479,10 +705,21 @@ class NewRegistProblem extends React.Component {
                                                                    className={classes.textField}
                                                         />
 
-                                                        <IconButton
-                                                            //variant="fab" mini
-                                                            className={classes.searchButton}
-                                                            onClick={this.getLocation}> <SearchIcon/> </IconButton>
+                                                        <Tooltip title={"Localizar por GPS"}>
+                                                            <IconButton
+                                                                aria-label={"Localizar por GPS"}
+                                                                //variant="fab" mini
+                                                                className={classes.searchButton}
+                                                                onClick={this.getLocation}> <GpsIcon/> </IconButton>
+                                                        </Tooltip>
+
+                                                        <Tooltip title={"Localizar por Morada"}>
+                                                            <IconButton
+                                                                aria-label={"Localizar por Morada"}
+                                                                //variant="fab" mini
+                                                                className={classes.searchButton}
+                                                                onClick={this.getAddressLocation}> <AddressIcon/> </IconButton>
+                                                        </Tooltip>
                                                     </div>
 
                                                     {suggestions.length> 0 &&
@@ -530,10 +767,12 @@ class NewRegistProblem extends React.Component {
 
                                 {!loading && <div className={classes.map} style={{ height: '50vh', width: '100%' }}>
                                     <GoogleMapReact
-                                        bootstrapURLKeys={{ key: 'AIzaSyAM-jV8q7-FWs7RdP0G4cH938jWgQwlGVo' }}
+                                        bootstrapURLKeys={{ key: 'AIzaSyDdgLsB6JZ6PGlDphDfM_9At-kVkdq-2VI' }}
                                         center={this.state.myLatLng}
                                         defaultZoom={this.props.zoom}
                                     >
+                                        {/*<Marker lat={this.state.myLatLng.lat} lng={this.state.myLatLng.lng} position={this.state.myLatLng}*/}
+                                        {/*visible={true} title={"nova ocorrencia"}/>*/}
                                         {/*<AnyReactComponent*/}
                                             {/*lat={38.661453}*/}
                                             {/*lng={-9.206618}*/}
@@ -570,14 +809,28 @@ class NewRegistProblem extends React.Component {
                                 </div>}
                             </TableCell>
                         </TableRow>
-                        {/*<TableRow>*/}
-                            {/*<TableCell>*/}
-                                    {/*<PlacesAutocomplete*/}
-                                        {/*value={this.state.address}*/}
-                                        {/*onChange={this.onChange}*/}
-                                    {/*/>*/}
-                            {/*</TableCell>*/}
-                        {/*</TableRow>*/}
+                        <TableRow>
+                            <TableCell>
+                                {!loading &&
+                                <Map id={"map"} center={position} zoom={11} style={{width: '100%', height: '50vh'}} scrollWheelZoom={false}>
+                                    <TileLayer
+                                        attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
+                                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                    />
+                                    <Marker position={position}
+                                            icon={this.iconWithLevel(this.state.problem, this.state.urgency)}>
+                                        <Popup>
+                                            <p>Nova ocorrencia</p>
+                                        </Popup>
+                                    </Marker>
+                                </Map>}
+                            </TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell>
+                                {/*{!loading && <div id="map" style={{height: '180px'}}></div>}*/}
+                            </TableCell>
+                        </TableRow>
                         <TableRow>
                             <TableCell>
                                 <TextField

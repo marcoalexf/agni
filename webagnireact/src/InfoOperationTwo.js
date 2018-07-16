@@ -14,6 +14,7 @@ import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import SwipeableViews from 'react-swipeable-views';
 import img2 from './img/matasuja.jpg';
 import { Map, TileLayer, Marker, Popup } from 'react-leaflet'
+import AddressIcon from '@material-ui/icons/Navigation';
 // import {Map, InfoWindow, Marker, GoogleApiWrapper, Listing} from 'google-maps-react';
 // import GoogleMapReact from 'google-map-react';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -25,7 +26,7 @@ import Checkbox from 'material-ui/Checkbox';
 import { FormLabel, FormControlLabel } from 'material-ui/Form';
 import TextField from "material-ui/TextField";
 import {redIcon} from './mapIcons';
-import Card from '@material-ui/core/Card';
+import Card from 'material-ui/Card';
 import CardHeader from '@material-ui/core/CardHeader';
 import CardMedia from '@material-ui/core/CardMedia';
 import CardContent from '@material-ui/core/CardContent';
@@ -294,6 +295,62 @@ function getComments (obj, index){
         }
     }
     );
+}
+
+function getCommentsUsers(userID){
+    return new Promise(resolve => {
+        var token = window.localStorage.getItem('token');
+        var d = new Date();
+        var t = d.getTime();
+
+        if(token != null){
+            var tokenjson = JSON.parse(token);
+            var expirationData = JSON.parse(token).expirationData;
+            console.log("tempo atual: " + t);
+            console.log("data de expiracao: " + expirationData);
+
+            if(expirationData <= t){
+                console.log("tempo expirado");
+                window.localStorage.removeItem('token');
+            }
+
+            else{
+                var data = {
+                    "userID": userID,
+                };
+
+                console.log(data);
+
+                var xmlHttp = new XMLHttpRequest();
+                xmlHttp.open( "POST", 'https://custom-tine-204615.appspot.com/rest/profile/username');
+                xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+                var myJSON = JSON.stringify(data);
+                xmlHttp.send(myJSON);
+
+                xmlHttp.onreadystatechange = function() {
+                    if (xmlHttp.readyState === XMLHttpRequest.DONE) {
+
+                        if (xmlHttp.status === 200) {
+                            var response = xmlHttp.response;
+                            var username = JSON.parse(response);
+
+                            resolve(username);
+
+                            console.log("Sucesso");
+                        }
+
+                        else {
+                            console.log("Ocorreu um erro - Nao foi possivel encontrar o nome");
+                        }
+                    }
+                }.bind(this)
+            }
+        }
+
+        else{
+            console.log("tologin");
+        }
+    });
 }
 
 function getSteps() {
@@ -621,7 +678,7 @@ class SwipeableTextMobileStepper extends React.Component {
                                     <div key={c.comment_date + c.comment_userID}>
                                         <Typography variant={"caption"} gutterBottom align={"right"}>{c.comment_date}</Typography>
                                         <div className={classes.comments}>
-                                            <b>{c.comment_userID} </b>{c.comment_text}
+                                            <b>{c.comment_username} </b>{c.comment_text}
                                         </div>
 
                                     </div>

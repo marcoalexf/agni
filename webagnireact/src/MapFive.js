@@ -25,6 +25,8 @@ import {cuttree1, cuttree2, cuttree3, cuttree4, cuttree5} from "./mapIcons";
 // import {MapContainer} from "./MapTwo";
 //import {MapContainer} from "leaflet";
 // import {Legend} from 'leaflet';
+import AddressIcon from '@material-ui/icons/Navigation';
+import {geocodeByAddress, getLatLng} from "react-places-autocomplete";
 
 const { BaseLayer, Overlay } = LayersControl;
 
@@ -44,48 +46,74 @@ const styles = theme => ({
     },
 });
 
-let EnhancedTableToolbar = props => {
-    const { classes } = props;
+function getUserAddress() {
+    return new Promise( resolve => {
+        console.log("informations1");
+        var obj;
+        var token = window.localStorage.getItem('token');
+        var d = new Date();
+        var t = d.getTime();
 
-    return (
-        <Toolbar
-            className={classes.toolbarroot}
-        >
-            <div className={classes.toolbartitle}>
-                {(
-                    <Typography variant="title" id="tableTitle">
-                        Mapa de Ocorrências
-                    </Typography>
-                )}
-            </div>
-            <div className={classes.spacer} />
-            <div className={classes.actions}>
-                {(
-                    <Tooltip title="Localizar por GPS">
-                        <IconButton aria-label="Localizar por GPS">
-                            <GpsIcon />
-                        </IconButton>
-                    </Tooltip>
-                )}
-            </div>
-            <div className={classes.actions}>
-                {(
-                    <Tooltip title="Atualizar mapa">
-                        <IconButton aria-label="Atualizar mapa">
-                            <UpdateListIcon />
-                        </IconButton>
-                    </Tooltip>
-                )}
-            </div>
-        </Toolbar>
-    );
-};
+        if(token != null){
+            var uname = JSON.parse(token).username;
+            var tokenObj = JSON.parse(token);
 
-EnhancedTableToolbar.propTypes = {
-    classes: PropTypes.object.isRequired,
-};
+            var user = {
+                "username": uname,
+                "token": tokenObj
+            };
 
-EnhancedTableToolbar = withStyles(styles)(EnhancedTableToolbar);
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.open( "POST", "https://custom-tine-204615.appspot.com/rest/profile/", true);
+            xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            var myJSON = JSON.stringify(user);
+            xmlHttp.send(myJSON);
+
+            xmlHttp.onreadystatechange = function() {
+                if (xmlHttp.readyState === XMLHttpRequest.DONE){
+                    if(xmlHttp.status === 200){
+                        console.log("informations2");
+                        var response = xmlHttp.response;
+                        console.log("XML response: " + response);
+                        obj = JSON.parse(response);
+                        console.log(obj);
+
+                        console.log(uname.charAt(0));
+
+                        resolve(obj.user_locality);
+                    }
+
+                    else{
+                        console.log("erro");
+                        var expirationData = JSON.parse(token).expirationData;
+                        console.log(token);
+                        console.log("tempo atual: " + t);
+                        console.log("data de expiracao: " + expirationData);
+                        if(expirationData <= t){
+                            console.log("tempo expirado");
+                            window.localStorage.removeItem('token');
+                            document.getElementById("tologin").click();
+                        }
+                    }
+                }
+            }.bind(this)
+        }
+        else{
+            console.log("Sem sessao iniciada");
+            // document.getElementById("tologin").click();
+
+        }
+    });
+}
+
+function getUserAddressLatLng(a){
+    return new Promise(resolve =>{
+        geocodeByAddress(a).then(results => getLatLng(results[0]))
+        //.then(latLng => console.log("Success", latLng))
+            .then(latLng => resolve(latLng))
+            .catch(error => console.error('Error', error));
+    })
+}
 
 function xmlRequest (){
     return new Promise(resolve => {
@@ -136,6 +164,7 @@ export default class SimpleExample extends Component {
         level3: true,
         level4: true,
         level5: true,
+        loading: true,
     };
 
     async componentDidMount() {
@@ -144,10 +173,37 @@ export default class SimpleExample extends Component {
         console.log("map occurrences:");
         console.log(this.state.object);
 
-        this.getLocation();
+        var token = window.localStorage.getItem('token');
+
+        if(token != null) {
+            let a = await getUserAddress();
+            if (a != null) {
+                this.setState({userLocality: a});
+                let b = await getUserAddressLatLng(a);
+                this.setState({
+                    userLatLng: {
+                        lat: b.lat,
+                        lng: b.lng
+                    }
+                });
+                console.log(b);
+                console.log(this.state.userLatLng);
+                console.log(this.state.userLocality);
+
+                this.getLocation();
+            }
+
+            else {
+                this.getLocation();
+            }
+        }
     }
 
     getLocation = () => {
+        var token = window.localStorage.getItem('token');
+        this.setState({loading: true});
+        console.log(this.state.loading);
+
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((position) => {
                 this.setState({
@@ -166,17 +222,32 @@ export default class SimpleExample extends Component {
             });
             this.setState({loading: false});
             console.log("GPS");
-        } else {
+        }
+        else if(token != null && this.state.userLocality != '') {
             //browser doesn't support geolocation, set as vancouver
+            //localidade do user
             this.setState({
-                        lat: 38.66,
-                        lng: -9.20
+                        lat: this.state.userLatLng.lat,
+                        lng: this.state.userLatLng.lng
 
                 }
             );
             this.setState({loading: false});
             console.log("browser does not support GPS");
         }
+        else{
+            //capital - Lisboa
+            this.setState({
+                    lat: 38.729948,
+                    lng: -9.139606,
+                }
+            );
+            this.setState({loading: false});
+        }
+    }
+
+    getAddressLocation = () => {
+        this.setState({lat: this.state.userLatLng.lat, lng: this.state.userLatLng.lng});
     }
 
     iconWithLevel = (type, level) => {
@@ -291,6 +362,7 @@ export default class SimpleExample extends Component {
         const {object, loading} = this.state;
         const center = [51.505, -0.09];
         const rectangle = [[51.49, -0.08], [51.5, -0.06]];
+        const classes = this.props;
 
         // // initialize the map
         // var map = L.map('map').setView([42.35, -71.08], 13);
@@ -329,7 +401,47 @@ export default class SimpleExample extends Component {
 
         return (
             <div>
-                <EnhancedTableToolbar></EnhancedTableToolbar>
+                <Toolbar
+                    className={classes.toolbarroot}
+                >
+                    <div className={classes.toolbartitle}>
+                        {(
+                            <Typography variant="title" id="tableTitle">
+                                Mapa de Ocorrências
+                            </Typography>
+                        )}
+                    </div>
+                    <div className={classes.spacer} />
+                    <div className={classes.actions}>
+                        {(
+                            <Tooltip title="Localizar por GPS">
+                                <IconButton
+                                    aria-label="Localizar por GPS"
+                                    onClick={this.getLocation}>
+                                    <GpsIcon />
+                                </IconButton>
+                            </Tooltip>
+                        )}
+                    </div>
+                    {/*<div className={classes.actions}>*/}
+                    {/*{(*/}
+                    {/*<Tooltip title="Atualizar mapa">*/}
+                    {/*<IconButton aria-label="Atualizar mapa">*/}
+                    {/*<UpdateListIcon />*/}
+                    {/*</IconButton>*/}
+                    {/*</Tooltip>*/}
+                    {/*)}*/}
+                    {/*</div>*/}
+                    <div className={classes.actions}>
+                        <Tooltip title={"Localizar por Morada"}>
+                            <IconButton
+                                aria-label={"Localizar por Morada"}
+                                //variant="fab" mini
+                                className={classes.searchButton}
+                                onClick={this.getAddressLocation}> <AddressIcon/> </IconButton>
+                        </Tooltip>
+                    </div>
+                </Toolbar>
 
                 {loading && <CircularProgress/>}
 

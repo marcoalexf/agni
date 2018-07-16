@@ -65,8 +65,6 @@ const styles = theme => ({
     serious: {
         color: amber[400],
     },
-
-
 });
 
 // function makeAJAXCall(){

@@ -31,7 +31,7 @@ import TestOperations from './TestOperations';
 import Map from './Map';
 import MapTwo from './MapFive';
 import Statistics from './Statistics';
-import Operation from './InfoOperationTwo';
+import Operation from './OperationsInformations';
 import AboutUs from './AboutUs';
 import ClickAwayListener from 'material-ui/utils/ClickAwayListener';
 import Grow from 'material-ui/transitions/Grow';
