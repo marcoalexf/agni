@@ -222,6 +222,17 @@
             android:background="@color/colorAccent"
             android:textColor="@android:color/white">
         </Button>
+
+        <Button
+            android:id="@+id/choose_finished_photo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/choose_photo"
+            android:layout_marginStart="5dp"
+            android:background="@color/colorAccent"
+            android:textColor="@android:color/white">
+        </Button>
     </LinearLayout>
         <LinearLayout
             android:layout_width="fill_parent"

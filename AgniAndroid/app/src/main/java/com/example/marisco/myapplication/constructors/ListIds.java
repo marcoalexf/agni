@@ -4,11 +4,18 @@ import java.util.List;
 
 public class ListIds {
 
-    @SuppressWarnings("unused")
     private List<Long> uploadMediaIDs;
 
     public ListIds(List<Long> uploadMediaIds) {
         this.uploadMediaIDs = uploadMediaIds;
     }
 
+
+    public List<Long> getUploadMediaIDs() {
+        return uploadMediaIDs;
+    }
+
+    public void setUploadMediaIDs(List<Long> uploadMediaIDs) {
+        this.uploadMediaIDs = uploadMediaIDs;
+    }
 }

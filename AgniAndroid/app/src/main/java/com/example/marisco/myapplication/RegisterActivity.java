@@ -264,10 +264,6 @@ public class RegisterActivity  extends AppCompatActivity implements Serializable
                 entity = FIREFIGHTERS;
         }
 
-        Toast toast2 = Toast.makeText(getApplicationContext(), "Entidade: " + entity
-                , Toast.LENGTH_SHORT);
-        toast2.show();
-
         if (retrofit == null) {
             retrofit = new Retrofit.Builder()
                     .baseUrl(ENDPOINT)
