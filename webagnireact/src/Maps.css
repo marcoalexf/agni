@@ -93,3 +93,7 @@
     display: inline-block;
     width: 150px;
 }
+
+.sr-only {
+    display: none;
+}

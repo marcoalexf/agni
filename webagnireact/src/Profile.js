@@ -127,6 +127,11 @@ const styles =  theme => ({
     loading:{
         margin: theme.spacing.unit * 2,
     },
+    tabs:{
+        height: '51vh',
+        overflowY: 'auto',
+        //overflowY: 'scroll',
+    },
 });
 
 // function Transition(props) {
@@ -272,6 +277,65 @@ function xmlRequest(){
     });
 }
 
+function getLikesOfUser(){
+    return new Promise(resolve => {
+        var token = window.localStorage.getItem('token');
+        var d = new Date();
+        var t = d.getTime();
+
+        if(token != null){
+            var tokenjson = JSON.parse(token);
+            var expirationData = JSON.parse(token).expirationData;
+            var userID = tokenjson.userID;
+            console.log("tempo atual: " + t);
+            console.log("data de expiracao: " + expirationData);
+
+            if(expirationData <= t){
+                console.log("tempo expirado");
+                window.localStorage.removeItem('token');
+            }
+
+            else{
+                var data = {
+                    "token": tokenjson,
+                    "userID": userID,
+                    "cursor": null,
+                };
+
+                console.log(data);
+
+                var xmlHttp = new XMLHttpRequest();
+                xmlHttp.open( "POST", 'https://custom-tine-204615.appspot.com/rest/occurrence/like/list');
+                xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+                var myJSON = JSON.stringify(data);
+                xmlHttp.send(myJSON);
+
+                xmlHttp.onreadystatechange = function() {
+                    if (xmlHttp.readyState === XMLHttpRequest.DONE) {
+
+                        if (xmlHttp.status === 200) {
+                            var response = xmlHttp.response;
+                            var ocLikes = JSON.parse(response);
+
+                            resolve(ocLikes.mapList);
+
+                            console.log("Sucesso");
+                        }
+
+                        else {
+                            console.log("Ocorreu um erro - Nao foi possivel encontrar os likes");
+                        }
+                    }
+                }.bind(this)
+            }
+        }
+
+        else{
+            console.log("tologin");
+        }
+    })
+}
+
 class Profile extends React.Component {
     constructor(props){
         super(props);
@@ -293,6 +357,7 @@ class Profile extends React.Component {
             {user_occurrence_title: ''}],
         hasPhoto: true,
         loading: true,
+        likes: [],
     };
 
     handleToggle = () => {
@@ -429,6 +494,7 @@ class Profile extends React.Component {
     async componentDidMount () {
         console.log("componentdidmount");
         var token = window.localStorage.getItem('token');
+        console.log(this.state.likes.length);
 
         if(token != null){
             var tokenID = JSON.parse(token);
@@ -446,7 +512,7 @@ class Profile extends React.Component {
             this.setState({firstLetter: uname.charAt(0)});
 
             let r = await xmlRequest();
-            if(r != undefined && r.length != 0){
+            if(r != undefined && r.length != 0) {
                 this.setState({reports: r});
                 // if(this.isMounted())
                 //     this.setState({loggedIn: true});
@@ -455,6 +521,13 @@ class Profile extends React.Component {
                 console.log(this.state.isLoggedIn);
                 console.log(r);
                 this.setState({hasReports: true});
+            }
+
+            let l = await getLikesOfUser();
+            if(l != undefined && l.length != 0){
+                console.log(l);
+                console.log("here1111111111111111111111111111111111111111111111111")
+                this.setState({likes: l});
             }
             else{
                 console.log("not loggedIn");
@@ -505,7 +578,7 @@ class Profile extends React.Component {
 
     render() {
         const { classes } = this.props;
-        const { accountOpen, value, isLoggedIn, reports, name, email, role, username, firstLetter, hasReports, loading } = this.state;
+        const { accountOpen, value, isLoggedIn, reports, name, email, role, username, firstLetter, hasReports, loading, likes } = this.state;
 
         if(!isLoggedIn){
             return <Redirect to={"/login"}>Link</Redirect>;
@@ -649,7 +722,7 @@ class Profile extends React.Component {
                             {hasReports ? <b id="reports">{reports.length}</b> : <b id="reports">0</b>} Reportes de Problemas
                         </div>
                         <div className={classes.basicInfo}>
-                            <b id="supports">0</b> A apoiar
+                            <b id="supports">{likes.length}</b> A apoiar
                         </div>
                         <div className={classes.basicInfo}>
                             <b id="supports">0</b> Comentarios
@@ -680,6 +753,7 @@ class Profile extends React.Component {
                 {/*<Paper>*/}
                     {value === 0 && hasReports &&
                         <TabContainer>
+                            <div className={classes.tabs}>
                         {reports.map(n => {
                             return(
                                 <div style={{marginBottom: '50px'}}>
@@ -708,9 +782,32 @@ class Profile extends React.Component {
                                 </div>
                             )
                         })}
+                            </div>
                     </TabContainer>}
                     {value === 0 && !hasReports && <TabContainer>Sem registos de momento</TabContainer>}
-                    {value === 1 && <TabContainer>Sem apoios de momento</TabContainer>}
+                    {value === 1 && likes.length == 0 && <TabContainer>Sem apoios de momento</TabContainer>}
+                    {value === 1 && likes.length != 0 &&
+                        <TabContainer>
+                            <div className={classes.tabs}>
+                            {likes.map( n => {
+                                return(
+                                    <div style={{marginBottom: '50px'}}>
+                                        <div>
+                                            <h2>{n.user_occurrence_title}</h2>
+                                            <p>Tipo: {n.user_occurrence_type}</p>
+                                            <p>Grau: {n.user_occurrence_level}</p>
+                                            <p>Data do registo: {n.user_occurrence_date}</p>
+                                            {this.hasRegistPhoto(n) ?
+                                                <img key={n.user_occurrence_date} className={classes.img} src={this.getPhotoUrl(n)} style={{margin: '0 auto'}} alt={n.user_occurrence_title} /> :
+                                                <img key={n.user_occurrence_date} className={classes.img} src={img2} style={{margin: '0 auto'}} alt={n.user_occurrence_title} />
+                                            }
+                                            <Divider style={{marginTop: 50}}/>
+                                        </div>
+                                    </div>
+                                )}
+                            )}
+                            </div>
+                        </TabContainer>}
                     {/*{value === 2 && <TabContainer>Sem amigos de momento</TabContainer>}*/}
                 </Paper>
 
