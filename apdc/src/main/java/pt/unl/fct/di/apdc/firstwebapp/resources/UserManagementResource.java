@@ -26,12 +26,10 @@ import com.google.appengine.api.datastore.PropertyProjection;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.QueryResultList;
 import com.google.appengine.api.datastore.Transaction;
-import com.google.appengine.api.datastore.Query.CompositeFilter;
 import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
-import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.firstwebapp.resources.constructors.UserApprovalData;
@@ -251,20 +249,30 @@ public class UserManagementResource {
 			fetchOptions.startCursor(Cursor.fromWebSafeString(data.cursor));
 		}
 		
+		Filter filter = null;
 		List<Filter>subFilters = new LinkedList<Filter>();
 		
 		if(data.entity != null && !data.entity.isEmpty()) {
-			subFilters.add(new FilterPredicate("user_entity", FilterOperator.EQUAL, data.entity));
+			filter = new FilterPredicate("user_entity", FilterOperator.EQUAL, data.entity);
+			subFilters.add(filter);
 		}
 		if(data.role != null && !data.role.isEmpty()) {
-			subFilters.add(new FilterPredicate("user_role", FilterOperator.EQUAL, data.role));
+			filter = new FilterPredicate("user_role", FilterOperator.EQUAL, data.role);
+			subFilters.add(filter);
 		}
-		if(data.waitingModApproval == true) {
-			subFilters.add(new FilterPredicate("user_waiting_worker_approval", FilterOperator.EQUAL, data.waitingModApproval));
+		if(data.waitingModApproval != null) {
+			filter = new FilterPredicate("user_waiting_worker_approval", FilterOperator.EQUAL, data.waitingModApproval);
+			subFilters.add(filter);
 		}
 		
-		CompositeFilter compositeFilter = CompositeFilterOperator.and(subFilters);
-		Query ctrQuery = new Query("ResolvedOccurrence").setFilter(compositeFilter).addSort("user_creation_time", SortDirection.DESCENDING);
+		if(subFilters.size() >= 2) {
+			filter = CompositeFilterOperator.and(subFilters);
+		}
+		
+		Query ctrQuery = new Query("User");//.addSort("user_creation_time", SortDirection.DESCENDING);
+		if(filter != null) {
+			ctrQuery.setFilter(filter);
+		}
 		ctrQuery.addProjection(new PropertyProjection("user_username", String.class));
 		ctrQuery.addProjection(new PropertyProjection("user_name", String.class));
 		QueryResultList<Entity> results = datastore.prepare(ctrQuery).asQueryResultList(fetchOptions);
@@ -277,8 +285,11 @@ public class UserManagementResource {
 			userMap = new HashMap<String, Object>();
 			userMap.putAll(userEntity.getProperties());
 			userMap.put("userID", userID);
+			//userMap.put("user_username", (String)(userEntity.getProperty("user_username")));
+			//userMap.put("user_name", (String)(userEntity.getProperty("user_name")));
 			users.add(userMap);
 		}
+		LOG.info(String.valueOf(results.size()));
 		CursorList cursorList = new CursorList(results.getCursor().toWebSafeString(), users);
 		LOG.info("List of users sent");
 		return Response.ok(g.toJson(cursorList)).build();

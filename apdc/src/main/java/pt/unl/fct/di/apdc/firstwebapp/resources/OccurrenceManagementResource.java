@@ -134,7 +134,7 @@ public class OccurrenceManagementResource {
 			
 			// Check occurrence was accepted by the user
 			String workerEntity = (String)(datastore.get(txn, workerKey).getProperty("user_entity"));
-			if(!((String)(approvedEntity.getProperty("approved_occurrence_entity"))).equals(workerEntity)) {
+			if(workerEntity == null || !((String)(approvedEntity.getProperty("approved_occurrence_entity"))).equals(workerEntity)) {
 				txn.rollback();
 				LOG.warning("Failed to accept occurrence, the occurrence was not approved by the same entity.");
 				return Response.status(Status.FORBIDDEN).build();
@@ -468,7 +468,7 @@ public class OccurrenceManagementResource {
 				occurrenceMap.put("username", userOccurrenceKey.getName());
 				occurrenceMap.put("occurrenceID", String.valueOf(occurrenceKey.getId()));
 				occurrenceMap.put("userID", String.valueOf(userOccurrenceKey.getId()));
-				occurrenceMap.put("approved_occurrence_date", (Date)(approveEntity.getProperty("accepted_occurrence_date")));
+				occurrenceMap.put("approved_occurrence_date", (Date)(approveEntity.getProperty("approved_occurrence_date")));
 				ctrQueryMedia = new Query("UserOccurrenceMedia").setAncestor(occurrenceKey);
 				mediaResults = datastore.prepare(ctrQueryMedia).asList(FetchOptions.Builder.withDefaults());
 				mediaIDs = new LinkedList<String>();

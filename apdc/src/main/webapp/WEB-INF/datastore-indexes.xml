@@ -45,4 +45,53 @@
         <property name="resolved_occurrence_entity" direction="asc"/>
         <property name="resolved_occurrence_date" direction="desc"/>
     </datastore-index>
+    <datastore-index kind="ApprovedOccurrence" ancestor="false" source="manual">
+        <property name="approved_occurrence_being_resolved" direction="asc"/>
+        <property name="approved_occurrence_entity" direction="asc"/>
+        <property name="approved_occurrence_date" direction="desc"/>
+    </datastore-index>
+    <datastore-index kind="User" ancestor="false" source="manual">
+        <property name="user_name" direction="asc"/>
+        <property name="user_username" direction="asc"/>
+    </datastore-index>
+    <datastore-index kind="User" ancestor="false" source="manual">
+        <property name="user_entity" direction="asc"/>
+        <property name="user_name" direction="asc"/>
+        <property name="user_username" direction="asc"/>
+    </datastore-index>
+    <datastore-index kind="User" ancestor="false" source="manual">
+        <property name="user_role" direction="asc"/>
+        <property name="user_name" direction="asc"/>
+        <property name="user_username" direction="asc"/>
+    </datastore-index>
+    <datastore-index kind="User" ancestor="false" source="manual">
+        <property name="user_waiting_worker_approval" direction="asc"/>
+        <property name="user_name" direction="asc"/>
+        <property name="user_username" direction="asc"/>
+    </datastore-index>
+    <datastore-index kind="User" ancestor="false" source="manual">
+        <property name="user_entity" direction="asc"/>
+        <property name="user_role" direction="asc"/>
+        <property name="user_name" direction="asc"/>
+        <property name="user_username" direction="asc"/>
+    </datastore-index>
+    <datastore-index kind="User" ancestor="false" source="manual">
+        <property name="user_entity" direction="asc"/>
+        <property name="user_waiting_worker_approval" direction="asc"/>
+        <property name="user_name" direction="asc"/>
+        <property name="user_username" direction="asc"/>
+    </datastore-index>
+    <datastore-index kind="User" ancestor="false" source="manual">
+        <property name="user_role" direction="asc"/>
+        <property name="user_waiting_worker_approval" direction="asc"/>
+        <property name="user_name" direction="asc"/>
+        <property name="user_username" direction="asc"/>
+    </datastore-index>
+    <datastore-index kind="User" ancestor="false" source="manual">
+        <property name="user_entity" direction="asc"/>
+        <property name="user_role" direction="asc"/>
+        <property name="user_waiting_worker_approval" direction="asc"/>
+        <property name="user_name" direction="asc"/>
+        <property name="user_username" direction="asc"/>
+    </datastore-index>
 </datastore-indexes>
